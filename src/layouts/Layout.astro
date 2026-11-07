@@ -48,6 +48,13 @@ const {
         // Weather survives reloads within the session.
         var wx = null;
         try { wx = sessionStorage.getItem('weather'); } catch (e) {}
+        // First visit this session: let the sky pick a (mostly clear) weather.
+        var auto = null;
+        try { auto = localStorage.getItem('auto-weather'); } catch (e) {}
+        if (!wx && auto !== 'off') {
+          var pool = ['clear','clear','clear','clear','rain','rain','breeze','breeze','mist','snow','storm'];
+          wx = pool[Math.floor(Math.random() * pool.length)];
+        }
         root.dataset.weather = wx || 'clear';
 
         // Graphics quality: saved choice, else auto-detect low-power devices.

@@ -104,21 +104,76 @@ function renderWeather() {
   });
 }
 
-function cycleWeather() {
+type WeatherId = (typeof WEATHERS)[number]['id'];
+
+/** Apply a weather. `manual` = the visitor chose it (dialogue + quest); auto changes are quiet. */
+function setWeather(next: WeatherId, manual: boolean) {
   const ids = WEATHERS.map((w) => w.id);
-  const next = ids[(ids.indexOf(currentWeather() as (typeof ids)[number]) + 1) % ids.length];
   document.documentElement.dataset.weather = next;
   write('weather', next, 'session');
   renderWeather();
-  say(dialogue.weather[next]);
-  moriReact();
-  completeQuest('weather');
+
+  if (manual) {
+    say(dialogue.weather[next]);
+    moriReact();
+    completeQuest('weather');
+  } else {
+    // a gentle glow on the weather token instead of a toast
+    document.querySelectorAll('[data-hud-weather-btn]').forEach((el) => {
+      el.classList.remove('is-shifting');
+      void (el as HTMLElement).offsetWidth;
+      el.classList.add('is-shifting');
+    });
+  }
 
   if (!state.weathers.includes(next)) {
     state.weathers.push(next);
     save();
   }
   if (ids.every((id) => id === 'clear' || state.weathers.includes(id))) completeQuest('all-weather');
+}
+
+/** Visitor's weather button / R key: step through the weathers in order. */
+function cycleWeather() {
+  const ids = WEATHERS.map((w) => w.id);
+  const next = ids[(ids.indexOf(currentWeather() as WeatherId) + 1) % ids.length];
+  setWeather(next, true);
+  scheduleAutoWeather(); // the visitor's choice gets a full spell before the sky moves on
+}
+
+/* ---- automatic weather: a random, mostly-clear rotation ---- */
+
+const WEATHER_POOL: WeatherId[] = ['clear', 'clear', 'clear', 'clear', 'rain', 'rain', 'breeze', 'breeze', 'mist', 'snow', 'storm'];
+let autoWeatherTimer: number | undefined;
+
+const autoWeatherOn = () => read('auto-weather') !== 'off';
+
+function scheduleAutoWeather() {
+  window.clearTimeout(autoWeatherTimer);
+  if (!autoWeatherOn()) return;
+  const delay = 45000 + Math.random() * 45000; // every 45–90 s
+  autoWeatherTimer = window.setTimeout(() => {
+    if (document.visibilityState === 'visible' && !document.documentElement.classList.contains('show-title')) {
+      const options = WEATHER_POOL.filter((w) => w !== currentWeather());
+      setWeather(options[Math.floor(Math.random() * options.length)], false);
+    }
+    scheduleAutoWeather();
+  }, delay);
+}
+
+function renderAutoWeather() {
+  document.querySelectorAll<HTMLElement>('[data-auto-weather]').forEach((b) => {
+    b.setAttribute('aria-pressed', String(autoWeatherOn()));
+    const label = b.querySelector('[data-auto-weather-label]');
+    if (label) label.textContent = autoWeatherOn() ? 'On' : 'Off';
+  });
+}
+
+function toggleAutoWeather() {
+  write('auto-weather', autoWeatherOn() ? 'off' : 'on');
+  renderAutoWeather();
+  scheduleAutoWeather();
+  toast(autoWeatherOn() ? 'clear' : 'x', `Auto weather ${autoWeatherOn() ? 'on' : 'off'}`, autoWeatherOn() ? 'The sky will change on its own now and then.' : 'The weather stays put until you change it.');
 }
 
 
@@ -498,6 +553,9 @@ function initHud() {
 
 function init() {
   renderWeather();
+  renderAutoWeather();
+  scheduleAutoWeather();
+  document.addEventListener('visibilitychange', () => document.visibilityState === 'visible' && scheduleAutoWeather());
   initGraphics();
   initTooltips();
   initHud();
@@ -524,6 +582,7 @@ function init() {
     }
     if (t.closest('[data-pat-spirit]')) return patMori();
     if (t.closest('[data-weather-cycle]')) return cycleWeather();
+    if (t.closest('[data-auto-weather]')) return toggleAutoWeather();
     const gfxBtn = t.closest<HTMLElement>('[data-gfx]');
     if (gfxBtn) return setGraphics(gfxBtn.dataset.gfx as Gfx);
     if (t.closest('[data-open-journal]')) return openJournal();

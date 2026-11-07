@@ -14,7 +14,7 @@ const { chapter, eyebrow, title, badge, icon } = Astro.props;
 <div class="mb-10 space-y-3">
   <div class="chapter-ribbon" aria-hidden="true">
     <span class="chapter-ribbon__line"></span>
-    <span class="chapter-ribbon__label font-serif-story italic">❦ {chapter} ❦</span>
+    <span class="chapter-ribbon__label font-serif-story italic"><Icon name="leaf" class="ornament" /> {chapter} <Icon name="leaf" class="ornament ornament--flip" /></span>
     <span class="chapter-ribbon__line"></span>
   </div>
   <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-2">
