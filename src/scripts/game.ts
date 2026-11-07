@@ -2,6 +2,7 @@ import { ACORN_IDS, WEATHERS, XP_PER_LEVEL, dialogue, quests } from '../data/por
 import { initDialogue, say } from './dialogue';
 import { read, write, prefersReducedMotion } from './storage';
 import { icon, type IconName } from './icons';
+import { audio } from './audio';
 
 /* ------------------------------------------------------------------ */
 /* State                                                               */
@@ -112,6 +113,7 @@ function setWeather(next: WeatherId, manual: boolean) {
   document.documentElement.dataset.weather = next;
   write('weather', next, 'session');
   renderWeather();
+  audio.setWeather(next);
 
   if (manual) {
     say(dialogue.weather[next]);
@@ -269,38 +271,51 @@ function collectAcorn(id: string, from: HTMLElement) {
 
 function applyTheme(dark: boolean) {
   document.documentElement.classList.toggle('dark', dark);
+  audio.setNight(dark);
   write('theme', dark ? 'dark' : 'light');
   document.querySelectorAll('[data-theme-toggle]').forEach((b) => b.setAttribute('aria-pressed', String(dark)));
 }
 
 /**
- * Day ↔ night with a circular "spell" reveal that grows from the point the
- * spell was cast (View Transitions API). Browsers without it, and visitors who
- * prefer reduced motion, get an instant switch.
+ * Day ↔ night "spell sweep": a soft circle of the new sky grows from where the
+ * spell was cast (GPU transform/opacity only), the theme flips underneath it in
+ * a single repaint, then the circle fades away. Unlike a View Transition, the
+ * page is never frozen into a snapshot, so the scenery keeps moving throughout.
  */
+let sweeping = false;
 function setTheme(dark: boolean, origin?: { x: number; y: number }) {
-  const doc = document as Document & {
-    startViewTransition?: (cb: () => void) => { ready: Promise<void>; finished: Promise<void> };
-  };
-  if (!doc.startViewTransition || prefersReducedMotion()) {
+  const root = document.documentElement;
+  if (prefersReducedMotion() || sweeping) {
     applyTheme(dark);
     return;
   }
-  const x = origin?.x ?? window.innerWidth - 60;
-  const y = origin?.y ?? 32;
+  sweeping = true;
+  const x = origin?.x ?? window.innerWidth / 2;
+  const y = origin?.y ?? window.innerHeight - 40;
   const r = Math.hypot(Math.max(x, window.innerWidth - x), Math.max(y, window.innerHeight - y));
-  const root = document.documentElement;
-  root.classList.add('theme-switching');
-  const t = doc.startViewTransition(() => applyTheme(dark));
-  t.ready
-    .then(() => {
-      root.animate(
-        { clipPath: [`circle(0px at ${x}px ${y}px)`, `circle(${r}px at ${x}px ${y}px)`] },
-        { duration: 1100, easing: 'cubic-bezier(0.65, 0, 0.35, 1)', pseudoElement: '::view-transition-new(root)' },
-      );
-    })
-    .catch(() => {});
-  t.finished.finally(() => root.classList.remove('theme-switching'));
+  const BASE = 120; // small element scaled up → tiny GPU texture
+  const sweep = document.createElement('div');
+  sweep.className = `theme-sweep ${dark ? 'theme-sweep--night' : 'theme-sweep--day'}`;
+  sweep.style.left = `${x - BASE / 2}px`;
+  sweep.style.top = `${y - BASE / 2}px`;
+  sweep.style.setProperty('--sweep-scale', String(((r * 2) / BASE) * 1.15));
+  document.body.appendChild(sweep);
+
+  window.setTimeout(() => {
+    // fully covered: flip the theme in one repaint (no colour transitions)
+    root.classList.add('theme-switching');
+    applyTheme(dark);
+    requestAnimationFrame(() =>
+      requestAnimationFrame(() => {
+        root.classList.remove('theme-switching');
+        sweep.classList.add('is-fading');
+        window.setTimeout(() => {
+          sweep.remove();
+          sweeping = false;
+        }, 650);
+      }),
+    );
+  }, 560);
 }
 
 export function toggleTheme(origin?: { x: number; y: number }) {
@@ -327,6 +342,7 @@ function closeTitle() {
   const root = document.documentElement;
   if (!screen || !root.classList.contains('show-title') || screen.classList.contains('is-leaving')) return;
   write(TITLE_KEY, '1', 'session');
+  audio.start(); // the Begin click/key is the user gesture browsers require
   const reduced = prefersReducedMotion();
   screen.classList.add('is-leaving');
   window.setTimeout(
@@ -548,6 +564,55 @@ function initHud() {
 }
 
 /* ------------------------------------------------------------------ */
+/* Sound                                                               */
+/* ------------------------------------------------------------------ */
+
+function renderSound() {
+  const on = audio.isEnabled();
+  document.documentElement.classList.toggle('sound-muted', !on);
+  document.querySelectorAll('[data-sound-toggle]').forEach((b) => b.setAttribute('aria-pressed', String(on)));
+  const { music, ambience } = audio.volumes;
+  document.querySelectorAll<HTMLInputElement>('[data-volume]').forEach((el) => {
+    el.value = String(el.dataset.volume === 'music' ? music : ambience);
+  });
+}
+
+function toggleSound() {
+  audio.setEnabled(!audio.isEnabled());
+  renderSound();
+  // no toast on the title screen; the button label already says it
+  if (!document.documentElement.classList.contains('show-title')) {
+    toast(audio.isEnabled() ? 'music' : 'volumeOff', audio.isEnabled() ? 'Sound on' : 'Sound off', audio.isEnabled() ? 'Music and weather ambience are playing.' : 'The forest falls quiet.');
+  }
+}
+
+function initSound() {
+  if (!audio.supported) {
+    document.querySelectorAll<HTMLElement>('[data-sound-toggle]').forEach((b) => (b.hidden = true));
+    return;
+  }
+  audio.setNight(document.documentElement.classList.contains('dark'));
+  audio.setWeather(document.documentElement.dataset.weather || 'clear');
+  renderSound();
+
+  // Returning visitors (no title screen): start on the first interaction.
+  const firstGesture = (e: Event) => {
+    if ((e.target as HTMLElement).closest?.('[data-sound-toggle]')) return; // that click decides itself
+    if (!document.documentElement.classList.contains('show-title')) audio.start();
+  };
+  window.addEventListener('pointerdown', firstGesture, { once: true, capture: true });
+  window.addEventListener('keydown', firstGesture, { once: true, capture: true });
+
+  document.addEventListener('input', (e) => {
+    const el = e.target as HTMLInputElement;
+    if (!el.matches?.('[data-volume]')) return;
+    const { music, ambience } = audio.volumes;
+    audio.setVolumes(el.dataset.volume === 'music' ? Number(el.value) : music, el.dataset.volume === 'ambience' ? Number(el.value) : ambience);
+  });
+  document.addEventListener('visibilitychange', () => audio.setPageVisible(document.visibilityState === 'visible'));
+}
+
+/* ------------------------------------------------------------------ */
 /* Wiring                                                              */
 /* ------------------------------------------------------------------ */
 
@@ -558,6 +623,7 @@ function init() {
   document.addEventListener('visibilitychange', () => document.visibilityState === 'visible' && scheduleAutoWeather());
   initGraphics();
   initTooltips();
+  initSound();
   initHud();
   render();
   initDialogue();
@@ -583,6 +649,7 @@ function init() {
     if (t.closest('[data-pat-spirit]')) return patMori();
     if (t.closest('[data-weather-cycle]')) return cycleWeather();
     if (t.closest('[data-auto-weather]')) return toggleAutoWeather();
+    if (t.closest('[data-sound-toggle]')) return toggleSound();
     const gfxBtn = t.closest<HTMLElement>('[data-gfx]');
     if (gfxBtn) return setGraphics(gfxBtn.dataset.gfx as Gfx);
     if (t.closest('[data-open-journal]')) return openJournal();
@@ -661,6 +728,9 @@ function init() {
       }
       case 'r':
         cycleWeather();
+        break;
+      case 'm':
+        toggleSound();
         break;
       case '1':
         jump('#about');

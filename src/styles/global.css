@@ -859,11 +859,6 @@ kbd {
 /* Day ↔ night switch: circular reveal from the spell button             */
 /* (View Transitions API; other browsers just switch instantly)          */
 /* ===================================================================== */
-::view-transition-old(root),
-::view-transition-new(root) {
-  animation: none;
-  mix-blend-mode: normal;
-}
 .theme-switching *,
 .theme-switching *::before,
 .theme-switching *::after {
@@ -2772,3 +2767,61 @@ kbd {
   30% { box-shadow: 0 2px 0 #a8792c, 0 0 0 8px rgba(104, 168, 232, 0.25); transform: scale(1.12); }
   100% { box-shadow: 0 2px 0 #a8792c, 0 0 0 14px rgba(104, 168, 232, 0); transform: scale(1); }
 }
+
+/* ===================================================================== */
+/* Day ↔ night spell sweep (live, never freezes the scene)                */
+/* ===================================================================== */
+.theme-sweep {
+  position: fixed;
+  z-index: 95;
+  width: 120px;
+  height: 120px;
+  border-radius: 9999px;
+  pointer-events: none;
+  transform: scale(0);
+  will-change: transform, opacity;
+  animation: theme-sweep-grow 0.6s cubic-bezier(0.55, 0, 0.35, 1) forwards;
+}
+.theme-sweep--night {
+  background: radial-gradient(circle, #0d1f3d 0 58%, #173556 66%, rgba(214, 168, 79, 0.9) 69%, rgba(214, 168, 79, 0) 72%);
+}
+.theme-sweep--day {
+  background: radial-gradient(circle, #cdeef8 0 50%, #fff3cf 62%, rgba(255, 236, 170, 0.95) 68%, rgba(255, 236, 170, 0) 72%);
+}
+.theme-sweep.is-fading { animation: theme-sweep-fade 0.6s ease-out forwards; transform: scale(var(--sweep-scale)); }
+@keyframes theme-sweep-grow { to { transform: scale(var(--sweep-scale)); } }
+@keyframes theme-sweep-fade { to { opacity: 0; transform: scale(calc(var(--sweep-scale) * 1.08)); } }
+
+/* ===================================================================== */
+/* Sound controls                                                         */
+/* ===================================================================== */
+.sound-off { display: none !important; }
+.sound-muted .sound-on { display: none !important; }
+.sound-muted .sound-off { display: inline-flex !important; }
+.sound-muted .hud-bubble__token--sound { opacity: 0.7; }
+
+.ts-sound {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: rgba(254, 243, 199, 0.85);
+  padding: 0.35rem 0.8rem;
+  border-radius: 9999px;
+  border: 1px solid rgba(242, 216, 149, 0.4);
+  cursor: pointer;
+}
+.ts-sound:hover { color: #fef3c7; border-color: rgba(242, 216, 149, 0.8); }
+
+.volume-row {
+  display: grid;
+  grid-template-columns: 5.5rem 1fr;
+  align-items: center;
+  gap: 0.6rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #6b5d45;
+}
+.dark .volume-row { color: #8fa3bf; }
+.volume-row input[type="range"] { width: 100%; accent-color: #5f9f4f; cursor: pointer; }
+.sound-muted .volume-row { opacity: 0.5; }

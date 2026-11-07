@@ -88,6 +88,18 @@ const RING = 2 * Math.PI * 20; // XP ring circumference (r = 20)
 
   <button
     type="button"
+    data-sound-toggle
+    data-tip="Music & ambience · M"
+    aria-label="Sound (M)"
+    aria-pressed="true"
+    class="hud-bubble__token hud-bubble__token--sound"
+  >
+    <span class="sound-on inline-flex"><Icon name="volume" /></span>
+    <span class="sound-off inline-flex"><Icon name="volumeOff" /></span>
+  </button>
+
+  <button
+    type="button"
     data-theme-toggle
     data-hud-theme-btn
     data-tip="Day / night spell · N"

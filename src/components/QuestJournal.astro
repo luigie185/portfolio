@@ -70,6 +70,7 @@ import { ACORN_IDS, quests } from '../data/portfolio';
         <div class="flex gap-2"><dt><kbd>J</kbd></dt><dd>Open / close journal</dd></div>
         <div class="flex gap-2"><dt><kbd>N</kbd></dt><dd>Day / night spell</dd></div>
         <div class="flex gap-2"><dt><kbd>R</kbd></dt><dd>Change weather</dd></div>
+        <div class="flex gap-2"><dt><kbd>M</kbd></dt><dd>Sound on / off</dd></div>
         <div class="flex gap-2"><dt><kbd>Esc</kbd></dt><dd>Close window</dd></div>
       </dl>
       <div class="flex flex-wrap items-center justify-between gap-2 pt-1">
@@ -79,6 +80,22 @@ import { ACORN_IDS, quests } from '../data/portfolio';
           <button type="button" data-gfx="full" class="gfx-opt px-3 py-1 cursor-pointer border-x-2 border-[#c59b47]">Full</button>
           <button type="button" data-gfx="lite" class="gfx-opt px-3 py-1 cursor-pointer">Lite</button>
         </div>
+      </div>
+      <div class="space-y-2 pt-1">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <span class="text-xs font-mono font-bold uppercase tracking-wider text-[#23476e] dark:text-[#f3b354]"><Icon name="music" /> Sound</span>
+          <button type="button" data-sound-toggle aria-pressed="true" class="gfx-opt px-3 py-1 rounded-xl border-2 border-[#c59b47] text-xs font-mono font-bold cursor-pointer">
+            <span class="sound-on">On</span><span class="sound-off">Off</span>
+          </button>
+        </div>
+        <label class="volume-row">
+          <span>Music</span>
+          <input type="range" min="0" max="1" step="0.05" value="0.5" data-volume="music" aria-label="Music volume" />
+        </label>
+        <label class="volume-row">
+          <span>Ambience</span>
+          <input type="range" min="0" max="1" step="0.05" value="0.7" data-volume="ambience" aria-label="Weather ambience volume" />
+        </label>
       </div>
       <div class="flex flex-wrap items-center justify-between gap-2 pt-1">
         <span class="text-xs font-mono font-bold uppercase tracking-wider text-[#23476e] dark:text-[#f3b354]"><Icon name="clear" /> Auto weather</span>
