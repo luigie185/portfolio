@@ -3009,7 +3009,34 @@ kbd {
 /*     sets / moon rises, windows and lamps light, fireflies come out    */
 /*  3. cards & HUD fade back in, already in the new colours              */
 /* ===================================================================== */
-.scene-paint { position: absolute; inset: 0; }
+/* Each painting sits in a circular frame centred on the HUD bubble that
+   always covers the whole viewport. The day/night reveal scales the frame
+   up from a dot while counter-scaling the painting inside, so the circle
+   grows on the GPU without repainting the brush-filtered artwork.
+   (--rc-* are set by the game script; before that, a plain full rectangle.) */
+.scene-paint { position: absolute; inset: 0; overflow: hidden; }
+.scene-paint .paint-inner { position: absolute; inset: 0; }
+.has-reveal-frame .scene-paint {
+  inset: auto;
+  left: calc(var(--rc-x) - var(--rc-r));
+  top: calc(var(--rc-y) - var(--rc-r));
+  width: calc(var(--rc-r) * 2);
+  height: calc(var(--rc-r) * 2);
+  border-radius: 50%;
+}
+.has-reveal-frame .scene-paint .paint-inner {
+  inset: auto;
+  left: calc(var(--rc-r) - var(--rc-x));
+  top: calc(var(--rc-r) - var(--rc-y));
+  width: var(--vp-w);
+  height: var(--vp-h);
+  transform-origin: var(--rc-x) var(--rc-y);
+}
+/* pre-promote both frames and paintings at load so the reveal never has to
+   rasterize the filtered artwork mid-switch */
+.has-reveal-frame .scene-paint { will-change: transform, opacity; }
+.has-reveal-frame .scene-paint .paint-inner { will-change: transform; }
+.lite .scene-paint, .lite .scene-paint .paint-inner { will-change: auto !important; }
 /* Both paintings are drawn once at load and kept as GPU layers, so switching
    is a pure compositor opacity fade with no first-time paint at the switch. */
 .scene-paint--night {
@@ -3021,29 +3048,6 @@ kbd {
 /* lite mode: no filters, so painting is cheap — don't keep the extra layer */
 .lite .scene-paint--night { will-change: auto; visibility: hidden; transition: opacity 1.6s ease-in-out, visibility 0s linear 1.6s; }
 .lite.dark .scene-paint--night { visibility: visible; transition: opacity 1.6s ease-in-out, visibility 0s; }
-
-/* golden-hour glow */
-.twilight-tint {
-  position: absolute;
-  inset: 0;
-  opacity: 0;
-  pointer-events: none;
-  background: linear-gradient(180deg, rgba(255, 150, 110, 0) 0%, rgba(255, 150, 110, 0.28) 40%, rgba(255, 186, 120, 0.42) 70%, rgba(255, 210, 150, 0.3) 100%);
-}
-.time-dusk .twilight-tint { animation: twilight-glow 2s ease-in-out; }
-.time-dawn .twilight-tint {
-  background: linear-gradient(0deg, rgba(255, 214, 160, 0.45) 0%, rgba(255, 180, 170, 0.32) 45%, rgba(230, 190, 230, 0.15) 75%, rgba(230, 190, 230, 0) 100%);
-  animation: twilight-glow 2s ease-in-out;
-}
-@keyframes twilight-glow { 0% { opacity: 0; } 45% { opacity: 1; } 100% { opacity: 0; } }
-
-/* sun sets while the moon rises (and the reverse at dawn) */
-.time-dusk .palette-day .scene-sun { animation: celestial-set 1.7s ease-in forwards; }
-.time-dusk .palette-night .scene-sun { animation: celestial-rise 1.9s 0.2s ease-out both; }
-.time-dawn .palette-night .scene-sun { animation: celestial-set 1.7s ease-in forwards; }
-.time-dawn .palette-day .scene-sun { animation: celestial-rise 1.9s 0.2s ease-out both; }
-@keyframes celestial-set { to { transform: translate3d(0, 38vh, 0); opacity: 0; } }
-@keyframes celestial-rise { from { transform: translate3d(0, 30vh, 0); opacity: 0; } }
 
 /* fireflies / seeds / leaves ease in and out with the light */
 .night-only { opacity: 0; visibility: hidden; transition: opacity 1.4s ease, visibility 0s linear 1.4s; }
