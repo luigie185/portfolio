@@ -82,6 +82,8 @@ export const quests: Quest[] = [
   { id: "quest-log", icon: "📜", title: "Read the Quest Log", hint: "Travel to the Work Experience chapter.", xp: 60 },
   { id: "relics", icon: "📖", title: "Enter the Relic Vault", hint: "Travel to the Projects chapter.", xp: 60 },
   { id: "nightfall", icon: "🌙", title: "Cast Time-Shift", hint: "Switch between day and night.", xp: 40 },
+  { id: "pat", icon: "🌱", title: "Befriend Mori", hint: "Give the forest spirit a gentle pat.", xp: 30 },
+  { id: "rain", icon: "🌧️", title: "Summon a Summer Shower", hint: "Ask Mori for rain, or press R.", xp: 40 },
   { id: "journal", icon: "🗺️", title: "Open the Journal", hint: "Press J or tap the journal button.", xp: 20 },
   { id: "acorns", icon: "🌰", title: "Acorn Gatherer", hint: `Find all ${ACORN_IDS.length} acorns hidden across the forest.`, xp: 150 },
   { id: "pigeon", icon: "🕊️", title: "Send a Pigeon Post", hint: "Reach out through the email link.", xp: 80 },
@@ -224,5 +226,14 @@ export const dialogue = {
       scroll: "#projects",
     },
   ] satisfies DialogueOption[],
+  pats: [
+    "Hehe~ that tickles! My sprout grew a little.",
+    "Mmm, warm hands. The camphor tree says hello too.",
+    "Did you know? Acorns taste best after a summer shower.",
+    "Shh… listen. You can hear the rice fields whispering in the wind.",
+    "At night I carry a lantern so lost travelers can find the path home.",
+  ],
+  rainOn: "Pitter-patter… a summer shower! Watch the ripples dance across the rice fields.",
+  rainOff: "The rain has passed. Everything smells of wet earth and green leaves.",
   acornsComplete: `You found every acorn! The forest is grateful. Here's the secret: ${profile.shortName} reads every pigeon post — send one and say hi!`,
 };

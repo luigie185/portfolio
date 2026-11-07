@@ -165,23 +165,25 @@ import ForestSpirit from './ForestSpirit.astro';
   <div data-dialogue-box class="dialogue-box rpg-panel relative rounded-2xl p-5 sm:p-6">
     <Acorn id="dialogue" class="-top-3 right-8 z-20" />
     <div class="flex flex-col sm:flex-row items-start gap-4">
-      <!-- Mori, the forest spirit guide -->
-      <div
-        class="animate-float-slow relative w-16 h-16 rounded-2xl bg-[#cfe9f2]/60 dark:bg-[#101c2e] border-2 border-[#c59b47] flex items-center justify-center shrink-0 shadow-md"
-        aria-hidden="true"
+      <!-- Mori, the forest spirit guide (pat for a reaction) -->
+      <button
+        type="button"
+        data-pat-spirit
+        aria-label="Pat Mori, the forest spirit"
+        class="spirit-avatar animate-float-slow relative w-[4.5rem] h-[4.5rem] rounded-2xl bg-gradient-to-b from-[#d6eef6] to-[#eef6dc] dark:from-[#0d1f3d] dark:to-[#173556] border-2 border-[#c59b47] flex items-center justify-center shrink-0 shadow-md transition-transform"
       >
-        <ForestSpirit standalone class="w-14 h-14 npc-eyes-host" />
+        <ForestSpirit standalone class="w-16 h-16" />
         <span class="absolute -bottom-2 px-1.5 bg-[#c59b47] text-[#101c2e] font-mono font-bold text-[9px] rounded uppercase">
           Mori
         </span>
-      </div>
+      </button>
 
       <div class="flex-1 space-y-3 w-full min-w-0">
         <div class="flex flex-wrap items-center justify-between gap-2">
           <span class="text-xs font-mono font-bold uppercase tracking-wider text-[#2b6e4c] dark:text-[#f3b354]">
             <span aria-hidden="true">🍃</span> {dialogue.speaker}
           </span>
-          <span class="text-[11px] font-mono text-[#505d53] dark:text-amber-200/70">Click the text to skip ▸</span>
+          <span class="text-[11px] font-mono text-[#505d53] dark:text-amber-200/70">Pat Mori · click text to skip ▸</span>
         </div>
 
         <!-- Screen readers get the full line once; the animated copy is hidden from them -->
@@ -214,6 +216,15 @@ import ForestSpirit from './ForestSpirit.astro';
           >
             <span class="npc-choice__cursor" aria-hidden="true">✨</span>
             <span>Cast Time-Shift Spell</span>
+          </button>
+          <button
+            type="button"
+            data-rain-toggle
+            aria-pressed="false"
+            class="npc-choice inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono font-semibold bg-[#23476e]/10 dark:bg-white/10 text-[#23476e] dark:text-sky-300 hover:bg-[#c59b47] hover:text-[#131a29] border border-[#c59b47]/60 transition-colors cursor-pointer"
+          >
+            <span class="npc-choice__cursor" aria-hidden="true">🌧️</span>
+            <span>Summon a Summer Shower</span>
           </button>
         </div>
       </div>

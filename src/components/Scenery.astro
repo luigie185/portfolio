@@ -194,6 +194,14 @@ const poles = [
         <stop offset="0" stop-color="var(--scene-haze)" stop-opacity="0" />
         <stop offset="1" stop-color="var(--scene-haze)" stop-opacity="0.55" />
       </linearGradient>
+      <clipPath id="paddy-clip">
+        <path d="M-20 900 L-20 606 Q720 598 1460 610 L1460 900Z" />
+      </clipPath>
+      <linearGradient id="wind-band" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0" stop-color="var(--scene-wind)" stop-opacity="0" />
+        <stop offset="0.5" stop-color="var(--scene-wind)" stop-opacity="0.55" />
+        <stop offset="1" stop-color="var(--scene-wind)" stop-opacity="0" />
+      </linearGradient>
       <radialGradient id="window-glow">
         <stop offset="0" stop-color="var(--scene-window)" stop-opacity="0.9" />
         <stop offset="1" stop-color="var(--scene-window)" stop-opacity="0" />
@@ -262,6 +270,10 @@ const poles = [
       <path d="M1140 560 C1160 500 1168 440 1160 360 L1212 360 C1206 440 1214 500 1240 560 Z" style="fill:var(--scene-trunk)" />
       <path d="M1162 430 Q1110 400 1060 405 Q1110 418 1158 446Z M1206 420 Q1260 390 1318 392 Q1262 410 1210 440Z" style="fill:var(--scene-trunk)" />
       <path d="M1188 380 C1190 450 1196 500 1214 556 L1236 556 C1214 500 1206 450 1206 380Z" style="fill:var(--scene-trunk-shadow)" />
+      <!-- a hollow between the roots, where something small seems to live -->
+      <path d="M1181 557 C1180 540 1186 531 1192 530 C1199 531 1204 541 1203 557 C1196 553 1188 553 1181 557Z" style="fill:var(--scene-hollow)" opacity="0.85" />
+      <ellipse cx="1192" cy="548" rx="16" ry="11" class="hollow-glow" />
+      <circle cx="1188.5" cy="544" r="1.4" class="hollow-eyes" /><circle cx="1195.5" cy="544" r="1.4" class="hollow-eyes" />
       <!-- shimenawa rope marking a sacred tree -->
       <path d="M1153 470 Q1190 482 1226 468" style="stroke:var(--scene-rope)" stroke-width="5" fill="none" stroke-linecap="round" />
       <path d="M1170 478v14M1190 481v16M1210 478v14" style="stroke:var(--scene-paper)" stroke-width="4" stroke-linecap="square" />
@@ -287,6 +299,19 @@ const poles = [
         <polygon points={p.pts} style="fill:var(--scene-paddy-shine)" opacity="0.18" />
       ))}
       {paddies.filter((p) => !p.water).map((p) => <polygon points={p.pts} fill="url(#rice-rows)" />)}
+    </g>
+
+    <!-- Wind rolling through the rice: soft bright bands sweeping across -->
+    <g clip-path="url(#paddy-clip)" class="wind-waves">
+      <rect class="wind-wave" x="-600" y="600" width="520" height="160" fill="url(#wind-band)" />
+      <rect class="wind-wave wind-wave--2" x="-600" y="640" width="380" height="120" fill="url(#wind-band)" />
+    </g>
+
+    <!-- Rain ripples on the flooded fields (only while it rains) -->
+    <g class="rain-ripples" clip-path="url(#paddy-clip)">
+      {[[140,700],[320,660],[470,735],[690,690],[860,640],[980,720],[1130,668],[1290,705],[560,630],[1380,650],[240,740],[780,742]].map(([x, y], i) => (
+        <ellipse cx={x} cy={y} rx="14" ry="3.5" class="ripple" style={`animation-delay:${(i * 0.37) % 2.2}s`} />
+      ))}
     </g>
 
     <!-- Dirt path winding toward the farmhouse -->
@@ -315,9 +340,43 @@ const poles = [
       <ellipse cx="1040" cy="610" rx="160" ry="24" />
     </g>
 
+    <!-- A quiet country bus stop: sign, little wooden bench and a lamp that glows at night -->
+    <g transform="translate(640 628)">
+      <ellipse cx="22" cy="72" rx="48" ry="7" style="fill:var(--scene-stone-shadow)" />
+      <!-- bench -->
+      <rect x="10" y="54" width="44" height="5" rx="1.5" style="fill:var(--scene-wood)" />
+      <rect x="10" y="46" width="44" height="3.5" rx="1.5" style="fill:var(--scene-wood)" />
+      <path d="M14 59v12M50 59v12M14 49v6M50 49v6" style="stroke:var(--scene-wood-dark)" stroke-width="2.5" />
+      <!-- sign -->
+      <line x1="0" y1="10" x2="0" y2="72" style="stroke:var(--scene-pole)" stroke-width="3" />
+      <circle cx="0" cy="8" r="9" style="fill:var(--scene-sign)" />
+      <rect x="-5.5" y="5.5" width="11" height="5" rx="1" style="fill:var(--scene-paper)" />
+      <!-- lamp -->
+      <line x1="70" y1="-6" x2="70" y2="72" style="stroke:var(--scene-pole)" stroke-width="3" />
+      <path d="M70 -4 h-12" style="stroke:var(--scene-pole)" stroke-width="2.5" />
+      <path d="M53 -2 h10 l-2 8 h-6Z" style="fill:var(--scene-lamp)" />
+      <circle cx="58" cy="10" r="40" class="lamp-glow" />
+    </g>
+
     <!-- The forest spirit, resting on a mossy stone beside the path -->
     <g transform="translate(150 690)">
       <ForestSpirit />
+    </g>
+
+    <!-- Mori's friends: shy dandelion-fluff sprites peeking from the grass -->
+    <g class="fluffs">
+      {[[78, 752, 1, 0], [232, 742, 0.8, 1.1], [270, 768, 0.65, 2.3]].map(([x, y, sc, d]) => (
+        <g transform={`translate(${x} ${y}) scale(${sc})`}>
+          <g class="fluff" style={`animation-delay:-${d}s`}>
+            <path d="M0 14 Q2 22 0 30" style="stroke:var(--spirit-stem-scene)" stroke-width="2" fill="none" />
+            <circle r="14" class="fluff-puff" />
+            <circle r="14" class="fluff-fuzz" />
+            <circle cx="-4.5" cy="-1" r="1.6" class="fluff-eye" /><circle cx="4.5" cy="-1" r="1.6" class="fluff-eye" />
+            <ellipse cx="-8" cy="4" rx="2.6" ry="1.5" fill="#f2a08c" opacity=".5" />
+            <ellipse cx="8" cy="4" rx="2.6" ry="1.5" fill="#f2a08c" opacity=".5" />
+          </g>
+        </g>
+      ))}
     </g>
 
     <!-- Foreground tall summer grass and wildflowers -->
@@ -333,6 +392,17 @@ const poles = [
       ))}
     </g>
   </svg>
+
+  <!-- Summer shower (toggled by the rain spell) -->
+  <div class="scene-rain scene-rain--far absolute inset-0"></div>
+  <div class="scene-rain scene-rain--near absolute inset-0"></div>
+
+  <!-- Dandelion seeds drifting on the breeze (day) -->
+  <div class="seeds dark:hidden">
+    {Array.from({ length: 7 }, (_, i) => (
+      <span class="seed" style={`top:${18 + ((i * 37) % 55)}%; animation-delay:-${i * 3.1}s; animation-duration:${18 + (i % 3) * 5}s`}></span>
+    ))}
+  </div>
 
   <!-- Fireflies (night) and drifting leaves (day) -->
   <div class="hidden dark:block">

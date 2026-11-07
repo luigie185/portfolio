@@ -578,6 +578,13 @@ kbd {
   --scene-house-roof-lit: #8c887a;
   --scene-window: #4d5b5f;
 
+  --scene-wind: #f4ffd8;
+  --scene-hollow: #2d2219;
+  --scene-wood: #9b7652;
+  --scene-wood-dark: #6b4e36;
+  --scene-sign: #d8553d;
+  --scene-lamp: #3e3a33;
+  --spirit-stem-scene: #4d8a3e;
   --scene-stone: #9aa293;
   --scene-stone-shadow: rgba(30, 60, 30, 0.25);
   --scene-moss: #6fa654;
@@ -586,13 +593,6 @@ kbd {
   --scene-flower: #fffdf4;
   --scene-flower-warm: #f7d35c;
 
-  --spirit-body: #8fbf7a;
-  --spirit-lit: #c4e3a8;
-  --spirit-shade: #6d9c5e;
-  --spirit-leaf: #7cb85c;
-  --spirit-leaf-lit: #9fd46b;
-  --spirit-stem: #3f6b33;
-  --spirit-eye: #2a2a24;
 }
 
 .dark .scene {
@@ -642,6 +642,13 @@ kbd {
   --scene-house-roof-lit: #222a36;
   --scene-window: #ffcf6e;
 
+  --scene-wind: #9cc7ff;
+  --scene-hollow: #05090b;
+  --scene-wood: #3a3530;
+  --scene-wood-dark: #1d1a17;
+  --scene-sign: #7a2f25;
+  --scene-lamp: #ffd27a;
+  --spirit-stem-scene: #24452f;
   --scene-stone: #3a4450;
   --scene-stone-shadow: rgba(0, 0, 0, 0.35);
   --scene-moss: #1f4a3e;
@@ -650,13 +657,6 @@ kbd {
   --scene-flower: #b9c7d6;
   --scene-flower-warm: #c9b26a;
 
-  --spirit-body: #4e7d63;
-  --spirit-lit: #7fae8e;
-  --spirit-shade: #34594a;
-  --spirit-leaf: #3f7a52;
-  --spirit-leaf-lit: #5a9a62;
-  --spirit-stem: #20402f;
-  --spirit-eye: #0b1214;
 }
 
 .scene-sky {
@@ -732,12 +732,243 @@ kbd {
   animation-delay: -2s;
 }
 
+
+
+/* ===================================================================== */
+/* Mori, the forest spirit                                               */
+/* ===================================================================== */
+[data-spirit] {
+  --spirit-body: #8fbf7a;
+  --spirit-lit: #c4e3a8;
+  --spirit-shade: #6d9c5e;
+  --spirit-leaf: #7cb85c;
+  --spirit-leaf-lit: #9fd46b;
+  --spirit-stem: #3f6b33;
+  --spirit-eye: #2a2a24;
+  --spirit-cheek: #f2a08c;
+  overflow: visible;
+}
+.dark [data-spirit] {
+  --spirit-body: #5f8f72;
+  --spirit-lit: #8fbf9c;
+  --spirit-shade: #3f6a55;
+  --spirit-leaf: #4c8a5c;
+  --spirit-leaf-lit: #6aa56c;
+  --spirit-stem: #24452f;
+  --spirit-eye: #0b1214;
+  --spirit-cheek: #e48f86;
+}
+[data-spirit] .spirit-body { fill: var(--spirit-body); }
+[data-spirit] .spirit-lit { fill: var(--spirit-lit); opacity: 0.8; }
+[data-spirit] .spirit-shade { fill: var(--spirit-shade); opacity: 0.7; }
+[data-spirit] .spirit-foot { fill: var(--spirit-shade); }
+[data-spirit] .spirit-leaf { fill: var(--spirit-leaf); }
+[data-spirit] .spirit-leaf-lit { fill: var(--spirit-leaf-lit); }
+[data-spirit] .spirit-stem { stroke: var(--spirit-stem); stroke-width: 2.5; fill: none; stroke-linecap: round; }
+[data-spirit] .spirit-eye { fill: var(--spirit-eye); }
+[data-spirit] .spirit-cheek { fill: var(--spirit-cheek); opacity: 0.65; }
+[data-spirit] .spirit-mouth { stroke: var(--spirit-eye); stroke-width: 1.6; fill: none; stroke-linecap: round; }
+[data-spirit] .spirit-mouth-happy { fill: #8a3b34; opacity: 0; }
+[data-spirit] .spirit-arms { stroke: var(--spirit-shade); stroke-width: 4; stroke-linecap: round; fill: none; }
+[data-spirit] .spirit-ground-shadow { fill: #000; opacity: 0.12; }
+
+/* Idle: gentle breathing, blinking, swaying sprout */
+.spirit-breathe, .spirit-hop, .spirit-eyes, .spirit-sprout {
+  transform-box: fill-box;
+}
+.spirit-breathe {
+  transform-origin: 50% 100%;
+  animation: spirit-breathe 3.4s ease-in-out infinite;
+}
+@keyframes spirit-breathe {
+  0%, 100% { transform: scale(1, 1); }
+  50% { transform: scale(1.025, 0.975); }
+}
+.spirit-eyes {
+  transform-origin: center;
+  animation: spirit-blink 5.5s infinite;
+}
+@keyframes spirit-blink {
+  0%, 92%, 96%, 100% { transform: scaleY(1); }
+  94% { transform: scaleY(0.1); }
+}
 .spirit-sprout {
-  transform-box: view-box;
-  transform-origin: 0 -46px;
+  transform-origin: 0% 100%;
   animation: sprout-sway 3.6s ease-in-out infinite;
 }
 @keyframes sprout-sway {
   0%, 100% { rotate: -5deg; }
   50% { rotate: 6deg; }
+}
+
+/* Happy reaction (rewards, pats) */
+.spirit-hop { transform-origin: 50% 100%; }
+[data-spirit].is-happy .spirit-hop { animation: spirit-hop 0.9s cubic-bezier(0.3, 1.6, 0.5, 1); }
+@keyframes spirit-hop {
+  0% { transform: translateY(0) scale(1, 1); }
+  15% { transform: translateY(0) scale(1.12, 0.86); }
+  45% { transform: translateY(-16px) scale(0.94, 1.08); }
+  75% { transform: translateY(0) scale(1.08, 0.92); }
+  100% { transform: translateY(0) scale(1, 1); }
+}
+[data-spirit].is-happy .spirit-mouth { opacity: 0; }
+[data-spirit].is-happy .spirit-mouth-happy { opacity: 1; }
+[data-spirit].is-happy .spirit-eyes { animation: none; transform: scaleY(0.35); }
+.spirit-sparkles path { fill: #ffd76a; opacity: 0; transform-box: fill-box; transform-origin: center; }
+[data-spirit].is-happy .spirit-sparkles path { animation: sparkle 0.9s ease-out; }
+[data-spirit].is-happy .spirit-sparkles path:nth-child(2) { animation-delay: 0.08s; }
+[data-spirit].is-happy .spirit-sparkles path:nth-child(3) { animation-delay: 0.16s; }
+[data-spirit].is-happy .spirit-sparkles path:nth-child(4) { animation-delay: 0.24s; }
+@keyframes sparkle {
+  0% { opacity: 0; transform: scale(0.2) rotate(0deg); }
+  40% { opacity: 1; transform: scale(1.2) rotate(45deg); }
+  100% { opacity: 0; transform: scale(0.6) rotate(90deg); }
+}
+
+/* Night lantern */
+.spirit-lantern { opacity: 0; transition: opacity 0.6s ease; }
+.dark .spirit-lantern { opacity: 1; }
+.spirit-lantern-stick { stroke: #5a4634; stroke-width: 2; stroke-linecap: round; fill: none; }
+.spirit-lantern-paper { fill: #ffd27a; stroke: #b5692a; stroke-width: 1; }
+.spirit-lantern-rib { stroke: #d48a3a; stroke-width: 0.8; }
+.spirit-lantern-glow { fill: #ffcf6e; opacity: 0.28; filter: blur(4px); animation: lantern-flicker 2.6s ease-in-out infinite; }
+@keyframes lantern-flicker {
+  0%, 100% { opacity: 0.26; }
+  40% { opacity: 0.38; }
+  60% { opacity: 0.22; }
+}
+
+/* Pat-able avatar */
+.spirit-avatar { cursor: pointer; }
+.spirit-avatar:hover { transform: translateY(-2px) rotate(-2deg); }
+
+/* ===================================================================== */
+/* Atmosphere: wind, seeds, friends, bus stop, hollow, rain               */
+/* ===================================================================== */
+.wind-wave {
+  animation: wind-sweep 11s ease-in-out infinite;
+  mix-blend-mode: soft-light;
+}
+.wind-wave--2 { animation-duration: 15s; animation-delay: -6s; }
+.dark .wind-wave { opacity: 0.35; }
+@keyframes wind-sweep {
+  from { transform: translateX(0); }
+  to { transform: translateX(2300px); }
+}
+
+.seeds .seed {
+  position: absolute;
+  left: -3%;
+  width: 14px;
+  height: 14px;
+  border-radius: 9999px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.95) 0 22%, rgba(255, 255, 255, 0.35) 40%, transparent 70%);
+  animation: seed-drift linear infinite;
+}
+.seeds .seed::after {
+  content: "";
+  position: absolute;
+  left: 6px;
+  top: 11px;
+  width: 1.5px;
+  height: 9px;
+  background: rgba(120, 100, 70, 0.6);
+  transform: rotate(-20deg);
+}
+@keyframes seed-drift {
+  0% { transform: translate(0, 0) rotate(0deg); }
+  25% { transform: translate(28vw, -6vh) rotate(40deg); }
+  50% { transform: translate(55vw, 2vh) rotate(-10deg); }
+  75% { transform: translate(80vw, -8vh) rotate(30deg); }
+  100% { transform: translate(110vw, -2vh) rotate(0deg); }
+}
+
+.fluff {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: fluff-bob 2.8s ease-in-out infinite;
+}
+@keyframes fluff-bob {
+  0%, 100% { transform: translateY(0) rotate(-3deg); }
+  50% { transform: translateY(-5px) rotate(3deg); }
+}
+.fluff-puff { fill: #fffbea; }
+.fluff-fuzz { fill: none; stroke: #ffffff; stroke-width: 5; stroke-dasharray: 1.5 3; opacity: 0.9; }
+.fluff-eye { fill: #2a2a24; }
+.dark .fluff-puff { fill: #c9d6e6; }
+.dark .fluff-fuzz { stroke: #dfe8f5; opacity: 0.5; }
+.dark .fluff-eye { fill: #0b1214; }
+
+.lamp-glow { fill: #ffd27a; opacity: 0; filter: blur(10px); transition: opacity 0.8s ease; }
+.dark .lamp-glow { opacity: 0.35; animation: lantern-flicker 3s ease-in-out infinite; }
+
+.hollow-glow { fill: #b6f0c0; opacity: 0; filter: blur(6px); transition: opacity 0.8s ease; }
+.dark .hollow-glow { opacity: 0.35; }
+.hollow-eyes { fill: #fffbe8; opacity: 0; }
+.dark .hollow-eyes { animation: hollow-peek 9s ease-in-out infinite; }
+@keyframes hollow-peek {
+  0%, 60%, 100% { opacity: 0; }
+  66%, 88% { opacity: 0.9; }
+  77% { opacity: 0.1; }
+}
+
+/* Rain spell */
+.scene-rain {
+  opacity: 0;
+  transition: opacity 1.2s ease;
+  background-image: repeating-linear-gradient(
+    100deg,
+    transparent 0 14px,
+    rgba(220, 235, 255, 0.55) 14px 15px,
+    transparent 15px 34px
+  );
+  background-size: 200px 220px;
+  animation: rain-fall 0.45s linear infinite;
+  mask-image: linear-gradient(transparent, #000 15%, #000 85%, transparent);
+}
+.scene-rain--far {
+  background-size: 120px 140px;
+  animation-duration: 0.7s;
+}
+@keyframes rain-fall {
+  from { background-position: 0 0; }
+  to { background-position: -40px 220px; }
+}
+.is-raining .scene-rain--near { opacity: 0.55; }
+.is-raining .scene-rain--far { opacity: 0.35; }
+.is-raining .scene-sky { filter: saturate(0.55) brightness(0.88); }
+.is-raining .scene-sun { opacity: 0.25; transition: opacity 1.2s ease; }
+.is-raining .scene-clouds { filter: saturate(0.4) brightness(0.85); transition: filter 1.2s ease; }
+.is-raining .seeds { display: none; }
+.scene-sky, .scene-clouds { transition: filter 1.2s ease; }
+
+.rain-ripples { opacity: 0; transition: opacity 1s ease; }
+.is-raining .rain-ripples { opacity: 1; }
+.ripple {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.75);
+  stroke-width: 1.2;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: ripple 2.2s ease-out infinite;
+}
+.dark .ripple { stroke: rgba(253, 243, 192, 0.5); }
+@keyframes ripple {
+  0% { transform: scale(0.2); opacity: 0.9; }
+  100% { transform: scale(2.2); opacity: 0; }
+}
+
+/* ===================================================================== */
+/* Day ↔ night switch: circular reveal from the spell button             */
+/* (View Transitions API; other browsers just switch instantly)          */
+/* ===================================================================== */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+.theme-switching *,
+.theme-switching *::before,
+.theme-switching *::after {
+  transition: none !important;
 }

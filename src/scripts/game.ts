@@ -55,6 +55,44 @@ function toast(icon: string, title: string, body: string) {
 }
 
 /* ------------------------------------------------------------------ */
+/* Mori reactions                                                      */
+/* ------------------------------------------------------------------ */
+
+let reactTimer: number | undefined;
+function moriReact() {
+  if (prefersReducedMotion()) return;
+  const spirits = document.querySelectorAll<SVGElement>('[data-spirit]');
+  spirits.forEach((el) => {
+    el.classList.remove('is-happy');
+    void el.getBoundingClientRect(); // restart the animation
+    el.classList.add('is-happy');
+  });
+  window.clearTimeout(reactTimer);
+  reactTimer = window.setTimeout(() => spirits.forEach((el) => el.classList.remove('is-happy')), 950);
+}
+
+let patIndex = 0;
+function patMori() {
+  moriReact();
+  say(dialogue.pats[patIndex % dialogue.pats.length]);
+  patIndex++;
+  completeQuest('pat');
+}
+
+/* ------------------------------------------------------------------ */
+/* Rain spell                                                          */
+/* ------------------------------------------------------------------ */
+
+function toggleRain() {
+  const raining = document.documentElement.classList.toggle('is-raining');
+  write('rain', raining ? '1' : '0', 'session');
+  document.querySelectorAll('[data-rain-toggle]').forEach((b) => b.setAttribute('aria-pressed', String(raining)));
+  say(raining ? dialogue.rainOn : dialogue.rainOff);
+  moriReact();
+  completeQuest('rain');
+}
+
+/* ------------------------------------------------------------------ */
 /* Rendering                                                           */
 /* ------------------------------------------------------------------ */
 
@@ -99,6 +137,7 @@ export function completeQuest(id: string) {
   render();
 
   toast(quest.icon, `Quest complete: ${quest.title}`, `+${quest.xp} XP`);
+  moriReact();
   const after = levelOf(state.xp);
   if (after > before) {
     window.setTimeout(() => toast('⭐', `Level up! Traveler LV.${after}`, 'The forest spirits cheer for you.'), 700);
@@ -128,6 +167,7 @@ function collectAcorn(id: string, from: HTMLElement) {
   }
 
   const left = ACORN_IDS.length - state.acorns.length;
+  moriReact();
   toast('🌰', 'Acorn found! +10 XP', left > 0 ? `${left} more hidden in the forest.` : 'That was the last one!');
   if (left === 0) {
     completeQuest('acorns');
@@ -135,20 +175,51 @@ function collectAcorn(id: string, from: HTMLElement) {
   }
 }
 
-function setTheme(dark: boolean) {
+function applyTheme(dark: boolean) {
   document.documentElement.classList.toggle('dark', dark);
   write('theme', dark ? 'dark' : 'light');
   document.querySelectorAll('[data-theme-toggle]').forEach((b) => b.setAttribute('aria-pressed', String(dark)));
 }
 
-export function toggleTheme() {
+/**
+ * Day ↔ night with a circular "spell" reveal that grows from the point the
+ * spell was cast (View Transitions API). Browsers without it, and visitors who
+ * prefer reduced motion, get an instant switch.
+ */
+function setTheme(dark: boolean, origin?: { x: number; y: number }) {
+  const doc = document as Document & {
+    startViewTransition?: (cb: () => void) => { ready: Promise<void>; finished: Promise<void> };
+  };
+  if (!doc.startViewTransition || prefersReducedMotion()) {
+    applyTheme(dark);
+    return;
+  }
+  const x = origin?.x ?? window.innerWidth - 60;
+  const y = origin?.y ?? 32;
+  const r = Math.hypot(Math.max(x, window.innerWidth - x), Math.max(y, window.innerHeight - y));
+  const root = document.documentElement;
+  root.classList.add('theme-switching');
+  const t = doc.startViewTransition(() => applyTheme(dark));
+  t.ready
+    .then(() => {
+      root.animate(
+        { clipPath: [`circle(0px at ${x}px ${y}px)`, `circle(${r}px at ${x}px ${y}px)`] },
+        { duration: 1100, easing: 'cubic-bezier(0.65, 0, 0.35, 1)', pseudoElement: '::view-transition-new(root)' },
+      );
+    })
+    .catch(() => {});
+  t.finished.finally(() => root.classList.remove('theme-switching'));
+}
+
+export function toggleTheme(origin?: { x: number; y: number }) {
   const dark = !document.documentElement.classList.contains('dark');
-  setTheme(dark);
+  setTheme(dark, origin);
   completeQuest('nightfall');
+  moriReact();
   say(
     dark
-      ? '✨ Spell cast: Nightfall! The lanterns are lit and fireflies dance across the starlit forest.'
-      : '☀️ Spell cast: Dawnbreak! Warm sunlight returns to the summer meadow.',
+      ? '✨ Spell cast: Nightfall! Mori lights a little lantern, and fireflies rise from the rice fields.'
+      : '☀️ Spell cast: Dawnbreak! Warm sunlight spills back over the summer meadow.',
   );
 }
 
@@ -188,6 +259,10 @@ function resetProgress() {
 /* ------------------------------------------------------------------ */
 
 function init() {
+  if (read('rain', 'session') === '1') {
+    document.documentElement.classList.add('is-raining');
+    document.querySelectorAll('[data-rain-toggle]').forEach((b) => b.setAttribute('aria-pressed', 'true'));
+  }
   render();
   initDialogue();
   document
@@ -200,7 +275,17 @@ function init() {
     const acorn = t.closest<HTMLElement>('[data-acorn]');
     if (acorn) return collectAcorn(acorn.dataset.acorn!, acorn);
 
-    if (t.closest('[data-theme-toggle]')) return toggleTheme();
+    const themeBtn = t.closest<HTMLElement>('[data-theme-toggle]');
+    if (themeBtn) {
+      const me = e as MouseEvent;
+      const box = themeBtn.getBoundingClientRect();
+      const fromPointer = me.clientX || me.clientY;
+      return toggleTheme(
+        fromPointer ? { x: me.clientX, y: me.clientY } : { x: box.left + box.width / 2, y: box.top + box.height / 2 },
+      );
+    }
+    if (t.closest('[data-pat-spirit]')) return patMori();
+    if (t.closest('[data-rain-toggle]')) return toggleRain();
     if (t.closest('[data-open-journal]')) return openJournal();
     if (t.closest('[data-start-game]')) return closeTitle();
     if (t.closest('[data-reset-game]')) return resetProgress();
@@ -265,8 +350,14 @@ function init() {
         else openJournal();
         break;
       }
-      case 'n':
-        toggleTheme();
+      case 'n': {
+        const btn = document.querySelector<HTMLElement>('header [data-theme-toggle]');
+        const box = btn?.getBoundingClientRect();
+        toggleTheme(box ? { x: box.left + box.width / 2, y: box.top + box.height / 2 } : undefined);
+        break;
+      }
+      case 'r':
+        toggleRain();
         break;
       case '1':
         jump('#about');
