@@ -639,7 +639,7 @@ kbd {
   z-index: -1;
 }
 .scene-sun { isolation: isolate; }
-.dark .scene-sun {
+.palette-night .scene-sun {
   /* moon: smaller, cooler, with soft maria */
   width: clamp(64px, 7vw, 100px);
   background:
@@ -666,13 +666,13 @@ kbd {
   opacity: 0.28;
   filter: blur(14px);
 }
-.dark .scene-light ellipse {
+.palette-night .scene-light ellipse {
   fill: #9cc7ff;
   opacity: 0.08;
 }
 
 .house-glow { opacity: 0; }
-.dark .house-glow { opacity: 1; }
+.palette-night .house-glow { opacity: 1; }
 
 
 
@@ -846,7 +846,7 @@ kbd {
 .dark .lamp-glow { opacity: 0.35; animation: lantern-flicker 3s ease-in-out infinite; }
 
 .hollow-glow { fill: #b6f0c0; opacity: 0; filter: blur(6px); transition: opacity 0.8s ease; }
-.dark .hollow-glow { opacity: 0.35; }
+.palette-night .hollow-glow { opacity: 0.35; }
 .hollow-eyes { fill: #fffbe8; opacity: 0; }
 .dark .hollow-eyes { animation: hollow-peek 9s ease-in-out infinite; }
 @keyframes hollow-peek {
@@ -2836,81 +2836,228 @@ kbd {
   .hud-bubble__tab { padding: 0 0.38rem; }
 }
 
-/* ===================================================================== */
-/* Day ↔ night time-lapse                                                 */
-/* A short (26vh) gradient strip is stretched 10x with scaleY so the GPU   */
-/* texture stays tiny; only transform/opacity animate.                     */
-/* ===================================================================== */
-.time-band {
-  position: fixed;
-  left: 0;
-  right: 0;
-  top: 0;
-  z-index: 95;
-  height: 26vh;
-  pointer-events: none;
-  transform-origin: 50% 0;
-  will-change: transform, opacity;
-}
-/* Nightfall: band falls from above — trailing fade, indigo body with a few
-   early stars, rose-orange leading edge at the bottom */
-.time-band--night {
-  background:
-    radial-gradient(1px 0.1px at 20% 52%, rgba(255, 255, 255, 0.9), transparent),
-    radial-gradient(1px 0.1px at 62% 45%, rgba(255, 255, 255, 0.8), transparent),
-    radial-gradient(1px 0.1px at 82% 58%, rgba(255, 255, 255, 0.85), transparent),
-    linear-gradient(180deg,
-      rgba(11, 22, 44, 0) 0%,
-      rgba(11, 22, 44, 0.75) 12%,
-      #0d1f3d 22%,
-      #13284a 62%,
-      #3b3366 72%,
-      #a4547a 78%,
-      #f0946a 83%,
-      rgba(246, 177, 112, 0.6) 88%,
-      rgba(246, 177, 112, 0) 95%);
-  animation: band-fall 0.72s cubic-bezier(0.55, 0.05, 0.4, 1) forwards;
-}
-/* Dawn: band rises from the horizon — golden leading edge on top */
-.time-band--day {
-  background: linear-gradient(0deg,
-    rgba(255, 238, 200, 0) 0%,
-    rgba(255, 238, 200, 0.75) 12%,
-    #fff3d6 22%,
-    #fde3b4 55%,
-    #fbcf8c 68%,
-    #f7b26e 76%,
-    rgba(255, 214, 150, 0.7) 84%,
-    rgba(255, 236, 190, 0) 95%);
-  animation: band-rise 0.72s cubic-bezier(0.55, 0.05, 0.4, 1) forwards;
-}
-/* covering position: the opaque body (22%–62% of 260vh ≈ 104vh) spans the
-   viewport when translated to -57vh */
-@keyframes band-fall {
-  from { transform: translate3d(0, -260vh, 0) scaleY(10); }
-  to { transform: translate3d(0, -57vh, 0) scaleY(10); }
-}
-@keyframes band-rise {
-  from { transform: translate3d(0, 100vh, 0) scaleY(10); }
-  to { transform: translate3d(0, -70vh, 0) scaleY(10); }
-}
-.time-band--night.is-leaving { animation: band-fall-out 0.8s cubic-bezier(0.3, 0, 0.3, 1) forwards; }
-.time-band--day.is-leaving { animation: band-rise-out 0.8s cubic-bezier(0.3, 0, 0.3, 1) forwards; }
-@keyframes band-fall-out {
-  from { transform: translate3d(0, -57vh, 0) scaleY(10); opacity: 1; }
-  to { transform: translate3d(0, 40vh, 0) scaleY(10); opacity: 0; }
-}
-@keyframes band-rise-out {
-  from { transform: translate3d(0, -70vh, 0) scaleY(10); opacity: 1; }
-  to { transform: translate3d(0, -230vh, 0) scaleY(10); opacity: 0; }
-}
 
-/* the sun / moon sets before the flip and rises after it */
-.time-to-night .scene-sun,
-.time-to-day .scene-sun { animation: celestial-set 0.72s cubic-bezier(0.5, 0, 0.75, 0.5) forwards; }
-.time-enter-night .scene-sun,
-.time-enter-day .scene-sun { animation: celestial-rise 1.4s cubic-bezier(0.2, 0.7, 0.3, 1) both; }
-@keyframes celestial-set { to { transform: translate3d(0, 55vh, 0); opacity: 0; } }
-@keyframes celestial-rise { from { transform: translate3d(0, 40vh, 0); opacity: 0; } }
-.time-enter-night .night-stars { animation: stars-in 1.6s ease-out both, twinkle 5s 1.6s ease-in-out infinite alternate; }
-@keyframes stars-in { from { opacity: 0; } }
+/* ===================================================================== */
+/* Day & night paintings: each copy carries its own palette, independent */
+/* of html.dark, so switching only cross-fades them (no repaint).        */
+/* ===================================================================== */
+.scene .palette-day {
+  --scene-sky-top: #2f8fd6;
+  --scene-sky-mid: #79c4ec;
+  --scene-sky-low: #c9ebf3;
+  --scene-sky-horizon: #eef6dc;
+  --scene-sun: #fff8de;
+  --scene-sun-glow: rgba(255, 246, 210, 0.85);
+
+  --scene-cloud-light: #ffffff;
+  --scene-cloud-warm: rgba(255, 238, 200, 0.55);
+  --scene-cloud-shade: #d9e2f0;
+  --scene-cloud-deep: #aab6d3;
+  --scene-cloud-wisp: rgba(255, 255, 255, 0.75);
+
+  --scene-haze: #dff0ef;
+  --scene-mtn-far: #9cc0d0;
+  --scene-mtn-near: #84b3a8;
+  --scene-forest-far: #5f9a71;
+  --scene-forest-far-lit: #7fb385;
+
+  --scene-tree-dark: #1d5634;
+  --scene-tree-mid: #2f7a43;
+  --scene-tree-lit: #4f9d48;
+  --scene-tree-sun: #9acb5c;
+  --scene-trunk: #5b4636;
+  --scene-trunk-shadow: #3f2f24;
+  --scene-rope: #d9c48f;
+  --scene-paper: #fbf7ea;
+  --scene-hill-mid: #5f9f4f;
+
+  --scene-ridge: #6f9f45;
+  --scene-paddy: #9fcf63;
+  --scene-paddy-alt: #b4dc74;
+  --scene-paddy-deep: #8cc25a;
+  --scene-rice-row: rgba(60, 120, 50, 0.22);
+  --scene-paddy-water: #a9d6d8;
+  --scene-paddy-shine: #ffffff;
+  --scene-path: #d8c59a;
+  --scene-pole: #5a4a3c;
+
+  --scene-house-wall: #efe3c6;
+  --scene-house-shadow: #8a7454;
+  --scene-house-trim: #5e4a36;
+  --scene-house-roof: #6e6a5e;
+  --scene-house-roof-lit: #8c887a;
+  --scene-window: #4d5b5f;
+
+  --scene-wind: #f4ffd8;
+  --scene-hollow: #2d2219;
+  --scene-wood: #9b7652;
+  --scene-wood-dark: #6b4e36;
+  --scene-sign: #d8553d;
+  --scene-lamp: #3e3a33;
+  --spirit-stem-scene: #4d8a3e;
+  --scene-stone: #9aa293;
+  --scene-stone-shadow: rgba(30, 60, 30, 0.25);
+  --scene-moss: #6fa654;
+  --scene-grass-back: #3f8a3c;
+  --scene-grass-front: #2c6a30;
+  --scene-flower: #fffdf4;
+  --scene-flower-warm: #f7d35c;
+}
+.scene .palette-night {
+  --scene-sky-top: #050b1a;
+  --scene-sky-mid: #0d1f3d;
+  --scene-sky-low: #173556;
+  --scene-sky-horizon: #24485a;
+  --scene-sun: #fdf3c0;
+  --scene-sun-glow: rgba(253, 230, 138, 0.35);
+
+  --scene-cloud-light: #3d4f72;
+  --scene-cloud-warm: rgba(253, 243, 192, 0.12);
+  --scene-cloud-shade: #2a3a5a;
+  --scene-cloud-deep: #1c2944;
+  --scene-cloud-wisp: rgba(120, 140, 180, 0.25);
+
+  --scene-haze: #1b3647;
+  --scene-mtn-far: #1b3248;
+  --scene-mtn-near: #17303c;
+  --scene-forest-far: #12302f;
+  --scene-forest-far-lit: #1a3e3b;
+
+  --scene-tree-dark: #071a18;
+  --scene-tree-mid: #0d2724;
+  --scene-tree-lit: #153a35;
+  --scene-tree-sun: #1f4c45;
+  --scene-trunk: #1a1d22;
+  --scene-trunk-shadow: #0d0f13;
+  --scene-rope: #6f6650;
+  --scene-paper: #b9b7ad;
+  --scene-hill-mid: #10302b;
+
+  --scene-ridge: #0f2a25;
+  --scene-paddy: #163a31;
+  --scene-paddy-alt: #1a4036;
+  --scene-paddy-deep: #12322b;
+  --scene-rice-row: rgba(0, 0, 0, 0.25);
+  --scene-paddy-water: #22405c;
+  --scene-paddy-shine: #fdf3c0;
+  --scene-path: #3b3f45;
+  --scene-pole: #0a0f14;
+
+  --scene-house-wall: #2b3341;
+  --scene-house-shadow: #000000;
+  --scene-house-trim: #10151c;
+  --scene-house-roof: #151b24;
+  --scene-house-roof-lit: #222a36;
+  --scene-window: #ffcf6e;
+
+  --scene-wind: #9cc7ff;
+  --scene-hollow: #05090b;
+  --scene-wood: #3a3530;
+  --scene-wood-dark: #1d1a17;
+  --scene-sign: #7a2f25;
+  --scene-lamp: #ffd27a;
+  --spirit-stem-scene: #24452f;
+  --scene-stone: #3a4450;
+  --scene-stone-shadow: rgba(0, 0, 0, 0.35);
+  --scene-moss: #1f4a3e;
+  --scene-grass-back: #0c2622;
+  --scene-grass-front: #081b18;
+  --scene-flower: #b9c7d6;
+  --scene-flower-warm: #c9b26a;
+}
+[data-weather="snow"] .scene .palette-day {
+  --scene-sky-top: #7f9fbf; --scene-sky-mid: #b9cddf; --scene-sky-low: #dfe8f0; --scene-sky-horizon: #eef2f6;
+  --scene-cloud-light: #f4f7fb; --scene-cloud-shade: #d3dce8; --scene-cloud-deep: #b3bfd0;
+  --scene-mtn-far: #c9d6e2; --scene-mtn-near: #b6c8d2;
+  --scene-forest-far: #8fa9a0; --scene-forest-far-lit: #e6eeec;
+  --scene-tree-dark: #2f4f45; --scene-tree-mid: #4a6b5f; --scene-tree-lit: #dfe9e6; --scene-tree-sun: #ffffff;
+  --scene-hill-mid: #dbe5e3; --scene-ridge: #c9d6d6;
+  --scene-paddy: #eef3f4; --scene-paddy-alt: #f7fafb; --scene-paddy-deep: #e1e9ec; --scene-paddy-water: #c3d6e2;
+  --scene-rice-row: rgba(120, 140, 160, 0.15);
+  --scene-path: #e9edf0; --scene-moss: #f1f5f6;
+  --scene-house-roof: #f0f4f6; --scene-house-roof-lit: #ffffff;
+  --scene-grass-back: #b7c9c3; --scene-grass-front: #93aba3;
+  --scene-flower: #ffffff; --scene-flower-warm: #e9f1f5;}
+[data-weather="snow"] .scene .palette-night {
+  --scene-sky-top: #7f9fbf; --scene-sky-mid: #b9cddf; --scene-sky-low: #dfe8f0; --scene-sky-horizon: #eef2f6;
+  --scene-cloud-light: #f4f7fb; --scene-cloud-shade: #d3dce8; --scene-cloud-deep: #b3bfd0;
+  --scene-mtn-far: #c9d6e2; --scene-mtn-near: #b6c8d2;
+  --scene-forest-far: #8fa9a0; --scene-forest-far-lit: #e6eeec;
+  --scene-tree-dark: #2f4f45; --scene-tree-mid: #4a6b5f; --scene-tree-lit: #dfe9e6; --scene-tree-sun: #ffffff;
+  --scene-hill-mid: #dbe5e3; --scene-ridge: #c9d6d6;
+  --scene-paddy: #eef3f4; --scene-paddy-alt: #f7fafb; --scene-paddy-deep: #e1e9ec; --scene-paddy-water: #c3d6e2;
+  --scene-rice-row: rgba(120, 140, 160, 0.15);
+  --scene-path: #e9edf0; --scene-moss: #f1f5f6;
+  --scene-house-roof: #f0f4f6; --scene-house-roof-lit: #ffffff;
+  --scene-grass-back: #b7c9c3; --scene-grass-front: #93aba3;
+  --scene-flower: #ffffff; --scene-flower-warm: #e9f1f5;}
+[data-weather="snow"] .scene .palette-night {
+  --scene-sky-top: #0a1424; --scene-sky-mid: #1a2c45; --scene-sky-low: #2c4660; --scene-sky-horizon: #3c5a70;
+  --scene-forest-far-lit: #4a6276; --scene-tree-lit: #5a7186; --scene-tree-sun: #7a92a8;
+  --scene-hill-mid: #3a4f62; --scene-ridge: #33485a;
+  --scene-paddy: #3d5266; --scene-paddy-alt: #45596d; --scene-paddy-deep: #34495c; --scene-paddy-water: #2a4058;
+  --scene-path: #4a5c6e; --scene-moss: #50667a;
+  --scene-house-roof: #5c7084; --scene-house-roof-lit: #6f849a;
+  --scene-grass-back: #2c3f4f; --scene-grass-front: #22323f;
+  --scene-flower: #c9d6e6; --scene-flower-warm: #a9b9cc;}
+
+/* ===================================================================== */
+/* Twilight: the day ↔ night change                                      */
+/*  1. cards & HUD fade out (0.35s) so no colour snap is ever visible     */
+/*  2. the theme flips; the night painting fades in over the day one     */
+/*     (or out, for dawn) while a warm golden-hour glow passes, the sun  */
+/*     sets / moon rises, windows and lamps light, fireflies come out    */
+/*  3. cards & HUD fade back in, already in the new colours              */
+/* ===================================================================== */
+.scene-paint { position: absolute; inset: 0; }
+/* Both paintings are drawn once at load and kept as GPU layers, so switching
+   is a pure compositor opacity fade with no first-time paint at the switch. */
+.scene-paint--night {
+  opacity: 0;
+  will-change: opacity;
+  transition: opacity 1.6s ease-in-out;
+}
+.dark .scene-paint--night { opacity: 1; }
+/* lite mode: no filters, so painting is cheap — don't keep the extra layer */
+.lite .scene-paint--night { will-change: auto; visibility: hidden; transition: opacity 1.6s ease-in-out, visibility 0s linear 1.6s; }
+.lite.dark .scene-paint--night { visibility: visible; transition: opacity 1.6s ease-in-out, visibility 0s; }
+
+/* golden-hour glow */
+.twilight-tint {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(255, 150, 110, 0) 0%, rgba(255, 150, 110, 0.28) 40%, rgba(255, 186, 120, 0.42) 70%, rgba(255, 210, 150, 0.3) 100%);
+}
+.time-dusk .twilight-tint { animation: twilight-glow 2s ease-in-out; }
+.time-dawn .twilight-tint {
+  background: linear-gradient(0deg, rgba(255, 214, 160, 0.45) 0%, rgba(255, 180, 170, 0.32) 45%, rgba(230, 190, 230, 0.15) 75%, rgba(230, 190, 230, 0) 100%);
+  animation: twilight-glow 2s ease-in-out;
+}
+@keyframes twilight-glow { 0% { opacity: 0; } 45% { opacity: 1; } 100% { opacity: 0; } }
+
+/* sun sets while the moon rises (and the reverse at dawn) */
+.time-dusk .palette-day .scene-sun { animation: celestial-set 1.7s ease-in forwards; }
+.time-dusk .palette-night .scene-sun { animation: celestial-rise 1.9s 0.2s ease-out both; }
+.time-dawn .palette-night .scene-sun { animation: celestial-set 1.7s ease-in forwards; }
+.time-dawn .palette-day .scene-sun { animation: celestial-rise 1.9s 0.2s ease-out both; }
+@keyframes celestial-set { to { transform: translate3d(0, 38vh, 0); opacity: 0; } }
+@keyframes celestial-rise { from { transform: translate3d(0, 30vh, 0); opacity: 0; } }
+
+/* fireflies / seeds / leaves ease in and out with the light */
+.night-only { opacity: 0; visibility: hidden; transition: opacity 1.4s ease, visibility 0s linear 1.4s; }
+.dark .night-only { opacity: 1; visibility: visible; transition: opacity 1.4s ease 0.5s, visibility 0s; }
+.day-only { transition: opacity 1.2s ease; }
+.dark .day-only { opacity: 0; visibility: hidden; transition: opacity 1.2s ease, visibility 0s linear 1.2s; }
+
+/* the living layers (unfiltered, cheap to repaint) ease their colours */
+.scene-actors * { transition: fill 1.5s ease-in-out, stroke 1.5s ease-in-out; }
+/* grass: day/night copies cross-fade (painted once, opacity only) */
+.grass-night { opacity: 0; transition: opacity 1.6s ease-in-out; }
+.dark .grass-night { opacity: 1; }
+.lamp-glow { transition: opacity 1.6s ease 0.6s; }
+
+/* the cards & HUD briefly step aside so the theme never visibly snaps */
+#main, .site-footer, .hud-bubble { transition: opacity 0.6s ease; }
+.time-shift-out :is(#main, .site-footer, .hud-bubble) { opacity: 0; transition: opacity 0.35s ease; }

@@ -277,14 +277,14 @@ function applyTheme(dark: boolean) {
 }
 
 /**
- * Day ↔ night as a little time-lapse:
- *  - Nightfall: the sun sinks behind the hills while a band of evening sky
- *    (rose-orange edge, deep indigo body) drifts down over the world; the theme
- *    flips underneath it in one repaint; the moon rises and the stars fade in.
- *  - Dawn: the moon sinks, a band of golden morning light rises from the
- *    horizon, and the sun climbs back up.
- * GPU transform/opacity only, and nothing is frozen into a snapshot, so the
- * scenery keeps moving throughout. Reduced motion → instant switch.
+ * Day ↔ night as twilight passing over the painted countryside:
+ *  1. the cards & HUD fade out (so no colour ever visibly snaps),
+ *  2. the theme flips; the night painting cross-fades in over the day one
+ *     (or out, at dawn) while a golden-hour glow passes, the sun sets and the
+ *     moon rises, windows and lamps light up and fireflies come out,
+ *  3. the cards & HUD fade back in, already in the new colours.
+ * Both paintings keep their own colours, so nothing heavy is repainted and the
+ * scenery keeps moving the whole time. Reduced motion → instant switch.
  */
 let shifting = false;
 function setTheme(dark: boolean, _origin?: { x: number; y: number }) {
@@ -294,31 +294,14 @@ function setTheme(dark: boolean, _origin?: { x: number; y: number }) {
     return;
   }
   shifting = true;
-  const dir = dark ? 'night' : 'day';
-  const band = document.createElement('div');
-  band.className = `time-band time-band--${dir}`;
-  band.setAttribute('aria-hidden', 'true');
-  document.body.appendChild(band);
-  root.classList.add(`time-to-${dir}`); // sun/moon sets
-
+  const phase = dark ? 'time-dusk' : 'time-dawn';
+  root.classList.add(phase, 'time-shift-out');
+  window.setTimeout(() => applyTheme(dark), 380);
+  window.setTimeout(() => root.classList.remove('time-shift-out'), 1000);
   window.setTimeout(() => {
-    // the band covers the screen: flip the theme in a single repaint
-    root.classList.add('theme-switching');
-    applyTheme(dark);
-    root.classList.remove(`time-to-${dir}`);
-    root.classList.add(`time-enter-${dir}`); // moon/sun rises, stars fade in
-    requestAnimationFrame(() =>
-      requestAnimationFrame(() => {
-        root.classList.remove('theme-switching');
-        band.classList.add('is-leaving');
-      }),
-    );
-    window.setTimeout(() => {
-      band.remove();
-      root.classList.remove(`time-enter-${dir}`);
-      shifting = false;
-    }, 1500);
-  }, 720);
+    root.classList.remove(phase);
+    shifting = false;
+  }, 2200);
 }
 
 export function toggleTheme(origin?: { x: number; y: number }) {
