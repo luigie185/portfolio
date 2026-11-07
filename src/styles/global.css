@@ -156,3 +156,372 @@
   transform: translateY(2px);
   box-shadow: 0 1px 0 0 #946f25;
 }
+
+/* ===================================================================== */
+/* Watercolor & storybook texture                                        */
+/* ===================================================================== */
+
+/* Fine paper grain over the whole page (SVG turbulence, no image request) */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  pointer-events: none;
+  opacity: 0.07;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .35 0 0 0 0 .28 0 0 0 0 .18 0 0 0 1 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+.dark body::after {
+  opacity: 0.1;
+  mix-blend-mode: screen;
+}
+
+/* Soft painted light blooms in the sky */
+.watercolor-wash {
+  background:
+    radial-gradient(40% 30% at 18% 22%, rgba(255, 255, 255, 0.45), transparent 70%),
+    radial-gradient(35% 25% at 75% 12%, rgba(255, 244, 214, 0.5), transparent 70%),
+    radial-gradient(50% 35% at 50% 70%, rgba(214, 240, 200, 0.35), transparent 70%);
+}
+.dark .watercolor-wash {
+  background:
+    radial-gradient(40% 30% at 20% 25%, rgba(104, 168, 232, 0.12), transparent 70%),
+    radial-gradient(45% 30% at 70% 60%, rgba(89, 196, 157, 0.08), transparent 70%);
+}
+
+/* Starfield (dark mode only) */
+.night-stars {
+  background-image:
+    radial-gradient(1.5px 1.5px at 8% 12%, #fff, transparent),
+    radial-gradient(1px 1px at 22% 30%, #fef9c3, transparent),
+    radial-gradient(1.5px 1.5px at 35% 8%, #fff, transparent),
+    radial-gradient(1px 1px at 48% 22%, #e0f2fe, transparent),
+    radial-gradient(2px 2px at 60% 14%, #fff, transparent),
+    radial-gradient(1px 1px at 72% 34%, #fef9c3, transparent),
+    radial-gradient(1.5px 1.5px at 88% 6%, #fff, transparent),
+    radial-gradient(1px 1px at 94% 28%, #e0f2fe, transparent),
+    radial-gradient(1px 1px at 14% 44%, #fff, transparent),
+    radial-gradient(1.5px 1.5px at 42% 40%, #fef9c3, transparent),
+    radial-gradient(1px 1px at 80% 46%, #fff, transparent);
+  animation: twinkle 5s ease-in-out infinite alternate;
+}
+
+@keyframes twinkle {
+  from { opacity: 0.55; }
+  to { opacity: 1; }
+}
+
+@keyframes grass-sway {
+  0%, 100% { transform: skewX(0deg); }
+  50% { transform: skewX(-6deg); }
+}
+.grass-sway {
+  transform-box: fill-box;
+  transform-origin: bottom center;
+  animation: grass-sway 4s ease-in-out infinite;
+}
+
+/* Paper texture inside panels */
+.rpg-panel {
+  background-image:
+    radial-gradient(120% 80% at 0% 0%, rgba(255, 255, 255, 0.35), transparent 60%),
+    radial-gradient(100% 70% at 100% 100%, rgba(197, 155, 71, 0.08), transparent 60%);
+}
+.dark .rpg-panel {
+  background-image:
+    radial-gradient(120% 80% at 0% 0%, rgba(104, 168, 232, 0.08), transparent 60%),
+    radial-gradient(100% 70% at 100% 100%, rgba(243, 179, 84, 0.06), transparent 60%);
+}
+
+/* Storybook chapter ribbon */
+.chapter-ribbon {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+.chapter-ribbon__line {
+  flex: 1;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--border-gold), transparent);
+}
+.chapter-ribbon__label {
+  font-size: 0.95rem;
+  color: var(--accent-sun);
+  white-space: nowrap;
+}
+
+/* ===================================================================== */
+/* Game UI                                                               */
+/* ===================================================================== */
+
+.skip-link {
+  position: absolute;
+  left: 1rem;
+  top: -4rem;
+  z-index: 200;
+  padding: 0.5rem 1rem;
+  border-radius: 0.75rem;
+  background: #23476e;
+  color: #fff8e7;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+.skip-link:focus {
+  top: 1rem;
+}
+
+/* Visible keyboard focus everywhere, in the theme's gold */
+:where(a, button, [tabindex]:not([tabindex="-1"])):focus-visible {
+  outline: 3px solid #e09f3e;
+  outline-offset: 3px;
+  border-radius: 0.6rem;
+}
+
+/* Title screen (shown only when <html> has .show-title) */
+.title-screen {
+  display: none;
+}
+.show-title .title-screen {
+  display: flex;
+}
+.show-title body {
+  overflow: hidden;
+}
+.title-screen__sky {
+  background:
+    radial-gradient(60% 40% at 50% 100%, rgba(89, 196, 157, 0.35), transparent 70%),
+    linear-gradient(180deg, #0b1830 0%, #17345a 45%, #2b6e4c 100%);
+}
+.title-screen__stars {
+  background-image:
+    radial-gradient(1.5px 1.5px at 10% 15%, #fff, transparent),
+    radial-gradient(1px 1px at 25% 35%, #fef9c3, transparent),
+    radial-gradient(2px 2px at 40% 10%, #fff, transparent),
+    radial-gradient(1px 1px at 55% 28%, #e0f2fe, transparent),
+    radial-gradient(1.5px 1.5px at 70% 12%, #fff, transparent),
+    radial-gradient(1px 1px at 85% 32%, #fef9c3, transparent),
+    radial-gradient(2px 2px at 92% 8%, #fff, transparent);
+  animation: twinkle 3s ease-in-out infinite alternate;
+}
+.title-screen__title {
+  text-shadow: 0 4px 0 rgba(10, 20, 35, 0.45), 0 0 40px rgba(254, 243, 199, 0.35);
+}
+.title-screen__blink {
+  animation: blink 1.6s steps(2, start) infinite;
+}
+.title-screen.is-leaving {
+  opacity: 0;
+  transform: scale(1.04);
+  transition: opacity 0.45s ease, transform 0.45s ease;
+}
+@keyframes blink {
+  to { visibility: hidden; }
+}
+
+/* Hidden acorns */
+.acorn {
+  position: absolute;
+  width: 30px;
+  height: 30px;
+  padding: 2px;
+  border-radius: 9999px;
+  cursor: pointer;
+  filter: drop-shadow(0 2px 2px rgba(60, 40, 20, 0.35));
+  animation: acorn-wiggle 3.2s ease-in-out infinite;
+  transition: transform 0.2s ease;
+}
+.acorn:hover {
+  transform: scale(1.25) rotate(-8deg);
+}
+.acorn[hidden] {
+  display: none;
+}
+.acorn.is-collected {
+  animation: acorn-collect 0.35s ease-in forwards;
+}
+@keyframes acorn-wiggle {
+  0%, 82%, 100% { rotate: 0deg; }
+  86% { rotate: -14deg; }
+  90% { rotate: 12deg; }
+  94% { rotate: -6deg; }
+}
+@keyframes acorn-collect {
+  to { transform: translateY(-36px) scale(1.6); opacity: 0; }
+}
+
+/* HUD level-up pulse */
+.hud-badge.is-levelup {
+  animation: levelup 0.9s ease;
+}
+@keyframes levelup {
+  0% { box-shadow: 0 0 0 0 rgba(243, 179, 84, 0.9); transform: scale(1); }
+  40% { transform: scale(1.18); }
+  100% { box-shadow: 0 0 0 16px rgba(243, 179, 84, 0); transform: scale(1); }
+}
+
+/* Achievement toasts */
+.toast-region {
+  position: fixed;
+  z-index: 90;
+  right: 1rem;
+  bottom: 5.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: min(22rem, calc(100vw - 2rem));
+  pointer-events: none;
+}
+@media (min-width: 768px) {
+  .toast-region {
+    bottom: 1.25rem;
+  }
+}
+.game-toast {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-radius: 1rem;
+  border: 2px solid var(--border-gold);
+  background: #fffaf0;
+  color: #222b25;
+  box-shadow: 0 10px 25px -8px rgba(24, 38, 28, 0.4), inset 0 0 0 3px #fffaf0, inset 0 0 0 4.5px var(--border-inner);
+  animation: toast-in 0.35s cubic-bezier(0.2, 0.9, 0.3, 1.3);
+}
+.dark .game-toast {
+  background: #121d30;
+  color: #f4efe2;
+  box-shadow: 0 10px 25px -8px rgba(0, 0, 0, 0.6), inset 0 0 0 3px #121d30, inset 0 0 0 4.5px var(--border-inner);
+}
+.game-toast.is-leaving {
+  opacity: 0;
+  transform: translateX(20px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+.game-toast__icon {
+  font-size: 1.5rem;
+  line-height: 1;
+}
+.game-toast__title {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--accent-royal);
+}
+.game-toast__body {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+@keyframes toast-in {
+  from { opacity: 0; transform: translateY(16px) scale(0.95); }
+}
+
+/* Quest journal dialog */
+.journal {
+  margin: auto;
+  overflow-y: auto;
+}
+.journal::backdrop {
+  background: rgba(10, 24, 40, 0.55);
+  backdrop-filter: blur(3px);
+}
+.journal[open] {
+  animation: toast-in 0.3s ease;
+}
+.journal-quest__check {
+  flex-shrink: 0;
+  margin-top: 0.15rem;
+  width: 1.15rem;
+  height: 1.15rem;
+  border-radius: 0.35rem;
+  border: 2px solid var(--border-gold);
+  display: grid;
+  place-items: center;
+}
+.journal-quest.is-complete .journal-quest__check {
+  background: var(--accent-meadow);
+  border-color: var(--accent-meadow);
+}
+.journal-quest.is-complete .journal-quest__check::after {
+  content: "✓";
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 800;
+}
+.journal-quest.is-complete {
+  border-color: color-mix(in srgb, var(--accent-meadow) 50%, transparent);
+}
+.journal-quest .journal-quest__status-done,
+.journal-quest.is-complete .journal-quest__status-todo {
+  display: none;
+}
+.journal-quest.is-complete .journal-quest__status-done {
+  display: inline;
+}
+kbd {
+  display: inline-block;
+  min-width: 1.4rem;
+  margin-right: 0.15rem;
+  padding: 0 0.3rem;
+  border-radius: 0.35rem;
+  border: 1px solid var(--border-gold);
+  border-bottom-width: 3px;
+  background: var(--bg-card);
+  text-align: center;
+  font-weight: 700;
+}
+
+/* NPC dialogue */
+.dialogue-box {
+  cursor: default;
+}
+.dialogue-caret {
+  display: inline-block;
+  margin-left: 0.35rem;
+  font-size: 0.7em;
+  color: var(--accent-sun);
+  opacity: 0;
+}
+.dialogue-caret.is-done {
+  opacity: 1;
+  animation: caret-bob 0.9s ease-in-out infinite;
+}
+@keyframes caret-bob {
+  50% { transform: translateY(3px); }
+}
+.npc-choice__cursor {
+  display: inline-block;
+  transition: transform 0.15s ease;
+}
+.npc-choice:hover .npc-choice__cursor,
+.npc-choice:focus-visible .npc-choice__cursor {
+  transform: translateX(3px);
+}
+.npc-eyes {
+  animation: npc-blink 5s infinite;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+@keyframes npc-blink {
+  0%, 94%, 100% { transform: scaleY(1); }
+  96% { transform: scaleY(0.1); }
+}
+
+/* ===================================================================== */
+/* Respect reduced-motion preferences (WCAG 2.3.3)                       */
+/* ===================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  html {
+    scroll-behavior: auto;
+  }
+}

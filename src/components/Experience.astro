@@ -1,21 +1,16 @@
 ---
 import { experiences } from '../data/portfolio';
+import Acorn from './Acorn.astro';
+import ChapterHeading from './ChapterHeading.astro';
 ---
 
-<section id="experience" class="py-14 border-t-2 border-dashed border-[#c59b47]/50">
-  <div class="flex flex-col sm:flex-row sm:items-end justify-between mb-10 gap-2">
-    <div>
-      <p class="text-xs font-mono font-bold uppercase tracking-widest text-[#2e7050] dark:text-[#59c49d] mb-1">
-        📜 SWIFT SOLUTIONS · CAMPAIGN CHRONICLES
-      </p>
-      <h2 class="text-2xl sm:text-3xl font-bold tracking-tight text-[#252b27] dark:text-[#f5efe2]">
-        Main Story Quests (Work Experience)
-      </h2>
-    </div>
-    <p class="text-xs font-mono font-semibold px-3 py-1 rounded-full bg-[#e9dfc4] dark:bg-[#1c2942] text-[#23476e] dark:text-[#f3b354] w-fit">
-      COMPLETED & ACTIVE QUESTS: {experiences.length}
-    </p>
-  </div>
+<section data-section-quest="quest-log" id="experience" class="py-14 scroll-mt-20 border-t-2 border-dashed border-[#c59b47]/50">
+  <ChapterHeading
+    chapter="Chapter II"
+    eyebrow="📜 Campaign Chronicles"
+    title="Main Story Quests (Work Experience)"
+    badge={`COMPLETED & ACTIVE QUESTS: ${experiences.length}`}
+  />
 
   <div class="relative border-l-2 border-[#c59b47] ml-4 space-y-8">
     {
@@ -103,5 +98,6 @@ import { experiences } from '../data/portfolio';
         </div>
       ))
     }
+    <Acorn id="quests" class="-bottom-5 -left-[17px] z-20" />
   </div>
 </section>

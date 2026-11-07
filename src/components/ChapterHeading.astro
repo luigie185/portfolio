@@ -1,0 +1,35 @@
+---
+// Storybook-style chapter title used at the top of each section.
+interface Props {
+  chapter: string; // e.g. "Chapter II"
+  eyebrow: string;
+  title: string;
+  badge?: string;
+}
+const { chapter, eyebrow, title, badge } = Astro.props;
+---
+
+<div class="mb-10 space-y-3">
+  <div class="chapter-ribbon" aria-hidden="true">
+    <span class="chapter-ribbon__line"></span>
+    <span class="chapter-ribbon__label font-serif-story italic">❦ {chapter} ❦</span>
+    <span class="chapter-ribbon__line"></span>
+  </div>
+  <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-2">
+    <div>
+      <p class="text-xs font-mono font-bold uppercase tracking-widest text-[#2e7050] dark:text-[#59c49d] mb-1">
+        {eyebrow}
+      </p>
+      <h2 class="text-2xl sm:text-3xl font-bold tracking-tight text-[#252b27] dark:text-[#f5efe2]">
+        <span class="sr-only">{chapter}: </span>{title}
+      </h2>
+    </div>
+    {
+      badge && (
+        <p class="text-xs font-mono font-semibold px-3 py-1 rounded-full bg-[#e9dfc4] dark:bg-[#1c2942] text-[#23476e] dark:text-[#f3b354] w-fit">
+          {badge}
+        </p>
+      )
+    }
+  </div>
+</div>

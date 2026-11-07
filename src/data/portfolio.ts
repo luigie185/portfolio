@@ -32,8 +32,6 @@ export const profile = {
   role: "Software Engineer",
   rpgClass: "Arcane Full-Stack Artificer",
   level: 25,
-  hp: { current: 980, max: 980 },
-  mp: { current: 450, max: 450 },
   guild: "Kingdom of Ding Dong Dell · Remote",
   tagline:
     "Weaving fast, resilient digital realms with clean architecture and modern web alchemy.",
@@ -54,11 +52,42 @@ export const profile = {
     { name: "Speed & Optimization", stat: 96, color: "from-rose-500 to-amber-400" },
   ],
   highlights: [
-    { label: "Primary Class", value: "Full-Stack & Web Performance" },
-    { label: "Equipped Runes", value: "TypeScript, Astro, React, Node.js" },
-    { label: "Guild Creed", value: "Minimalist, accessible, fast by default" },
+    { label: "🛡️ Role", value: "Full-Stack & Web Performance" },
+    { label: "🔮 Runes", value: "TypeScript, Astro, React, Node.js" },
+    { label: "🌿 Trait", value: "Minimalist, accessible, fast by default" },
   ],
 };
+
+/* ------------------------------------------------------------------ */
+/* Game layer: the visitor ("traveler") earns XP by exploring the page */
+/* ------------------------------------------------------------------ */
+
+export interface Quest {
+  id: string;
+  title: string;
+  hint: string;
+  xp: number;
+  icon: string;
+}
+
+/** XP needed per traveler level. */
+export const XP_PER_LEVEL = 100;
+
+/** Acorns hidden around the page (ids must match <Acorn id="..."/> usages). */
+export const ACORN_IDS = ["hero", "dialogue", "quests", "relics", "footer"] as const;
+
+export const quests: Quest[] = [
+  { id: "begin", icon: "🌱", title: "Begin the Journey", hint: "Press start on the title screen.", xp: 20 },
+  { id: "greet", icon: "🍃", title: "Greet the Forest Spirit", hint: "Choose any dialogue option with Totoro.", xp: 40 },
+  { id: "quest-log", icon: "📜", title: "Read the Quest Log", hint: "Travel to the Work Experience chapter.", xp: 60 },
+  { id: "relics", icon: "📖", title: "Enter the Relic Vault", hint: "Travel to the Projects chapter.", xp: 60 },
+  { id: "nightfall", icon: "🌙", title: "Cast Time-Shift", hint: "Switch between day and night.", xp: 40 },
+  { id: "journal", icon: "🗺️", title: "Open the Journal", hint: "Press J or tap the journal button.", xp: 20 },
+  { id: "acorns", icon: "🌰", title: "Acorn Gatherer", hint: `Find all ${ACORN_IDS.length} acorns hidden across the forest.`, xp: 150 },
+  { id: "pigeon", icon: "🕊️", title: "Send a Pigeon Post", hint: "Reach out through the email link.", xp: 80 },
+];
+
+
 
 export const experiences: ExperienceItem[] = [
   {
@@ -169,3 +198,31 @@ export const projects: ProjectItem[] = [
     repoUrl: "https://github.com/luigie185",
   },
 ];
+
+export interface DialogueOption {
+  label: string;
+  text: string;
+  scroll?: string;
+}
+
+export const dialogue = {
+  speaker: "Totoro · Keeper of the Forest",
+  greeting: `Rrrooar~! Welcome, traveler, to ${profile.shortName}'s forest sanctuary. Collect acorns, finish quests, and you might learn a secret or two. Where shall we wander first?`,
+  options: [
+    {
+      label: `Who is ${profile.shortName}?`,
+      text: `${profile.name} is a ${profile.role.toLowerCase()} — an ${profile.rpgClass} who works with ${profile.highlights[1].value}. ${profile.highlights[2].value}.`,
+    },
+    {
+      label: "Show Quest Log",
+      text: `To the Quest Log! ${experiences.length} campaigns completed so far — the most recent at ${experiences[0].company}.`,
+      scroll: "#experience",
+    },
+    {
+      label: "Inspect Relics",
+      text: `Behold the Relic Vault: ${projects.length} artifacts forged with care. Each card links to its demo portal and source scroll.`,
+      scroll: "#projects",
+    },
+  ] satisfies DialogueOption[],
+  acornsComplete: `You found every acorn! The forest is grateful. Here's the secret: ${profile.shortName} reads every pigeon post — send one and say hi!`,
+};

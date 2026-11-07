@@ -1,100 +1,125 @@
 ---
-import { profile } from '../data/portfolio';
+import { ACORN_IDS, XP_PER_LEVEL, profile } from '../data/portfolio';
+
+const links = [
+  { href: '#about', icon: '✦', label: 'Status', key: '1' },
+  { href: '#experience', icon: '📜', label: 'Quests', key: '2' },
+  { href: '#projects', icon: '📖', label: 'Relics', key: '3' },
+];
 ---
 
 <header
   class="sticky top-0 z-50 backdrop-blur-md bg-[#f7f0de]/90 dark:bg-[#0f1624]/90 border-b-2 border-[#c59b47] shadow-sm transition-colors"
 >
   <div class="max-w-4xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-3">
-    <!-- Left: JRPG Character HUD Status -->
-    <a href="#" class="flex items-center gap-3 group min-w-0">
-      <!-- Level Badge & Emblem -->
+    <!-- Left: hero badge + traveler XP -->
+    <a href="#about" class="flex items-center gap-3 group min-w-0">
       <div
-        class="relative flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-[#23476e] to-[#162d47] dark:from-[#2b588a] dark:to-[#152840] border-2 border-[#c59b47] text-[#fff8e7] shadow-sm shrink-0 group-hover:scale-105 transition-transform"
+        data-hud-badge
+        class="hud-badge relative flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-[#23476e] to-[#162d47] dark:from-[#2b588a] dark:to-[#152840] border-2 border-[#c59b47] text-[#fff8e7] shadow-sm shrink-0 group-hover:scale-105 transition-transform"
+        aria-hidden="true"
       >
         <span class="font-serif-story font-bold text-sm tracking-tighter">LV.{profile.level}</span>
         <span
           class="absolute -bottom-1 -right-1 w-3.5 h-3.5 rounded-full bg-emerald-500 border-2 border-[#f7f0de] dark:border-[#0f1624]"
-          title="Party Leader Online"
         ></span>
       </div>
 
-      <!-- Name & HP/MP Bars -->
       <div class="min-w-0">
-        <div class="flex items-center gap-2">
-          <span
-            class="font-serif-story font-bold text-sm sm:text-base truncate text-[#252b27] dark:text-[#f5efe2] group-hover:text-[#2e7050] dark:group-hover:text-[#f3b354] transition-colors"
-          >
-            {profile.name}
-          </span>
-        </div>
+        <span
+          class="block font-serif-story font-bold text-sm sm:text-base truncate text-[#252b27] dark:text-[#f5efe2] group-hover:text-[#2e7050] dark:group-hover:text-[#f3b354] transition-colors"
+        >
+          {profile.name}
+        </span>
 
-        <!-- Mini HP & MP Gauges -->
-        <div class="flex items-center gap-3 mt-0.5 text-[10px] font-mono font-semibold">
-          <div class="flex items-center gap-1">
-            <span class="text-emerald-700 dark:text-emerald-400">HP</span>
-            <div class="w-14 sm:w-16 h-1.5 rounded-full bg-black/15 dark:bg-white/10 overflow-hidden">
-              <div class="h-full w-full bg-gradient-to-r from-emerald-500 to-lime-400 rounded-full"></div>
+        <!-- Traveler (visitor) XP gauge -->
+        <div class="flex items-center gap-2 mt-0.5 text-[10px] font-mono font-semibold">
+          <span class="text-[#23476e] dark:text-[#f3b354] whitespace-nowrap">
+            You LV.<span data-hud-level>1</span>
+          </span>
+          <div
+            class="w-20 sm:w-28 h-1.5 rounded-full bg-black/15 dark:bg-white/10 overflow-hidden"
+            role="progressbar"
+            aria-label="Traveler experience"
+            aria-valuemin="0"
+            aria-valuemax={XP_PER_LEVEL}
+            aria-valuenow="0"
+          >
+            <div
+              data-hud-xp-bar
+              class="h-full w-0 bg-gradient-to-r from-emerald-500 to-lime-400 rounded-full transition-[width] duration-700"
+            >
             </div>
           </div>
-          <div class="flex items-center gap-1">
-            <span class="text-sky-700 dark:text-sky-400">MP</span>
-            <div class="w-12 sm:w-14 h-1.5 rounded-full bg-black/15 dark:bg-white/10 overflow-hidden">
-              <div class="h-full w-full bg-gradient-to-r from-sky-500 to-cyan-300 rounded-full"></div>
-            </div>
-          </div>
+          <span class="hidden sm:inline text-[#576058] dark:text-[#9fb0c9]" data-hud-xp>0/{XP_PER_LEVEL}</span>
         </div>
       </div>
     </a>
 
-    <!-- Right: Game Menu Tabs & Time-of-Day Spell Toggle -->
-    <div class="flex items-center gap-2 sm:gap-4 shrink-0">
-      <nav class="hidden md:flex items-center gap-1 text-xs font-mono font-semibold">
-        <a
-          href="#about"
-          class="px-3 py-1.5 rounded-lg text-[#576058] dark:text-[#9fb0c9] hover:bg-[#e9dfc4] dark:hover:bg-[#1c2942] hover:text-[#252b27] dark:hover:text-[#f3b354] transition-colors"
-        >
-          ✦ Status
-        </a>
-        <a
-          href="#experience"
-          class="px-3 py-1.5 rounded-lg text-[#576058] dark:text-[#9fb0c9] hover:bg-[#e9dfc4] dark:hover:bg-[#1c2942] hover:text-[#252b27] dark:hover:text-[#f3b354] transition-colors"
-        >
-          📜 Quests
-        </a>
-        <a
-          href="#projects"
-          class="px-3 py-1.5 rounded-lg text-[#576058] dark:text-[#9fb0c9] hover:bg-[#e9dfc4] dark:hover:bg-[#1c2942] hover:text-[#252b27] dark:hover:text-[#f3b354] transition-colors"
-        >
-          📖 Grimoire
-        </a>
+    <!-- Right: menu tabs, acorn counter, journal, day/night spell -->
+    <div class="flex items-center gap-1.5 sm:gap-3 shrink-0">
+      <nav aria-label="Chapters" class="hidden md:flex items-center gap-1 text-xs font-mono font-semibold">
+        {
+          links.map((l) => (
+            <a
+              href={l.href}
+              class="px-3 py-1.5 rounded-lg text-[#576058] dark:text-[#9fb0c9] hover:bg-[#e9dfc4] dark:hover:bg-[#1c2942] hover:text-[#252b27] dark:hover:text-[#f3b354] transition-colors"
+            >
+              <span aria-hidden="true">{l.icon}</span> {l.label}
+            </a>
+          ))
+        }
       </nav>
 
-      <!-- Spell Toggle: Sunstone (Day) / Starlight (Night) -->
       <button
-        id="theme-toggle"
         type="button"
-        aria-label="Cast Day or Night Spell"
-        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-mono font-semibold border-2 border-[#c59b47] bg-[#fffaf0] dark:bg-[#1a253a] text-[#23476e] dark:text-[#f3b354] hover:bg-[#f3e8ce] dark:hover:bg-[#22314d] transition-all cursor-pointer shadow-2xs"
+        data-open-journal
+        aria-label="Open quest journal (J)"
+        class="hud-chip inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-mono font-bold border-2 border-[#c59b47] bg-[#fffaf0] dark:bg-[#1a253a] text-[#7a5a3a] dark:text-[#f3b354] hover:bg-[#f3e8ce] dark:hover:bg-[#22314d] transition-colors cursor-pointer"
       >
-        <span class="hidden dark:inline-flex items-center gap-1.5">
-          <span>☀️</span>
-          <span>Cast: Dawn</span>
-        </span>
-        <span class="inline-flex dark:hidden items-center gap-1.5">
-          <span>🌙</span>
-          <span>Cast: Nightfall</span>
+        <span aria-hidden="true">🌰</span>
+        <span data-hud-acorns>0/{ACORN_IDS.length}</span>
+      </button>
+
+      <button
+        type="button"
+        data-theme-toggle
+        aria-label="Toggle night mode (N)"
+        aria-pressed="false"
+        class="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-mono font-semibold border-2 border-[#c59b47] bg-[#fffaf0] dark:bg-[#1a253a] text-[#23476e] dark:text-[#f3b354] hover:bg-[#f3e8ce] dark:hover:bg-[#22314d] transition-colors cursor-pointer"
+      >
+        <span class="hidden dark:inline" aria-hidden="true">☀️</span>
+        <span class="dark:hidden" aria-hidden="true">🌙</span>
+        <span class="hidden sm:inline">
+          <span class="dark:hidden">Nightfall</span><span class="hidden dark:inline">Dawn</span>
         </span>
       </button>
     </div>
   </div>
 </header>
 
-<script>
-  const themeToggle = document.getElementById('theme-toggle');
-  themeToggle?.addEventListener('click', () => {
-    const html = document.documentElement;
-    const isDark = html.classList.toggle('dark');
-    localStorage.setItem('theme', isDark ? 'dark' : 'light');
-  });
-</script>
+<!-- Mobile game command bar (replaces the desktop tabs on small screens) -->
+<nav
+  aria-label="Chapters"
+  class="md:hidden fixed bottom-3 inset-x-3 z-50 rpg-panel rounded-2xl px-2 py-1.5 flex items-stretch justify-around text-[11px] font-mono font-bold"
+>
+  {
+    links.map((l) => (
+      <a
+        href={l.href}
+        class="flex flex-col items-center gap-0.5 px-3 py-1 rounded-xl text-[#23476e] dark:text-[#f3b354] active:bg-[#e9dfc4] dark:active:bg-[#1c2942]"
+      >
+        <span aria-hidden="true" class="text-base leading-none">{l.icon}</span>
+        {l.label}
+      </a>
+    ))
+  }
+  <button
+    type="button"
+    data-open-journal
+    class="flex flex-col items-center gap-0.5 px-3 py-1 rounded-xl text-[#23476e] dark:text-[#f3b354] active:bg-[#e9dfc4] dark:active:bg-[#1c2942] cursor-pointer"
+  >
+    <span aria-hidden="true" class="text-base leading-none">🗺️</span>
+    Journal
+  </button>
+</nav>

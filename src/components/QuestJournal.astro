@@ -1,0 +1,82 @@
+---
+import { ACORN_IDS, quests } from '../data/portfolio';
+---
+
+<dialog
+  data-journal
+  aria-labelledby="journal-heading"
+  class="journal rpg-panel rounded-3xl p-0 w-[min(92vw,34rem)] max-h-[85vh] text-[#222b25] dark:text-[#f4efe2]"
+>
+  <div class="p-6 sm:p-7 space-y-5">
+    <div class="flex items-start justify-between gap-3 pb-4 border-b border-[#dfd3b8] dark:border-[#2e4063]">
+      <div>
+        <p class="text-[11px] font-mono font-bold uppercase tracking-widest text-[#d4712a] dark:text-[#f3b354]">
+          🗺️ Traveler's Journal
+        </p>
+        <h2 id="journal-heading" class="text-2xl font-bold">Forest Quests</h2>
+      </div>
+      <button
+        type="button"
+        data-close-journal
+        aria-label="Close journal"
+        class="shrink-0 w-9 h-9 rounded-xl border-2 border-[#c59b47] bg-[#fffaf0] dark:bg-[#1a253a] font-mono font-bold hover:bg-[#f3e8ce] dark:hover:bg-[#22314d] cursor-pointer"
+      >
+        ✕
+      </button>
+    </div>
+
+    <div class="grid grid-cols-3 gap-2 text-center font-mono">
+      <div class="rounded-xl bg-[#fffaf0] dark:bg-[#1a2740] border border-[#dfd3b8] dark:border-[#2e4063] p-2">
+        <p class="text-[10px] uppercase font-bold text-[#d4712a] dark:text-[#f3b354]">Level</p>
+        <p class="text-lg font-bold" data-hud-level>1</p>
+      </div>
+      <div class="rounded-xl bg-[#fffaf0] dark:bg-[#1a2740] border border-[#dfd3b8] dark:border-[#2e4063] p-2">
+        <p class="text-[10px] uppercase font-bold text-[#d4712a] dark:text-[#f3b354]">Quests</p>
+        <p class="text-lg font-bold" data-hud-quests>0/{quests.length}</p>
+      </div>
+      <div class="rounded-xl bg-[#fffaf0] dark:bg-[#1a2740] border border-[#dfd3b8] dark:border-[#2e4063] p-2">
+        <p class="text-[10px] uppercase font-bold text-[#d4712a] dark:text-[#f3b354]">Acorns</p>
+        <p class="text-lg font-bold" data-hud-acorns>0/{ACORN_IDS.length}</p>
+      </div>
+    </div>
+
+    <ul class="space-y-2">
+      {
+        quests.map((q) => (
+          <li
+            data-journal-quest={q.id}
+            class="journal-quest flex items-start gap-3 rounded-2xl border border-[#dfd3b8] dark:border-[#2e4063] bg-[#fffaf0]/70 dark:bg-[#131d30]/70 p-3"
+          >
+            <span class="journal-quest__check" aria-hidden="true" />
+            <div class="flex-1 min-w-0">
+              <p class="font-bold text-sm">
+                <span aria-hidden="true">{q.icon}</span> {q.title}
+                <span class="sr-only journal-quest__status-done">(complete)</span>
+                <span class="sr-only journal-quest__status-todo">(not yet complete)</span>
+              </p>
+              <p class="text-xs text-[#576058] dark:text-[#9fb0c9]">{q.hint}</p>
+            </div>
+            <span class="font-mono text-xs font-bold text-[#2e7050] dark:text-[#59c49d] shrink-0">+{q.xp} XP</span>
+          </li>
+        ))
+      }
+    </ul>
+
+    <div class="pt-3 border-t border-[#dfd3b8] dark:border-[#2e4063] space-y-3">
+      <p class="text-xs font-mono font-bold uppercase tracking-wider text-[#23476e] dark:text-[#f3b354]">⌨️ Controls</p>
+      <dl class="grid grid-cols-2 gap-x-4 gap-y-1.5 text-xs font-mono">
+        <div class="flex gap-2"><dt><kbd>1</kbd><kbd>2</kbd><kbd>3</kbd></dt><dd>Travel to chapter</dd></div>
+        <div class="flex gap-2"><dt><kbd>J</kbd></dt><dd>Open / close journal</dd></div>
+        <div class="flex gap-2"><dt><kbd>N</kbd></dt><dd>Day / night spell</dd></div>
+        <div class="flex gap-2"><dt><kbd>Esc</kbd></dt><dd>Close window</dd></div>
+      </dl>
+      <button
+        type="button"
+        data-reset-game
+        class="text-[11px] font-mono text-[#576058] dark:text-[#9fb0c9] underline underline-offset-4 hover:text-[#d4712a] cursor-pointer"
+      >
+        Reset journey progress
+      </button>
+    </div>
+  </div>
+</dialog>

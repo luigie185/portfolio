@@ -1,12 +1,16 @@
 ---
-import { profile } from '../data/portfolio';
+import { dialogue, profile } from '../data/portfolio';
+import Acorn from './Acorn.astro';
 ---
 
-<section id="about" class="pt-10 pb-14 sm:pt-14 sm:pb-18 space-y-6">
+<section id="about" class="pt-10 pb-14 sm:pt-14 sm:pb-[4.5rem] space-y-6">
   <!-- Main Wizard's Companion Character Sheet -->
   <div class="rpg-panel rounded-3xl p-6 sm:p-9 relative overflow-hidden">
+    <Acorn id="hero" class="bottom-3 right-4 z-20" />
+
     <!-- Rotating Arcane Compass Watermark in Corner -->
     <svg
+      aria-hidden="true"
       class="animate-spin-slow pointer-events-none absolute -right-16 -top-16 w-64 h-64 text-[#c59b47]/15 dark:text-[#d6a84f]/10"
       viewBox="0 0 200 200"
       fill="none"
@@ -67,6 +71,7 @@ import { profile } from '../data/portfolio';
 
           <a
             href={`mailto:${profile.email}`}
+            data-quest="pigeon"
             class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-mono font-semibold border-2 border-[#c59b47] bg-[#fffaf0] dark:bg-[#1b273d] text-[#252b27] dark:text-[#f5efe2] hover:bg-[#f2e6cb] dark:hover:bg-[#243452] transition-colors"
           >
             <span>✉️ SEND PIGEON POST</span>
@@ -128,10 +133,10 @@ import { profile } from '../data/portfolio';
           <!-- Equipped Passive Perks -->
           <div class="pt-2 border-t border-[#d6c7a5] dark:border-[#293a59] grid grid-cols-3 gap-2 text-center">
             {
-              profile.highlights.map((item, idx) => (
+              profile.highlights.map((item) => (
                 <div class="p-2 rounded-xl bg-[#fffaf0] dark:bg-[#1a2740] border border-[#dfd3b8] dark:border-[#2e4063]">
                   <p class="text-[10px] font-mono uppercase text-[#d4712a] dark:text-[#f3b354] font-bold">
-                    {idx === 0 ? '🛡️ Role' : idx === 1 ? '🔮 Runes' : '🌿 Trait'}
+                    {item.label}
                   </p>
                   <p class="mt-0.5 text-[11px] font-semibold text-[#252b27] dark:text-[#f5efe2] line-clamp-2">
                     {item.value}
@@ -145,96 +150,70 @@ import { profile } from '../data/portfolio';
     </div>
   </div>
 
-  <!-- Interactive Totoro Forest Spirit & Ni no Kuni Dialogue Box -->
-  <div
-    class="rpg-panel rounded-2xl p-5 sm:p-6 border-2 border-[#c59b47]"
-  >
-    <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+  <!-- Totoro guide: game-style dialogue box with typewriter text -->
+  <div data-dialogue-box class="dialogue-box rpg-panel relative rounded-2xl p-5 sm:p-6">
+    <Acorn id="dialogue" class="-top-3 right-8 z-20" />
+    <div class="flex flex-col sm:flex-row items-start gap-4">
       <!-- Totoro Spirit Guide Avatar -->
       <div
-        class="animate-float-slow relative w-14 h-14 rounded-2xl bg-[#7ec8e3]/30 dark:bg-[#101c2e] border-2 border-[#c59b47] flex items-center justify-center shrink-0 shadow-md"
+        class="animate-float-slow relative w-16 h-16 rounded-2xl bg-[#7ec8e3]/30 dark:bg-[#101c2e] border-2 border-[#c59b47] flex items-center justify-center shrink-0 shadow-md"
+        aria-hidden="true"
       >
-        <svg class="w-11 h-11" viewBox="0 0 64 64" fill="none">
-          <!-- Totoro Ears -->
+        <svg class="w-12 h-12" viewBox="0 0 64 64" fill="none">
           <path d="M21 19l-3-10 7 7zM43 19l3-10-7 7z" fill="#6b7278" />
-          <!-- Totoro Body -->
           <ellipse cx="32" cy="38" rx="18" ry="19" fill="#6b7278" />
-          <!-- Cream Belly & Chevrons -->
           <ellipse cx="32" cy="42" rx="12.5" ry="12.5" fill="#f3ebd3" />
-          <path
-            d="M25 37l2.5-2 2.5 2M34 37l2.5-2 2.5 2M28 43l3-2 3 2"
-            stroke="#6b7278"
-            stroke-width="2"
-            stroke-linecap="round"
-          />
-          <!-- Big Ghibli Eyes -->
-          <circle cx="25" cy="26" r="3" fill="#ffffff" />
-          <circle cx="39" cy="26" r="3" fill="#ffffff" />
-          <circle cx="25" cy="26" r="1.4" fill="#111" />
-          <circle cx="39" cy="26" r="1.4" fill="#111" />
-          <!-- Leaf Hat -->
+          <path d="M25 37l2.5-2 2.5 2M34 37l2.5-2 2.5 2M28 43l3-2 3 2" stroke="#6b7278" stroke-width="2" stroke-linecap="round" />
+          <g class="npc-eyes">
+            <circle cx="25" cy="26" r="3" fill="#ffffff" />
+            <circle cx="39" cy="26" r="3" fill="#ffffff" />
+            <circle cx="25" cy="26" r="1.4" fill="#111" />
+            <circle cx="39" cy="26" r="1.4" fill="#111" />
+          </g>
           <path d="M32 19c-3-4-7-2.5-7-2.5s2 4.5 7 2.5c5 2 7-2.5 7-2.5s-4-1.5-7 2.5z" fill="#4d9b58" />
         </svg>
-        <span
-          class="absolute -bottom-1.5 px-1.5 py-0.2 bg-[#c59b47] text-[#101c2e] font-mono font-bold text-[9px] rounded uppercase"
-        >
-          TOTORO
+        <span class="absolute -bottom-2 px-1.5 bg-[#c59b47] text-[#101c2e] font-mono font-bold text-[9px] rounded uppercase">
+          Totoro
         </span>
       </div>
 
-      <!-- Dialogue Text & Interactive Prompts -->
-      <div class="flex-1 space-y-3 w-full">
-        <div class="flex items-center justify-between">
+      <div class="flex-1 space-y-3 w-full min-w-0">
+        <div class="flex flex-wrap items-center justify-between gap-2">
           <span class="text-xs font-mono font-bold uppercase tracking-wider text-[#2b6e4c] dark:text-[#f3b354]">
-            🍃 Totoro · Keeper of Tsukamori Forest
+            <span aria-hidden="true">🍃</span> {dialogue.speaker}
           </span>
-          <span class="text-[11px] font-mono text-[#505d53] dark:text-amber-200/70">Select a dialogue option below</span>
+          <span class="text-[11px] font-mono text-[#505d53] dark:text-amber-200/70">Click the text to skip ▸</span>
         </div>
 
+        <!-- Screen readers get the full line once; the animated copy is hidden from them -->
+        <p class="sr-only" aria-live="polite" data-dialogue-sr>{dialogue.greeting}</p>
         <p
-          id="npc-dialogue-text"
-          class="text-sm sm:text-base font-medium text-[#252b27] dark:text-[#f5efe2] min-h-[2.5rem] leading-relaxed"
+          aria-hidden="true"
+          class="dialogue-text text-sm sm:text-base font-medium text-[#252b27] dark:text-[#f5efe2] min-h-[4.5rem] sm:min-h-[3.25rem] leading-relaxed"
         >
-          “Tidy! Welcome, traveler, to <strong>Luigie Cyril Francis A. Posod</strong>'s Sanctuary! What part of the Wizard's Companion shall we inspect first?”
+          “<span data-dialogue-visible>{dialogue.greeting}</span>”<span data-dialogue-caret class="dialogue-caret">▼</span>
         </p>
 
-        <!-- Interactive RPG Dialogue Choices -->
-        <div class="flex flex-wrap gap-2 pt-1">
+        <div class="flex flex-wrap gap-2 pt-1" role="group" aria-label="Dialogue choices">
+          {
+            dialogue.options.map((opt, i) => (
+              <button
+                type="button"
+                data-dialogue-option={i}
+                class="npc-choice inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono font-semibold bg-[#23476e]/10 dark:bg-white/10 text-[#23476e] dark:text-[#f3b354] hover:bg-[#c59b47] hover:text-[#131a29] border border-[#c59b47]/60 transition-colors cursor-pointer"
+              >
+                <span class="npc-choice__cursor" aria-hidden="true">▸</span>
+                <span>{opt.label}</span>
+              </button>
+            ))
+          }
           <button
             type="button"
-            data-dialogue="“Luigie is an Arcane Full-Stack Artificer who specializes in TypeScript, Astro, React, and high-speed web architecture—crafting web realms with near-zero load times!”"
-            class="npc-choice inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono font-semibold bg-[#23476e]/10 dark:bg-white/10 text-[#23476e] dark:text-[#f3b354] hover:bg-[#c59b47] hover:text-[#131a29] border border-[#c59b47]/60 transition-colors cursor-pointer"
-          >
-            <span class="animate-cursor-bounce">▸</span>
-            <span>Who is Luigie?</span>
-          </button>
-
-          <button
-            type="button"
-            data-dialogue="“Flipping to the Swift Solutions Quest Log! Luigie has completed S-Rank and A-Rank engineering campaigns across remote guilds, boosting performance by 42%.”"
-            data-scroll="#experience"
-            class="npc-choice inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono font-semibold bg-[#23476e]/10 dark:bg-white/10 text-[#23476e] dark:text-[#f3b354] hover:bg-[#c59b47] hover:text-[#131a29] border border-[#c59b47]/60 transition-colors cursor-pointer"
-          >
-            <span>▸</span>
-            <span>Show Quest Log</span>
-          </button>
-
-          <button
-            type="button"
-            data-dialogue="“Behold the Vault of Relics! Each project is forged with 5-star craftsmanship, clean code, and modern web alchemy. Click any relic below to inspect its source scroll!”"
-            data-scroll="#projects"
-            class="npc-choice inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono font-semibold bg-[#23476e]/10 dark:bg-white/10 text-[#23476e] dark:text-[#f3b354] hover:bg-[#c59b47] hover:text-[#131a29] border border-[#c59b47]/60 transition-colors cursor-pointer"
-          >
-            <span>▸</span>
-            <span>Inspect Relics</span>
-          </button>
-
-          <button
-            type="button"
-            data-cast-theme="true"
+            data-theme-toggle
+            aria-pressed="false"
             class="npc-choice inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono font-semibold bg-[#23476e]/10 dark:bg-white/10 text-[#2e7050] dark:text-emerald-300 hover:bg-[#c59b47] hover:text-[#131a29] border border-[#c59b47]/60 transition-colors cursor-pointer"
           >
-            <span>✨</span>
+            <span class="npc-choice__cursor" aria-hidden="true">✨</span>
             <span>Cast Time-Shift Spell</span>
           </button>
         </div>
@@ -242,35 +221,3 @@ import { profile } from '../data/portfolio';
     </div>
   </div>
 </section>
-
-<script>
-  const dialogueEl = document.getElementById('npc-dialogue-text');
-  const buttons = document.querySelectorAll('.npc-choice');
-
-  buttons.forEach((btn) => {
-    btn.addEventListener('click', () => {
-      const castTheme = btn.getAttribute('data-cast-theme');
-      if (castTheme === 'true') {
-        const html = document.documentElement;
-        const isDark = html.classList.toggle('dark');
-        localStorage.setItem('theme', isDark ? 'dark' : 'light');
-        if (dialogueEl) {
-          dialogueEl.innerHTML = isDark
-            ? '“✨ <em>Spell Cast: Nightfall!</em> Lanterns are lit and fireflies now dance across the starlit kingdom.”'
-            : '“☀️ <em>Spell Cast: Dawnbreak!</em> Warm sunlight returns to the summer meadows of Ding Dong Dell.”';
-        }
-        return;
-      }
-
-      const message = btn.getAttribute('data-dialogue');
-      const scrollTarget = btn.getAttribute('data-scroll');
-      if (message && dialogueEl) {
-        dialogueEl.textContent = message;
-      }
-      if (scrollTarget) {
-        const target = document.querySelector(scrollTarget);
-        target?.scrollIntoView({ behavior: 'smooth' });
-      }
-    });
-  });
-</script>

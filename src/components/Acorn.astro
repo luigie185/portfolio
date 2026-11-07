@@ -1,0 +1,25 @@
+---
+// A hidden collectible. Place it inside a `relative` container and position it
+// with the `class` prop. The game script hides it once collected.
+interface Props {
+  id: string;
+  class?: string;
+}
+const { id, class: className = '' } = Astro.props;
+---
+
+<button
+  type="button"
+  data-acorn={id}
+  aria-label="Hidden acorn — collect it"
+  title="An acorn! Click to collect"
+  class:list={['acorn', className]}
+>
+  <svg viewBox="0 0 32 32" aria-hidden="true">
+    <path d="M16 3v4" stroke="#5c4938" stroke-width="2.4" stroke-linecap="round" />
+    <path d="M5 13c0-4 5-7 11-7s11 3 11 7c0 1.5-1 2.5-2.5 2.5h-17C6 15.5 5 14.5 5 13Z" fill="#7a5a3a" />
+    <path d="M8 10.5h16M7 13h18" stroke="#5c4938" stroke-width="1" stroke-linecap="round" opacity=".6" />
+    <path d="M7.5 15.5h17c0 7-3.5 12.5-8.5 12.5S7.5 22.5 7.5 15.5Z" fill="#c98a3d" />
+    <path d="M11 18c.5 3 2 5.5 4 6.5" stroke="#fff3d6" stroke-width="1.6" stroke-linecap="round" opacity=".7" />
+  </svg>
+</button>

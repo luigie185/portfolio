@@ -1,24 +1,20 @@
 ---
 import { projects } from '../data/portfolio';
+import Acorn from './Acorn.astro';
+import ChapterHeading from './ChapterHeading.astro';
 ---
 
-<section id="projects" class="py-14 border-t-2 border-dashed border-[#c59b47]/50">
-  <div class="flex flex-col sm:flex-row sm:items-end justify-between mb-10 gap-2">
-    <div>
-      <p class="text-xs font-mono font-bold uppercase tracking-widest text-[#d4712a] dark:text-[#f3b354] mb-1">
-        📖 THE WIZARD'S COMPANION · ARTIFACT COMPENDIUM
-      </p>
-      <h2 class="text-2xl sm:text-3xl font-bold tracking-tight text-[#252b27] dark:text-[#f5efe2]">
-        Forged Relics & Spells (Featured Projects)
-      </h2>
-    </div>
-    <p class="text-xs font-mono font-semibold px-3 py-1 rounded-full bg-[#e9dfc4] dark:bg-[#1c2942] text-[#2e7050] dark:text-[#59c49d] w-fit">
-      DISCOVERED RELICS: {projects.length} / {projects.length}
-    </p>
-  </div>
+<section data-section-quest="relics" id="projects" class="py-14 scroll-mt-20 border-t-2 border-dashed border-[#c59b47]/50">
+  <ChapterHeading
+    chapter="Chapter III"
+    eyebrow="📖 Artifact Compendium"
+    title="Forged Relics & Spells (Featured Projects)"
+    badge={`DISCOVERED RELICS: ${projects.length} / ${projects.length}`}
+  />
 
   <!-- RPG Grimoire Inventory Grid -->
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+  <div class="relative grid grid-cols-1 md:grid-cols-2 gap-6">
+    <Acorn id="relics" class="-top-5 left-1/2 z-20" />
     {
       projects.map((project) => (
         <article class="rpg-panel group relative flex flex-col justify-between p-6 rounded-3xl hover:-translate-y-1 transition-all duration-300">

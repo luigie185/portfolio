@@ -1,5 +1,7 @@
 ---
 import '../styles/global.css';
+import TitleScreen from '../components/TitleScreen.astro';
+import QuestJournal from '../components/QuestJournal.astro';
 
 interface Props {
   title: string;
@@ -30,16 +32,17 @@ const {
       rel="stylesheet"
     />
 
-    <!-- Prevent flash of incorrect theme -->
+    <!-- Set theme + title-screen state before paint (storage access can throw, so guard it) -->
     <script is:inline>
-      const getThemePreference = () => {
-        if (typeof localStorage !== 'undefined' && localStorage.getItem('theme')) {
-          return localStorage.getItem('theme');
-        }
-        return 'light';
-      };
-      const isDark = getThemePreference() === 'dark';
-      document.documentElement.classList[isDark ? 'add' : 'remove']('dark');
+      (function () {
+        var root = document.documentElement;
+        var theme = null, seen = null;
+        try { theme = localStorage.getItem('theme'); } catch (e) {}
+        try { seen = sessionStorage.getItem('forest-title-seen'); } catch (e) {}
+        var dark = theme ? theme === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+        root.classList.toggle('dark', dark);
+        if (!seen) root.classList.add('show-title');
+      })();
     </script>
   </head>
   <body
@@ -48,12 +51,19 @@ const {
     <!-- ========================================================================= -->
     <!-- MY NEIGHBOR TOTORO SCENIC ILLUSTRATED BACKGROUND (DAY MEADOW & NIGHT SKY) -->
     <!-- ========================================================================= -->
+    <a href="#main" class="skip-link">Skip to content</a>
+    <TitleScreen />
+
     <div class="pointer-events-none fixed inset-0 -z-10 overflow-hidden" aria-hidden="true">
       <!-- 1. Sky Gradient: Summer Ghibli Cerulean Sky (Day) / Starry Tsukamori Forest (Night) -->
       <div
         class="absolute inset-0 bg-gradient-to-b from-[#6ec3e8] via-[#b8e6f5] to-[#dff2c9] dark:from-[#070d19] dark:via-[#11223d] dark:to-[#18333b] transition-colors duration-500"
       >
       </div>
+
+      <!-- 1b. Twinkling stars (night only) and watercolor wash -->
+      <div class="night-stars absolute inset-0 hidden dark:block"></div>
+      <div class="watercolor-wash absolute inset-0"></div>
 
       <!-- 2. Glowing Full Moon (Night) / Warm Summer Sun (Day) -->
       <div
@@ -236,6 +246,14 @@ const {
           d="M0 560V490Q420 435 860 485T1440 465V560Z"
           class="fill-[#39824c] dark:fill-[#0a1f1e] transition-colors duration-500"
         />
+
+        <!-- Swaying grass tufts in the foreground breeze -->
+        <g class="fill-[#2f7343] dark:fill-[#081a19]">
+          <path class="grass-sway" d="M300 500q4-30 10-44q-2 22 2 44zm16 0q2-24 12-38q-6 20-4 38zm-26 0q-6-20-14-30q10 10 20 30z" />
+          <path class="grass-sway" style="animation-delay:-1.2s" d="M640 486q4-30 10-44q-2 22 2 44zm16 0q2-24 12-38q-6 20-4 38zm-26 0q-6-20-14-30q10 10 20 30z" />
+          <path class="grass-sway" style="animation-delay:-2.4s" d="M980 492q4-30 10-44q-2 22 2 44zm16 0q2-24 12-38q-6 20-4 38zm-26 0q-6-20-14-30q10 10 20 30z" />
+          <path class="grass-sway" style="animation-delay:-0.6s" d="M1380 478q4-30 10-44q-2 22 2 44zm16 0q2-24 12-38q-6 20-4 38zm-26 0q-6-20-14-30q10 10 20 30z" />
+        </g>
       </svg>
 
       <!-- 6. Floating Soot Sprites / Forest Fireflies -->
@@ -253,8 +271,25 @@ const {
         style="animation-delay: -3.2s;"
       >
       </div>
+      <div
+        class="animate-firefly absolute top-[55%] right-[30%] w-2 h-2 rounded-full bg-amber-200/70 dark:bg-amber-200/90 blur-[1px] shadow-[0_0_12px_#fde68a]"
+        style="animation-delay: -2.4s;"
+      >
+      </div>
+      <div
+        class="animate-firefly absolute top-[18%] left-[45%] w-1.5 h-1.5 rounded-full bg-lime-100/70 dark:bg-teal-200/90 blur-[1px] shadow-[0_0_10px_#99f6e4]"
+        style="animation-delay: -0.9s;"
+      >
+      </div>
     </div>
 
     <slot />
+
+    <QuestJournal />
+    <div data-toast-region class="toast-region" role="status" aria-live="polite"></div>
+
+    <script>
+      import '../scripts/game';
+    </script>
   </body>
 </html>
