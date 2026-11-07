@@ -282,28 +282,48 @@ function applyTheme(dark: boolean) {
  * cards are briefly dipped, so no colour ever snaps. Reduced motion → instant.
  */
 let shifting = false;
+let queuedDark: boolean | null = null;
 function setTheme(dark: boolean, _origin?: { x: number; y: number }) {
   const root = document.documentElement;
-  if (prefersReducedMotion() || shifting) {
+  if (shifting) {
+    // never drop a press: remember it and play it once this sunset/sunrise ends
+    queuedDark = dark;
+    return;
+  }
+  if (prefersReducedMotion() || root.classList.contains('dark') === dark) {
     applyTheme(dark);
     return;
   }
   shifting = true;
   const story = dark ? 'sunset' : 'sunrise';
-  const FLIP = dark ? 1000 : 900; // sun on the horizon / moon gone
-  const TOTAL = dark ? 3600 : 3700;
+  const FLIP = dark ? 2700 : 2100; // sun at the horizon / moon gone
+  const TOTAL = 7000;
   root.classList.add(story);
-  window.setTimeout(() => root.classList.add('time-shift-out'), FLIP - 450);
+  window.setTimeout(() => root.classList.add('time-shift-out'), FLIP - 500);
   window.setTimeout(() => applyTheme(dark), FLIP);
-  window.setTimeout(() => root.classList.remove('time-shift-out'), FLIP + 250);
+  // keep the cards hidden until their redraw in the new colours has finished
+  window.setTimeout(() => root.classList.remove('time-shift-out'), FLIP + 700);
   window.setTimeout(() => {
     root.classList.remove(story);
     shifting = false;
+    const next = queuedDark;
+    queuedDark = null;
+    if (next !== null && next !== root.classList.contains('dark')) setTheme(next);
   }, TOTAL);
 }
 
+/** The day/night the sky is heading to (accounts for a running or queued change). */
+function targetDark() {
+  if (queuedDark !== null) return queuedDark;
+  const root = document.documentElement;
+  if (root.classList.contains('sunset')) return true;
+  if (root.classList.contains('sunrise')) return false;
+  return root.classList.contains('dark');
+}
+
 export function toggleTheme(origin?: { x: number; y: number }) {
-  const dark = !document.documentElement.classList.contains('dark');
+  // toggle relative to where the sky is heading, so clicks mid-sunset aren't lost
+  const dark = !targetDark();
   setTheme(dark, origin);
   completeQuest('nightfall');
   moriReact();
