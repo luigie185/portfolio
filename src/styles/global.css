@@ -3185,3 +3185,7 @@ kbd {
 /* seeds fade rather than blink out when the weather turns */
 .seeds { transition: opacity 1.2s ease; }
 :is([data-weather="rain"], [data-weather="storm"], [data-weather="snow"]) .seeds { display: block; opacity: 0; }
+
+/* the bubble crest shows your (fixed) level: a full gilt ring */
+.hud-ring__fill--full { stroke: #d6a84f !important; }
+.dark .hud-ring__fill--full { stroke: #f3b354 !important; }

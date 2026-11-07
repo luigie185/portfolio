@@ -4,7 +4,7 @@
  * device. It replaces the old top header + mobile dock:
  *   [traveler crest with XP ring] | chapter tabs | acorns · weather · day/night
  */
-import { ACORN_IDS, WEATHERS, XP_PER_LEVEL, profile } from '../data/portfolio';
+import { ACORN_IDS, WEATHERS, profile } from '../data/portfolio';
 import Icon from './Icon.astro';
 import type { IconName } from '../scripts/icons';
 
@@ -13,38 +13,23 @@ const links = [
   { href: '#experience', icon: 'scroll', label: 'Quests' },
   { href: '#projects', icon: 'book', label: 'Relics' },
 ] satisfies { href: string; icon: IconName; label: string }[];
-const RING = 2 * Math.PI * 20; // XP ring circumference (r = 20)
 ---
 
 <nav class="hud-bubble" data-hud aria-label="Game menu">
-  <!-- Traveler crest: level in the middle, XP as a ring around it -->
-  <a
-    href="#about"
-    class="hud-bubble__crest"
-    data-hud-badge
-  >
-    <!-- name plate that rises above the crest on hover / keyboard focus -->
+  <!-- Your crest: your level, with a gilt ring. Hover/focus shows your name. -->
+  <a href="#about" class="hud-bubble__crest">
     <span class="hud-nameplate" aria-hidden="true">
       <span class="hud-nameplate__name">{profile.name}</span>
-      <span class="hud-nameplate__meta" data-hud-crest-meta>Traveler LV 1 · 0/{XP_PER_LEVEL} XP</span>
+      <span class="hud-nameplate__meta">LV {profile.level} · {profile.role}</span>
     </span>
     <svg viewBox="0 0 48 48" aria-hidden="true">
       <circle cx="24" cy="24" r="20" class="hud-ring__track" />
-      <circle
-        cx="24"
-        cy="24"
-        r="20"
-        class="hud-ring__fill"
-        data-hud-xp-ring
-        style={`stroke-dasharray:${RING.toFixed(2)};stroke-dashoffset:${RING.toFixed(2)}`}
-      />
+      <circle cx="24" cy="24" r="20" class="hud-ring__fill hud-ring__fill--full" />
       <circle cx="24" cy="24" r="15.5" class="hud-ring__disc" />
       <text x="24" y="21" text-anchor="middle" class="hud-ring__lv">LV</text>
-      <text x="24" y="32" text-anchor="middle" class="hud-ring__num" data-hud-level>1</text>
+      <text x="24" y="32" text-anchor="middle" class="hud-ring__num">{profile.level}</text>
     </svg>
-    <span class="sr-only">
-      {profile.name}. Traveler level <span data-hud-level>1</span>, <span data-hud-xp>0/{XP_PER_LEVEL}</span> experience. Back to top.
-    </span>
+    <span class="sr-only">{profile.name}, level {profile.level}. Back to top.</span>
   </a>
 
   <span class="hud-bubble__sep" aria-hidden="true"></span>

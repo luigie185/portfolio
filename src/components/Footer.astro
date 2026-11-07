@@ -3,7 +3,6 @@ import Icon from './Icon.astro';
 import { ACORN_IDS, XP_PER_LEVEL, profile, quests } from '../data/portfolio';
 import Acorn from './Acorn.astro';
 import ForestSpirit from './ForestSpirit.astro';
-const currentYear = new Date().getFullYear();
 
 // Tall grass blades rising over the top of the signboard (seeded, so builds are identical)
 let seed = 19;
@@ -51,7 +50,7 @@ grass += ' L1440 60 Z';
 
         <dl class="mt-4 grid grid-cols-3 gap-2 max-w-sm">
           <div class="save-stat">
-            <dt>Level</dt>
+            <dt>Your level</dt>
             <dd><span data-hud-level>1</span></dd>
           </div>
           <div class="save-stat">
@@ -105,10 +104,5 @@ grass += ' L1440 60 Z';
       </div>
     </div>
 
-    <div class="site-footer__rule"></div>
-    <div class="max-w-4xl mx-auto px-5 sm:px-6 pt-4 pb-28 flex flex-col gap-1 items-center text-xs site-footer__fine">
-      <p>© {currentYear} <strong>{profile.name}</strong> · All rights reserved</p>
-      <p>Built with Astro &amp; Tailwind · scenery painted by hand in SVG</p>
-    </div>
-  </div>
+    <div class="pb-28"></div>
 </footer>

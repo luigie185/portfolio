@@ -50,7 +50,7 @@ export const profile = {
     "A software engineer and digital artificer who crafts performant, accessible, and user-centric web applications. Armed with the Wizard's Companion and modern TypeScript mastery, I transform complex quests into elegant, maintainable solutions.",
   location: "Available Worldwide",
   availableForWork: true,
-  email: "hello@example.com",
+  email: "luigie185@gmail.com",
   socials: {
     github: "https://github.com/luigie185",
     linkedin: "https://linkedin.com",
