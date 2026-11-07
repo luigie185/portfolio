@@ -1,0 +1,4 @@
+schema_version: "1.1"
+name: reduced-motion-support
+expected_outcome: |
+  Agent researches prefers-reduced-motion guidance (MDN / WCAG 2.3.3) and Tailwind v4 motion-reduce/motion-safe variants, gives a cited brief, then disables or tones down the infinite animations in src/styles/global.css and components, and runs npm run build.

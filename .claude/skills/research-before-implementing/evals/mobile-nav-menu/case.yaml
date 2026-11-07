@@ -1,0 +1,4 @@
+schema_version: "1.1"
+name: mobile-nav-menu
+expected_outcome: |
+  Agent checks package.json versions, searches official docs (WAI-ARIA APG disclosure pattern, Astro 5 scripts, Tailwind v4) before editing, posts a short research brief with source URLs, then implements an accessible toggle menu in src/components/Navbar.astro and runs npm run build.
