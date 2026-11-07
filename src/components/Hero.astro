@@ -1,6 +1,7 @@
 ---
 import { dialogue, profile } from '../data/portfolio';
 import Acorn from './Acorn.astro';
+import ForestSpirit from './ForestSpirit.astro';
 ---
 
 <section id="about" class="pt-10 pb-14 sm:pt-14 sm:pb-[4.5rem] space-y-6">
@@ -8,23 +9,33 @@ import Acorn from './Acorn.astro';
   <div class="rpg-panel rounded-3xl p-6 sm:p-9 relative overflow-hidden">
     <Acorn id="hero" class="bottom-3 right-4 z-20" />
 
-    <!-- Rotating Arcane Compass Watermark in Corner -->
+    <!-- Hand-drawn camphor sprig tucked into the corner of the page -->
     <svg
       aria-hidden="true"
-      class="animate-spin-slow pointer-events-none absolute -right-16 -top-16 w-64 h-64 text-[#c59b47]/15 dark:text-[#d6a84f]/10"
-      viewBox="0 0 200 200"
+      class="pointer-events-none absolute hidden lg:block -right-3 top-[10.5rem] w-48 h-36 opacity-90 dark:opacity-50"
+      viewBox="0 0 220 170"
       fill="none"
     >
-      <circle cx="100" cy="100" r="88" stroke="currentColor" stroke-width="2" stroke-dasharray="6 4" />
-      <circle cx="100" cy="100" r="68" stroke="currentColor" stroke-width="1.5" />
-      <path d="M100 6v188M6 100h188M34 34l132 132M166 34L34 166" stroke="currentColor" stroke-width="1" />
-      <polygon points="100,18 108,92 182,100 108,108 100,182 92,108 18,100 92,92" fill="currentColor" fill-opacity="0.2" />
+      <path d="M215 6 C170 30 130 60 92 104 C70 128 52 146 30 160" stroke="#7a5a3a" stroke-width="3" stroke-linecap="round" />
+      <path d="M150 44 C150 22 170 8 192 8 C190 30 172 44 150 44Z" fill="#5f9f4f" />
+      <path d="M150 44 L186 14" stroke="#3f7a3a" stroke-width="1.2" />
+      <path d="M128 64 C108 50 84 54 72 70 C92 82 114 80 128 64Z" fill="#7bb85a" />
+      <path d="M128 64 L80 68" stroke="#4d8f45" stroke-width="1.2" />
+      <path d="M112 84 C116 62 136 48 158 52 C152 74 134 86 112 84Z" fill="#4f9248" />
+      <path d="M112 84 L152 56" stroke="#356b33" stroke-width="1.2" />
+      <path d="M80 116 C60 104 38 110 28 126 C48 136 68 132 80 116Z" fill="#8cc464" />
+      <path d="M80 116 L36 124" stroke="#5a9a4a" stroke-width="1.2" />
+      <path d="M66 130 C72 110 92 100 112 104 C104 124 86 134 66 130Z" fill="#5f9f4f" />
+      <circle cx="176" cy="34" r="5" fill="#2b4a3a" /><circle cx="186" cy="40" r="4.5" fill="#2b4a3a" />
+      <circle cx="174.5" cy="32.5" r="1.4" fill="#fff" opacity=".6" />
     </svg>
 
     <!-- Top Guild Header Ribbon -->
-    <div class="flex flex-wrap items-center justify-between gap-2 pb-5 mb-6 border-b border-[#dfd3b8] dark:border-[#2e4063]">
+    <div class="relative z-10 flex flex-wrap items-center justify-between gap-2 pb-5 mb-6 border-b border-[#dfd3b8] dark:border-[#2e4063]">
       <div class="inline-flex items-center gap-2 text-xs font-mono font-bold uppercase tracking-wider text-[#23476e] dark:text-[#f3b354]">
-        <span>📖 THE WIZARD'S COMPANION · HERO REGISTRY</span>
+        <span class="font-serif-story italic normal-case tracking-normal text-sm text-[#c27a2c] dark:text-[#f3b354]">❦ Chapter I ❦</span>
+        <span class="text-[#c59b47]" aria-hidden="true">·</span>
+        <span>The Traveler's Registry</span>
       </div>
 
       {
@@ -138,7 +149,7 @@ import Acorn from './Acorn.astro';
                   <p class="text-[10px] font-mono uppercase text-[#d4712a] dark:text-[#f3b354] font-bold">
                     {item.label}
                   </p>
-                  <p class="mt-0.5 text-[11px] font-semibold text-[#252b27] dark:text-[#f5efe2] line-clamp-2">
+                  <p class="mt-0.5 text-[10.5px] font-semibold text-[#252b27] dark:text-[#f5efe2] leading-snug">
                     {item.value}
                   </p>
                 </div>
@@ -150,30 +161,18 @@ import Acorn from './Acorn.astro';
     </div>
   </div>
 
-  <!-- Totoro guide: game-style dialogue box with typewriter text -->
+  <!-- Forest spirit guide: game-style dialogue box with typewriter text -->
   <div data-dialogue-box class="dialogue-box rpg-panel relative rounded-2xl p-5 sm:p-6">
     <Acorn id="dialogue" class="-top-3 right-8 z-20" />
     <div class="flex flex-col sm:flex-row items-start gap-4">
-      <!-- Totoro Spirit Guide Avatar -->
+      <!-- Mori, the forest spirit guide -->
       <div
-        class="animate-float-slow relative w-16 h-16 rounded-2xl bg-[#7ec8e3]/30 dark:bg-[#101c2e] border-2 border-[#c59b47] flex items-center justify-center shrink-0 shadow-md"
+        class="animate-float-slow relative w-16 h-16 rounded-2xl bg-[#cfe9f2]/60 dark:bg-[#101c2e] border-2 border-[#c59b47] flex items-center justify-center shrink-0 shadow-md"
         aria-hidden="true"
       >
-        <svg class="w-12 h-12" viewBox="0 0 64 64" fill="none">
-          <path d="M21 19l-3-10 7 7zM43 19l3-10-7 7z" fill="#6b7278" />
-          <ellipse cx="32" cy="38" rx="18" ry="19" fill="#6b7278" />
-          <ellipse cx="32" cy="42" rx="12.5" ry="12.5" fill="#f3ebd3" />
-          <path d="M25 37l2.5-2 2.5 2M34 37l2.5-2 2.5 2M28 43l3-2 3 2" stroke="#6b7278" stroke-width="2" stroke-linecap="round" />
-          <g class="npc-eyes">
-            <circle cx="25" cy="26" r="3" fill="#ffffff" />
-            <circle cx="39" cy="26" r="3" fill="#ffffff" />
-            <circle cx="25" cy="26" r="1.4" fill="#111" />
-            <circle cx="39" cy="26" r="1.4" fill="#111" />
-          </g>
-          <path d="M32 19c-3-4-7-2.5-7-2.5s2 4.5 7 2.5c5 2 7-2.5 7-2.5s-4-1.5-7 2.5z" fill="#4d9b58" />
-        </svg>
+        <ForestSpirit standalone class="w-14 h-14 npc-eyes-host" />
         <span class="absolute -bottom-2 px-1.5 bg-[#c59b47] text-[#101c2e] font-mono font-bold text-[9px] rounded uppercase">
-          Totoro
+          Mori
         </span>
       </div>
 

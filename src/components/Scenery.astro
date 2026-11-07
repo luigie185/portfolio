@@ -1,0 +1,348 @@
+---
+/**
+ * Painterly satoyama landscape (original illustration in the style of hand-painted
+ * Japanese countryside animation backgrounds): summer cumulus, blue distant hills,
+ * layered forest, rice paddies, an old farmhouse, utility poles, a great camphor
+ * tree and a tall-grass foreground. Every colour is a CSS variable (see
+ * global.css → .scene), so the same painting switches between day and night.
+ *
+ * Organic detail (canopies, paddies, grass) is generated from a seeded RNG so the
+ * output is identical on every build.
+ */
+import ForestSpirit from './ForestSpirit.astro';
+
+function rng(seed: number) {
+  let s = seed % 2147483647;
+  return () => (s = (s * 16807) % 2147483647) / 2147483647;
+}
+
+interface Blob { x: number; y: number; r: number; lit: boolean }
+
+/** A tree canopy: overlapping blobs inside an ellipse, top ones catch the sun. */
+function canopy(cx: number, cy: number, w: number, h: number, n: number, seed: number, rMin = 18, rMax = 42): Blob[] {
+  const r = rng(seed);
+  const blobs: Blob[] = [];
+  for (let i = 0; i < n; i++) {
+    const a = r() * Math.PI * 2;
+    const d = Math.sqrt(r());
+    const x = cx + Math.cos(a) * d * w * 0.5;
+    const y = cy + Math.sin(a) * d * h * 0.5;
+    blobs.push({ x, y, r: rMin + r() * (rMax - rMin), lit: y < cy - h * 0.05 && x < cx + w * 0.2 });
+  }
+  return blobs.sort((a, b) => a.y - b.y);
+}
+
+/** A tree line along a ridge: canopies whose tops follow y(x). */
+function treeLine(x0: number, x1: number, y: (x: number) => number, seed: number, rMin: number, rMax: number): Blob[] {
+  const r = rng(seed);
+  const blobs: Blob[] = [];
+  for (let x = x0; x <= x1; x += rMin * 0.9 + r() * rMin) {
+    const rad = rMin + r() * (rMax - rMin);
+    const top = y(x);
+    blobs.push({ x, y: top + rad * 0.6, r: rad, lit: r() > 0.35 });
+    blobs.push({ x: x + rad * 0.4, y: top + rad * 1.4, r: rad * 1.1, lit: false });
+  }
+  return blobs;
+}
+
+// Distant forest ridge (cool, low contrast — atmospheric perspective)
+const farForest = treeLine(-40, 1480, (x) => 548 + Math.sin(x / 160) * 14 + Math.sin(x / 57) * 5, 7, 14, 24);
+
+// Wooded knoll on the left behind the farmhouse
+const leftGrove = [
+  ...canopy(250, 545, 360, 120, 34, 11, 22, 46),
+  ...canopy(470, 575, 200, 70, 16, 12, 18, 34),
+];
+
+// The great camphor tree on the right hill
+const camphor = [
+  ...canopy(1185, 300, 420, 260, 70, 21, 34, 70),
+  ...canopy(1060, 385, 170, 110, 18, 22, 24, 46),
+  ...canopy(1320, 395, 170, 110, 18, 23, 24, 46),
+];
+// Woods hugging the camphor hill
+const rightWoods = treeLine(930, 1480, (x) => 520 + Math.cos((x - 1200) / 140) * -18, 31, 20, 34);
+
+// Rice paddies: rows receding toward a vanishing point, fields split by ridges
+const VP = { x: 720, y: 470 };
+const paddyRows = [612, 628, 648, 674, 708, 752];
+const paddyCols = [-900, -500, -150, 180, 520, 860, 1200, 1560, 1950, 2350];
+const proj = (xBase: number, y: number) => VP.x + (xBase - VP.x) * ((y - VP.y) / (paddyRows.at(-1)! - VP.y));
+const pr = rng(41);
+const paddies: { pts: string; water: boolean; tone: string }[] = [];
+for (let i = 0; i < paddyRows.length - 1; i++) {
+  const y0 = paddyRows[i], y1 = paddyRows[i + 1];
+  for (let j = 0; j < paddyCols.length - 1; j++) {
+    const a = paddyCols[j], b = paddyCols[j + 1];
+    const pts = [
+      [proj(a, y0) + 2, y0 + 1.5], [proj(b, y0) - 2, y0 + 1.5],
+      [proj(b, y1) - 2, y1 - 1.5], [proj(a, y1) + 2, y1 - 1.5],
+    ].map((p) => p.map((n) => n.toFixed(1)).join(',')).join(' ');
+    const t = pr();
+    paddies.push({ pts, water: t > 0.72, tone: t < 0.3 ? '--scene-paddy-alt' : t < 0.5 ? '--scene-paddy-deep' : '--scene-paddy' });
+  }
+}
+
+// Foreground grass blades and wildflowers
+const gr = rng(77);
+const blades: string[] = [];
+for (let x = -20; x < 1460; x += 5 + gr() * 6) {
+  const base = 900;
+  const h = 60 + gr() * 120 + (x < 260 || x > 1180 ? 70 : 0);
+  const lean = (gr() - 0.4) * 40;
+  const w = 3 + gr() * 4;
+  blades.push(`M${x.toFixed(1)} ${base}Q${(x + lean * 0.4).toFixed(1)} ${(base - h * 0.6).toFixed(1)} ${(x + lean).toFixed(1)} ${(base - h).toFixed(1)}Q${(x + lean * 0.3 + w).toFixed(1)} ${(base - h * 0.55).toFixed(1)} ${(x + w * 1.6).toFixed(1)} ${base}Z`);
+}
+const flowers = Array.from({ length: 46 }, () => ({
+  x: gr() * 1440,
+  y: 800 + gr() * 80,
+  r: 2.2 + gr() * 2.6,
+  warm: gr() > 0.6,
+}));
+
+const poles = [
+  { x: 300, top: 548, bottom: 640 },
+  { x: 560, top: 556, bottom: 628 },
+  { x: 900, top: 552, bottom: 634 },
+  { x: 1385, top: 520, bottom: 660 },
+];
+---
+
+<div class="scene pointer-events-none fixed inset-0 -z-10 overflow-hidden" aria-hidden="true">
+  <!-- Sky: deep summer cerulean fading to a pale, hazy horizon -->
+  <div class="scene-sky absolute inset-0"></div>
+  <div class="scene-sun absolute"></div>
+  <div class="night-stars absolute inset-0 hidden dark:block"></div>
+
+  <!-- Clouds (own layers so they can drift without repainting the landscape) -->
+  <svg class="scene-clouds scene-clouds--far absolute top-0 left-0 w-full h-[70vh]" viewBox="0 0 1440 620" preserveAspectRatio="xMidYMin slice">
+    <g filter="url(#brush-soft)">
+      <!-- low far cumulus band above the hills -->
+      <g class="cloud-shade">
+        <circle cx="140" cy="520" r="46" /><circle cx="210" cy="505" r="58" /><circle cx="290" cy="520" r="42" />
+        <circle cx="820" cy="510" r="40" /><circle cx="880" cy="495" r="55" /><circle cx="950" cy="512" r="38" />
+      </g>
+      <g class="cloud-light">
+        <circle cx="200" cy="488" r="44" /><circle cx="150" cy="503" r="30" /><circle cx="262" cy="500" r="30" />
+        <circle cx="872" cy="480" r="40" /><circle cx="828" cy="494" r="26" /><circle cx="930" cy="494" r="26" />
+      </g>
+    </g>
+  </svg>
+
+  <svg class="scene-clouds scene-clouds--near absolute top-0 left-0 w-full h-[78vh]" viewBox="0 0 1440 700" preserveAspectRatio="xMidYMin slice">
+    <g filter="url(#brush-soft)">
+      <!-- Towering cumulonimbus, left: lavender undersides, sunlit crown -->
+      <g class="cloud-deep">
+        <ellipse cx="420" cy="455" rx="250" ry="70" />
+        <circle cx="300" cy="400" r="90" /><circle cx="440" cy="380" r="110" /><circle cx="570" cy="410" r="85" />
+      </g>
+      <g class="cloud-shade">
+        <circle cx="320" cy="360" r="88" /><circle cx="430" cy="300" r="118" /><circle cx="545" cy="345" r="92" />
+        <circle cx="390" cy="200" r="90" /><circle cx="480" cy="170" r="84" /><circle cx="430" cy="95" r="70" />
+        <circle cx="250" cy="410" r="60" /><circle cx="620" cy="420" r="58" />
+      </g>
+      <g class="cloud-light">
+        <circle cx="300" cy="335" r="70" /><circle cx="400" cy="270" r="96" /><circle cx="510" cy="300" r="64" />
+        <circle cx="370" cy="175" r="72" /><circle cx="455" cy="145" r="64" /><circle cx="410" cy="80" r="54" />
+        <circle cx="240" cy="392" r="44" />
+      </g>
+      <g class="cloud-warm" filter="url(#cloud-bloom)">
+        <circle cx="360" cy="150" r="46" /><circle cx="330" cy="250" r="50" /><circle cx="270" cy="330" r="40" />
+      </g>
+
+      <!-- Second, smaller cumulus on the right -->
+      <g class="cloud-deep">
+        <ellipse cx="1130" cy="330" rx="170" ry="46" />
+      </g>
+      <g class="cloud-shade">
+        <circle cx="1040" cy="300" r="56" /><circle cx="1120" cy="260" r="78" /><circle cx="1210" cy="290" r="60" />
+        <circle cx="1100" cy="190" r="56" /><circle cx="1280" cy="315" r="38" />
+      </g>
+      <g class="cloud-light">
+        <circle cx="1030" cy="285" r="40" /><circle cx="1105" cy="240" r="62" /><circle cx="1190" cy="268" r="42" />
+        <circle cx="1088" cy="178" r="42" />
+      </g>
+
+      <!-- Wispy high stratus -->
+      <g class="cloud-wisp">
+        <ellipse cx="760" cy="120" rx="160" ry="10" /><ellipse cx="820" cy="140" rx="110" ry="7" />
+        <ellipse cx="1340" cy="90" rx="120" ry="8" />
+      </g>
+    </g>
+  </svg>
+
+  <!-- Landscape -->
+  <svg class="absolute bottom-0 left-0 w-full h-full" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMax slice">
+    <defs>
+      <!-- Breaks up perfect vector edges into soft, brushy ones -->
+      <filter id="brush-soft" x="-10%" y="-10%" width="120%" height="120%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.022" numOctaves="3" seed="4" result="n" />
+        <feDisplacementMap in="SourceGraphic" in2="n" scale="16" xChannelSelector="R" yChannelSelector="G" result="d" />
+        <feGaussianBlur in="d" stdDeviation="1.4" />
+      </filter>
+      <filter id="cloud-bloom" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur stdDeviation="18" />
+      </filter>
+      <pattern id="rice-rows" width="10" height="5" patternUnits="userSpaceOnUse">
+        <rect width="10" height="1.4" style="fill:var(--scene-rice-row)" />
+      </pattern>
+      <filter id="brush" x="-5%" y="-5%" width="110%" height="110%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.06" numOctaves="2" seed="9" result="n" />
+        <feDisplacementMap in="SourceGraphic" in2="n" scale="7" xChannelSelector="R" yChannelSelector="G" />
+      </filter>
+      <linearGradient id="haze" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="var(--scene-haze)" stop-opacity="0" />
+        <stop offset="1" stop-color="var(--scene-haze)" stop-opacity="0.55" />
+      </linearGradient>
+      <radialGradient id="window-glow">
+        <stop offset="0" stop-color="var(--scene-window)" stop-opacity="0.9" />
+        <stop offset="1" stop-color="var(--scene-window)" stop-opacity="0" />
+      </radialGradient>
+    </defs>
+
+    <!-- Distant blue mountains -->
+    <g filter="url(#brush)">
+      <path d="M-20 600 L-20 500 Q120 440 260 470 Q380 420 520 465 Q640 430 760 470 Q900 420 1040 455 Q1200 410 1460 470 L1460 600Z" style="fill:var(--scene-mtn-far)" />
+      <path d="M-20 600 L-20 530 Q160 490 330 515 Q520 480 700 520 Q880 490 1080 512 Q1260 485 1460 520 L1460 600Z" style="fill:var(--scene-mtn-near)" />
+    </g>
+    <rect x="-20" y="430" width="1480" height="170" fill="url(#haze)" />
+
+    <!-- Far forest ridge -->
+    <g filter="url(#brush)">
+      <path d="M-20 640 L-20 572 Q300 555 720 575 T1460 568 L1460 640Z" style="fill:var(--scene-forest-far)" />
+      {farForest.map((b) => <circle cx={b.x} cy={b.y} r={b.r} style="fill:var(--scene-forest-far)" />)}
+      {farForest.filter((b) => b.lit).map((b) => (
+        <circle cx={b.x - b.r * 0.25} cy={b.y - b.r * 0.3} r={b.r * 0.55} style="fill:var(--scene-forest-far-lit)" />
+      ))}
+    </g>
+
+    <!-- Left grove (behind the farmhouse) -->
+    <g filter="url(#brush)">
+      <path d="M-20 640 L-20 560 Q200 520 420 560 Q520 580 600 612 L600 640Z" style="fill:var(--scene-tree-dark)" />
+      {leftGrove.map((b) => <circle cx={b.x + b.r * 0.15} cy={b.y + b.r * 0.2} r={b.r} style="fill:var(--scene-tree-dark)" />)}
+      {leftGrove.map((b) => <circle cx={b.x} cy={b.y} r={b.r * 0.9} style="fill:var(--scene-tree-mid)" />)}
+      {leftGrove.filter((b) => b.lit).map((b) => (
+        <circle cx={b.x - b.r * 0.28} cy={b.y - b.r * 0.32} r={b.r * 0.55} style="fill:var(--scene-tree-lit)" />
+      ))}
+      {leftGrove.filter((b, i) => b.lit && i % 4 === 0).map((b) => (
+        <ellipse cx={b.x - b.r * 0.35} cy={b.y - b.r * 0.42} rx={b.r * 0.4} ry={b.r * 0.24} style="fill:var(--scene-tree-sun)" opacity="0.7" />
+      ))}
+    </g>
+
+    <!-- Farmhouse with a deep hip roof, tucked against the grove -->
+    <g transform="translate(330 560)" filter="url(#brush)">
+      <ellipse cx="90" cy="64" rx="130" ry="10" style="fill:var(--scene-tree-dark)" opacity="0.35" />
+      <rect x="18" y="26" width="150" height="38" style="fill:var(--scene-house-wall)" />
+      <rect x="18" y="26" width="150" height="38" style="fill:var(--scene-house-shadow)" opacity="0.25" />
+      <path d="M18 34h150M18 46h150" style="stroke:var(--scene-house-trim)" stroke-width="1.5" />
+      <rect x="40" y="38" width="22" height="18" style="fill:var(--scene-window)" class="house-window" />
+      <rect x="112" y="38" width="30" height="18" style="fill:var(--scene-window)" class="house-window" />
+      <circle cx="51" cy="47" r="34" fill="url(#window-glow)" class="house-glow" />
+      <circle cx="127" cy="47" r="40" fill="url(#window-glow)" class="house-glow" />
+      <path d="M-6 30 L40 -6 L146 -6 L192 30 Z" style="fill:var(--scene-house-roof)" />
+      <path d="M40 -6 L146 -6 L130 4 L56 4 Z" style="fill:var(--scene-house-roof-lit)" />
+      <path d="M-6 30 L192 30" style="stroke:var(--scene-house-trim)" stroke-width="3" />
+      <!-- Small vegetable plot and fence -->
+      <path d="M190 64 L260 64" style="stroke:var(--scene-house-trim)" stroke-width="2" />
+      <path d="M196 56v10M210 56v10M224 56v10M238 56v10M252 56v10" style="stroke:var(--scene-house-trim)" stroke-width="2" />
+    </g>
+
+    <!-- Camphor hill and the woods around it -->
+    <g filter="url(#brush)">
+      <path d="M820 660 Q1000 560 1180 545 Q1340 540 1460 570 L1460 660Z" style="fill:var(--scene-hill-mid)" />
+      {rightWoods.map((b) => <circle cx={b.x + b.r * 0.15} cy={b.y + b.r * 0.2} r={b.r} style="fill:var(--scene-tree-dark)" />)}
+      {rightWoods.map((b) => <circle cx={b.x} cy={b.y} r={b.r * 0.88} style="fill:var(--scene-tree-mid)" />)}
+      {rightWoods.filter((b) => b.lit).map((b) => (
+        <circle cx={b.x - b.r * 0.25} cy={b.y - b.r * 0.3} r={b.r * 0.5} style="fill:var(--scene-tree-lit)" />
+      ))}
+    </g>
+
+    <!-- The great camphor tree -->
+    <g filter="url(#brush)">
+      <path d="M1140 560 C1160 500 1168 440 1160 360 L1212 360 C1206 440 1214 500 1240 560 Z" style="fill:var(--scene-trunk)" />
+      <path d="M1162 430 Q1110 400 1060 405 Q1110 418 1158 446Z M1206 420 Q1260 390 1318 392 Q1262 410 1210 440Z" style="fill:var(--scene-trunk)" />
+      <path d="M1188 380 C1190 450 1196 500 1214 556 L1236 556 C1214 500 1206 450 1206 380Z" style="fill:var(--scene-trunk-shadow)" />
+      <!-- shimenawa rope marking a sacred tree -->
+      <path d="M1153 470 Q1190 482 1226 468" style="stroke:var(--scene-rope)" stroke-width="5" fill="none" stroke-linecap="round" />
+      <path d="M1170 478v14M1190 481v16M1210 478v14" style="stroke:var(--scene-paper)" stroke-width="4" stroke-linecap="square" />
+
+      {camphor.map((b) => <circle cx={b.x + b.r * 0.15} cy={b.y + b.r * 0.22} r={b.r} style="fill:var(--scene-tree-dark)" />)}
+      {camphor.map((b) => <circle cx={b.x} cy={b.y} r={b.r * 0.88} style="fill:var(--scene-tree-mid)" />)}
+      {camphor.filter((b) => b.lit).map((b) => (
+        <circle cx={b.x - b.r * 0.28} cy={b.y - b.r * 0.32} r={b.r * 0.55} style="fill:var(--scene-tree-lit)" />
+      ))}
+      {camphor.filter((b, i) => b.lit && i % 4 === 0).map((b) => (
+        <ellipse cx={b.x - b.r * 0.35} cy={b.y - b.r * 0.42} rx={b.r * 0.42} ry={b.r * 0.26} style="fill:var(--scene-tree-sun)" opacity="0.7" />
+      ))}
+    </g>
+
+    <!-- Rice paddies -->
+    <g>
+      <path d="M-20 900 L-20 606 Q720 598 1460 610 L1460 900Z" style="fill:var(--scene-ridge)" />
+      {paddies.map((p) => (
+        <polygon points={p.pts} style={`fill:var(${p.water ? '--scene-paddy-water' : p.tone})`} />
+      ))}
+      <!-- sky reflected in flooded fields -->
+      {paddies.filter((p) => p.water).map((p) => (
+        <polygon points={p.pts} style="fill:var(--scene-paddy-shine)" opacity="0.18" />
+      ))}
+      {paddies.filter((p) => !p.water).map((p) => <polygon points={p.pts} fill="url(#rice-rows)" />)}
+    </g>
+
+    <!-- Dirt path winding toward the farmhouse -->
+    <path d="M760 900 C720 820 610 760 560 700 C520 660 470 640 430 626" style="stroke:var(--scene-path)" stroke-width="22" fill="none" stroke-linecap="round" filter="url(#brush)" />
+
+    <!-- Wooden utility poles and sagging wires -->
+    <g style="stroke:var(--scene-pole)" stroke-linecap="round">
+      {poles.map((p) => (
+        <>
+          <line x1={p.x} y1={p.top} x2={p.x} y2={p.bottom} stroke-width="3.5" />
+          <line x1={p.x - 12} y1={p.top + 8} x2={p.x + 12} y2={p.top + 8} stroke-width="2.5" />
+        </>
+      ))}
+      {poles.slice(0, -1).map((p, i) => {
+        const q = poles[i + 1];
+        const mx = (p.x + q.x) / 2;
+        return (
+          <path d={`M${p.x - 10} ${p.top + 8} Q${mx} ${Math.max(p.top, q.top) + 30} ${q.x - 10} ${q.top + 8} M${p.x + 10} ${p.top + 8} Q${mx} ${Math.max(p.top, q.top) + 34} ${q.x + 10} ${q.top + 8}`} stroke-width="1" fill="none" opacity="0.7" />
+        );
+      })}
+    </g>
+
+    <!-- Dappled warm light pooling on the fields (day) -->
+    <g class="scene-light">
+      <ellipse cx="660" cy="680" rx="260" ry="40" />
+      <ellipse cx="1040" cy="610" rx="160" ry="24" />
+    </g>
+
+    <!-- The forest spirit, resting on a mossy stone beside the path -->
+    <g transform="translate(150 690)">
+      <ForestSpirit />
+    </g>
+
+    <!-- Foreground tall summer grass and wildflowers -->
+    <g class="grass-sway-group">
+      <path d={blades.filter((_, i) => i % 2 === 0).join('')} style="fill:var(--scene-grass-back)" />
+    </g>
+    <g class="grass-sway-group grass-sway-group--alt">
+      <path d={blades.filter((_, i) => i % 2 === 1).join('')} style="fill:var(--scene-grass-front)" />
+    </g>
+    <g>
+      {flowers.map((f) => (
+        <circle cx={f.x} cy={f.y} r={f.r} style={`fill:var(${f.warm ? '--scene-flower-warm' : '--scene-flower'})`} />
+      ))}
+    </g>
+  </svg>
+
+  <!-- Fireflies (night) and drifting leaves (day) -->
+  <div class="hidden dark:block">
+    <div class="animate-firefly absolute top-[58%] left-[14%] w-2 h-2 rounded-full bg-amber-200 blur-[1px] shadow-[0_0_14px_#fcd34d]"></div>
+    <div class="animate-firefly absolute top-[66%] right-[20%] w-1.5 h-1.5 rounded-full bg-teal-200 blur-[1px] shadow-[0_0_12px_#5eead4]" style="animation-delay:-1.8s"></div>
+    <div class="animate-firefly absolute top-[72%] left-[38%] w-2 h-2 rounded-full bg-amber-100 blur-[1px] shadow-[0_0_14px_#fde68a]" style="animation-delay:-3.1s"></div>
+    <div class="animate-firefly absolute top-[62%] right-[36%] w-1.5 h-1.5 rounded-full bg-lime-100 blur-[1px] shadow-[0_0_12px_#d9f99d]" style="animation-delay:-2.4s"></div>
+  </div>
+  <div class="dark:hidden">
+    <svg class="animate-leaf-sway absolute top-[30%] left-[8%] w-6 h-6 text-[#4d8f4a]/70" viewBox="0 0 24 24" fill="currentColor"><path d="M4 20C4 10 10 4 21 3c-1 11-7 17-17 17Zm0 0 9-9" /></svg>
+    <svg class="animate-leaf-sway absolute top-[40%] right-[9%] w-5 h-5 text-[#6aa84f]/70" style="animation-delay:-3.5s" viewBox="0 0 24 24" fill="currentColor"><path d="M4 20C4 10 10 4 21 3c-1 11-7 17-17 17Zm0 0 9-9" /></svg>
+  </div>
+</div>

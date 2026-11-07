@@ -1,21 +1,15 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
-  <rect width="64" height="64" rx="16" fill="#7ec8e3"/>
-  <!-- Totoro Ears -->
-  <path d="M20 18l-3-11 8 8zM44 18l3-11-8 8z" fill="#6b7278"/>
-  <!-- Totoro Body -->
-  <ellipse cx="32" cy="39" rx="20" ry="21" fill="#6b7278"/>
-  <!-- Cream Belly -->
-  <ellipse cx="32" cy="43" rx="14" ry="14" fill="#f3ebd3"/>
-  <!-- Belly Chevron Markings -->
-  <path d="M25 37l3-2.5 3 2.5M33 37l3-2.5 3 2.5M22 43l3-2.5 3 2.5M29 42l3-2.5 3 2.5M36 43l3-2.5 3 2.5" stroke="#6b7278" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-  <!-- Eyes -->
-  <circle cx="24" cy="25" r="3.2" fill="#ffffff"/>
-  <circle cx="40" cy="25" r="3.2" fill="#ffffff"/>
-  <circle cx="24" cy="25" r="1.5" fill="#18181b"/>
-  <circle cx="40" cy="25" r="1.5" fill="#18181b"/>
-  <!-- Nose -->
-  <ellipse cx="32" cy="26" rx="2.5" ry="1.4" fill="#27272a"/>
-  <!-- Leaf on Head -->
-  <path d="M32 18c-3-4-8-3-8-3s2 5 8 3c6 2 8-3 8-3s-5-1-8 3z" fill="#4d9b58"/>
-  <path d="M32 15v4" stroke="#2f6937" stroke-width="1.5" stroke-linecap="round"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-50 -78 100 100">
+  <rect x="-50" y="-78" width="100" height="100" rx="24" fill="#cfe9f2"/>
+  <!-- Mori, the forest spirit: sprout -->
+  <path d="M0-46 C-1-54 0-60 2-64" stroke="#3f6b33" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <path d="M2-62 C-10-74-22-66-20-60 C-12-56-2-58 2-62Z" fill="#7cb85c"/>
+  <path d="M2-62 C10-76 26-72 24-64 C16-58 6-58 2-62Z" fill="#9fd46b"/>
+  <!-- body -->
+  <path d="M-30 4 C-34-26-18-48 0-48 C18-48 34-26 30 4 C26 14-26 14-30 4Z" fill="#8fbf7a"/>
+  <path d="M-22-30 C-16-42-4-46 6-44 C-6-40-14-34-18-24Z" fill="#c4e3a8" opacity=".8"/>
+  <circle cx="-9" cy="-20" r="3.6" fill="#2a2a24"/><circle cx="9" cy="-20" r="3.6" fill="#2a2a24"/>
+  <ellipse cx="-17" cy="-11" rx="5" ry="3" fill="#f2a08c" opacity=".8"/>
+  <ellipse cx="17" cy="-11" rx="5" ry="3" fill="#f2a08c" opacity=".8"/>
+  <path d="M-7 -2 C-7-6 7-6 7 -2 Z" fill="#7a5a3a"/>
+  <path d="M-6 -2 C-6 5 6 5 6 -2Z" fill="#c98a3d"/>
 </svg>

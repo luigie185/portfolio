@@ -1,0 +1,70 @@
+---
+/**
+ * "Mori" — the site's own forest spirit (an original character): a round,
+ * moss-soft sprite with a two-leaf sprout, rosy cheeks and a treasured acorn.
+ * Renders as an SVG <g> by default (for use inside the scenery), or as a
+ * standalone <svg> when `standalone` is set (avatar, title screen).
+ */
+interface Props {
+  standalone?: boolean;
+  stone?: boolean;
+  class?: string;
+}
+const { standalone = false, stone = true, class: className } = Astro.props;
+---
+
+{
+  standalone ? (
+    <svg class={className} viewBox="-50 -78 100 100" aria-hidden="true">
+      <g class="spirit">
+        <ellipse cx="0" cy="12" rx="30" ry="6" fill="#000" opacity=".12" />
+        <path class="spirit-sprout" d="M0-46 C-1-54 0-60 2-64" stroke="#3f6b33" stroke-width="2.5" fill="none" stroke-linecap="round" />
+        <path class="spirit-sprout" d="M2-62 C-10-74-22-66-20-60 C-12-56-2-58 2-62Z" fill="#7cb85c" />
+        <path class="spirit-sprout" d="M2-62 C10-76 26-72 24-64 C16-58 6-58 2-62Z" fill="#9fd46b" />
+        <path d="M-30 4 C-34-26-18-48 0-48 C18-48 34-26 30 4 C26 14-26 14-30 4Z" fill="#8fbf7a" />
+        <path d="M-22-30 C-16-42-4-46 6-44 C-6-40-14-34-18-24Z" fill="#c4e3a8" opacity=".8" />
+        <path d="M30 4 C34-14 28-30 18-40 C26-24 26-8 20 8Z" fill="#6d9c5e" opacity=".7" />
+        <circle cx="-9" cy="-20" r="3.2" fill="#2a2a24" /><circle cx="9" cy="-20" r="3.2" fill="#2a2a24" />
+        <circle cx="-8" cy="-21.3" r="1" fill="#fff" /><circle cx="10" cy="-21.3" r="1" fill="#fff" />
+        <ellipse cx="-17" cy="-12" rx="5" ry="3" fill="#f2a08c" opacity=".7" />
+        <ellipse cx="17" cy="-12" rx="5" ry="3" fill="#f2a08c" opacity=".7" />
+        <path d="M-3-13 Q0-10 3-13" stroke="#2a2a24" stroke-width="1.6" fill="none" stroke-linecap="round" />
+        <g transform="translate(0 -2)">
+          <path d="M-7 0 C-7-4 7-4 7 0 Z" fill="#7a5a3a" />
+          <path d="M-6 0 C-6 7 6 7 6 0Z" fill="#c98a3d" />
+          <path d="M-12 2 Q-8-2-6 1 M12 2 Q8-2 6 1" stroke="#6d9c5e" stroke-width="4" stroke-linecap="round" fill="none" />
+        </g>
+        <ellipse cx="-12" cy="9" rx="7" ry="4" fill="#6d9c5e" /><ellipse cx="12" cy="9" rx="7" ry="4" fill="#6d9c5e" />
+      </g>
+    </svg>
+  ) : (
+    <g class={className}>
+      {stone && (
+        <>
+          <ellipse cx="0" cy="24" rx="46" ry="16" style="fill:var(--scene-stone-shadow)" />
+          <path d="M-42 20 C-40 4-20-2 0-2 C22-2 42 4 44 20 C30 30-30 30-42 20Z" style="fill:var(--scene-stone)" />
+          <path d="M-36 8 C-20-2 10-4 30 4 C14 2-14 4-36 12Z" style="fill:var(--scene-moss)" />
+        </>
+      )}
+      <g class="spirit" transform="translate(0 2) scale(.9)">
+        <path class="spirit-sprout" d="M0-46 C-1-54 0-60 2-64" style="stroke:var(--spirit-stem)" stroke-width="2.5" fill="none" stroke-linecap="round" />
+        <path class="spirit-sprout" d="M2-62 C-10-74-22-66-20-60 C-12-56-2-58 2-62Z" style="fill:var(--spirit-leaf)" />
+        <path class="spirit-sprout" d="M2-62 C10-76 26-72 24-64 C16-58 6-58 2-62Z" style="fill:var(--spirit-leaf-lit)" />
+        <path d="M-30 4 C-34-26-18-48 0-48 C18-48 34-26 30 4 C26 14-26 14-30 4Z" style="fill:var(--spirit-body)" />
+        <path d="M-22-30 C-16-42-4-46 6-44 C-6-40-14-34-18-24Z" style="fill:var(--spirit-lit)" opacity=".8" />
+        <path d="M30 4 C34-14 28-30 18-40 C26-24 26-8 20 8Z" style="fill:var(--spirit-shade)" opacity=".7" />
+        <circle cx="-9" cy="-20" r="3.2" style="fill:var(--spirit-eye)" /><circle cx="9" cy="-20" r="3.2" style="fill:var(--spirit-eye)" />
+        <circle cx="-8" cy="-21.3" r="1" fill="#fff" /><circle cx="10" cy="-21.3" r="1" fill="#fff" />
+        <ellipse cx="-17" cy="-12" rx="5" ry="3" fill="#f2a08c" opacity=".6" />
+        <ellipse cx="17" cy="-12" rx="5" ry="3" fill="#f2a08c" opacity=".6" />
+        <path d="M-3-13 Q0-10 3-13" style="stroke:var(--spirit-eye)" stroke-width="1.6" fill="none" stroke-linecap="round" />
+        <g transform="translate(0 -2)">
+          <path d="M-7 0 C-7-4 7-4 7 0 Z" fill="#7a5a3a" />
+          <path d="M-6 0 C-6 7 6 7 6 0Z" fill="#c98a3d" />
+          <path d="M-12 2 Q-8-2-6 1 M12 2 Q8-2 6 1" style="stroke:var(--spirit-shade)" stroke-width="4" stroke-linecap="round" fill="none" />
+        </g>
+        <ellipse cx="-12" cy="9" rx="7" ry="4" style="fill:var(--spirit-shade)" /><ellipse cx="12" cy="9" rx="7" ry="4" style="fill:var(--spirit-shade)" />
+      </g>
+    </g>
+  )
+}

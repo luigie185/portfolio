@@ -5,7 +5,7 @@
 @layer base {
   :root {
     --bg-canvas: #d9f0ec;
-    --bg-card: rgba(253, 249, 238, 0.88);
+    --bg-card: rgba(253, 249, 238, 0.86);
     --text-main: #222b25;
     --text-muted: #505d53;
     --border-gold: #b88d3b;
@@ -41,7 +41,7 @@
   }
 }
 
-/* Gentle Totoro Forest & Ni no Kuni animations */
+/* Gentle forest animations */
 @keyframes float-slow {
   0%, 100% {
     transform: translateY(0px) rotate(0deg);
@@ -130,7 +130,7 @@
     0 10px 30px -6px rgba(24, 38, 28, 0.14),
     inset 0 0 0 3px var(--bg-card),
     inset 0 0 0 4.5px var(--border-inner);
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(14px) saturate(1.15);
 }
 
 .dark .rpg-panel {
@@ -524,4 +524,220 @@ kbd {
   html {
     scroll-behavior: auto;
   }
+}
+
+/* ===================================================================== */
+/* Painted satoyama scenery — day & night palettes                       */
+/* Day: saturated summer greens, cerulean sky, lavender cloud undersides, */
+/* cooler/paler hills in the distance. Night: moonlit blues and teals.    */
+/* ===================================================================== */
+.scene {
+  --scene-sky-top: #2f8fd6;
+  --scene-sky-mid: #79c4ec;
+  --scene-sky-low: #c9ebf3;
+  --scene-sky-horizon: #eef6dc;
+  --scene-sun: #fff8de;
+  --scene-sun-glow: rgba(255, 246, 210, 0.85);
+
+  --scene-cloud-light: #ffffff;
+  --scene-cloud-warm: rgba(255, 238, 200, 0.55);
+  --scene-cloud-shade: #d9e2f0;
+  --scene-cloud-deep: #aab6d3;
+  --scene-cloud-wisp: rgba(255, 255, 255, 0.75);
+
+  --scene-haze: #dff0ef;
+  --scene-mtn-far: #9cc0d0;
+  --scene-mtn-near: #84b3a8;
+  --scene-forest-far: #5f9a71;
+  --scene-forest-far-lit: #7fb385;
+
+  --scene-tree-dark: #1d5634;
+  --scene-tree-mid: #2f7a43;
+  --scene-tree-lit: #4f9d48;
+  --scene-tree-sun: #9acb5c;
+  --scene-trunk: #5b4636;
+  --scene-trunk-shadow: #3f2f24;
+  --scene-rope: #d9c48f;
+  --scene-paper: #fbf7ea;
+  --scene-hill-mid: #5f9f4f;
+
+  --scene-ridge: #6f9f45;
+  --scene-paddy: #9fcf63;
+  --scene-paddy-alt: #b4dc74;
+  --scene-paddy-deep: #8cc25a;
+  --scene-rice-row: rgba(60, 120, 50, 0.22);
+  --scene-paddy-water: #a9d6d8;
+  --scene-paddy-shine: #ffffff;
+  --scene-path: #d8c59a;
+  --scene-pole: #5a4a3c;
+
+  --scene-house-wall: #efe3c6;
+  --scene-house-shadow: #8a7454;
+  --scene-house-trim: #5e4a36;
+  --scene-house-roof: #6e6a5e;
+  --scene-house-roof-lit: #8c887a;
+  --scene-window: #4d5b5f;
+
+  --scene-stone: #9aa293;
+  --scene-stone-shadow: rgba(30, 60, 30, 0.25);
+  --scene-moss: #6fa654;
+  --scene-grass-back: #3f8a3c;
+  --scene-grass-front: #2c6a30;
+  --scene-flower: #fffdf4;
+  --scene-flower-warm: #f7d35c;
+
+  --spirit-body: #8fbf7a;
+  --spirit-lit: #c4e3a8;
+  --spirit-shade: #6d9c5e;
+  --spirit-leaf: #7cb85c;
+  --spirit-leaf-lit: #9fd46b;
+  --spirit-stem: #3f6b33;
+  --spirit-eye: #2a2a24;
+}
+
+.dark .scene {
+  --scene-sky-top: #050b1a;
+  --scene-sky-mid: #0d1f3d;
+  --scene-sky-low: #173556;
+  --scene-sky-horizon: #24485a;
+  --scene-sun: #fdf3c0;
+  --scene-sun-glow: rgba(253, 230, 138, 0.35);
+
+  --scene-cloud-light: #3d4f72;
+  --scene-cloud-warm: rgba(253, 243, 192, 0.12);
+  --scene-cloud-shade: #2a3a5a;
+  --scene-cloud-deep: #1c2944;
+  --scene-cloud-wisp: rgba(120, 140, 180, 0.25);
+
+  --scene-haze: #1b3647;
+  --scene-mtn-far: #1b3248;
+  --scene-mtn-near: #17303c;
+  --scene-forest-far: #12302f;
+  --scene-forest-far-lit: #1a3e3b;
+
+  --scene-tree-dark: #071a18;
+  --scene-tree-mid: #0d2724;
+  --scene-tree-lit: #153a35;
+  --scene-tree-sun: #1f4c45;
+  --scene-trunk: #1a1d22;
+  --scene-trunk-shadow: #0d0f13;
+  --scene-rope: #6f6650;
+  --scene-paper: #b9b7ad;
+  --scene-hill-mid: #10302b;
+
+  --scene-ridge: #0f2a25;
+  --scene-paddy: #163a31;
+  --scene-paddy-alt: #1a4036;
+  --scene-paddy-deep: #12322b;
+  --scene-rice-row: rgba(0, 0, 0, 0.25);
+  --scene-paddy-water: #22405c;
+  --scene-paddy-shine: #fdf3c0;
+  --scene-path: #3b3f45;
+  --scene-pole: #0a0f14;
+
+  --scene-house-wall: #2b3341;
+  --scene-house-shadow: #000000;
+  --scene-house-trim: #10151c;
+  --scene-house-roof: #151b24;
+  --scene-house-roof-lit: #222a36;
+  --scene-window: #ffcf6e;
+
+  --scene-stone: #3a4450;
+  --scene-stone-shadow: rgba(0, 0, 0, 0.35);
+  --scene-moss: #1f4a3e;
+  --scene-grass-back: #0c2622;
+  --scene-grass-front: #081b18;
+  --scene-flower: #b9c7d6;
+  --scene-flower-warm: #c9b26a;
+
+  --spirit-body: #4e7d63;
+  --spirit-lit: #7fae8e;
+  --spirit-shade: #34594a;
+  --spirit-leaf: #3f7a52;
+  --spirit-leaf-lit: #5a9a62;
+  --spirit-stem: #20402f;
+  --spirit-eye: #0b1214;
+}
+
+.scene-sky {
+  background: linear-gradient(
+    180deg,
+    var(--scene-sky-top) 0%,
+    var(--scene-sky-mid) 32%,
+    var(--scene-sky-low) 58%,
+    var(--scene-sky-horizon) 72%
+  );
+  transition: background 0.6s ease;
+}
+.scene-sun {
+  top: 4%;
+  left: 6%;
+  width: clamp(80px, 9vw, 130px);
+  aspect-ratio: 1;
+  border-radius: 9999px;
+  background: var(--scene-sun);
+}
+/* soft halo drawn as a gradient (large box-shadows render with hard tile edges) */
+.scene-sun::before {
+  content: "";
+  position: absolute;
+  inset: -260%;
+  border-radius: 9999px;
+  background: radial-gradient(circle, var(--scene-sun-glow) 0%, transparent 55%);
+  z-index: -1;
+}
+.scene-sun { isolation: isolate; }
+.dark .scene-sun {
+  /* moon: smaller, cooler, with soft maria */
+  width: clamp(64px, 7vw, 100px);
+  background:
+    radial-gradient(circle at 35% 40%, rgba(200, 190, 150, 0.35) 0 12%, transparent 13%),
+    radial-gradient(circle at 62% 62%, rgba(200, 190, 150, 0.3) 0 9%, transparent 10%),
+    var(--scene-sun);
+}
+
+.scene .cloud-light { fill: var(--scene-cloud-light); }
+.scene .cloud-warm { fill: var(--scene-cloud-warm); }
+.scene .cloud-shade { fill: var(--scene-cloud-shade); }
+.scene .cloud-deep { fill: var(--scene-cloud-deep); }
+.scene .cloud-wisp { fill: var(--scene-cloud-wisp); }
+
+.scene-clouds--near { animation: cloud-drift 60s ease-in-out infinite alternate; }
+.scene-clouds--far { animation: cloud-drift 90s ease-in-out infinite alternate-reverse; }
+@keyframes cloud-drift {
+  from { transform: translateX(-1.5%); }
+  to { transform: translateX(1.5%); }
+}
+
+.scene-light ellipse {
+  fill: #fff4c8;
+  opacity: 0.28;
+  filter: blur(14px);
+}
+.dark .scene-light ellipse {
+  fill: #9cc7ff;
+  opacity: 0.08;
+}
+
+.house-glow { opacity: 0; }
+.dark .house-glow { opacity: 1; }
+
+.grass-sway-group {
+  transform-box: fill-box;
+  transform-origin: bottom center;
+  animation: grass-sway 6s ease-in-out infinite;
+}
+.grass-sway-group--alt {
+  animation-duration: 7.5s;
+  animation-delay: -2s;
+}
+
+.spirit-sprout {
+  transform-box: view-box;
+  transform-origin: 0 -46px;
+  animation: sprout-sway 3.6s ease-in-out infinite;
+}
+@keyframes sprout-sway {
+  0%, 100% { rotate: -5deg; }
+  50% { rotate: 6deg; }
 }

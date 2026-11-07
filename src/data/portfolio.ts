@@ -78,7 +78,7 @@ export const ACORN_IDS = ["hero", "dialogue", "quests", "relics", "footer"] as c
 
 export const quests: Quest[] = [
   { id: "begin", icon: "🌱", title: "Begin the Journey", hint: "Press start on the title screen.", xp: 20 },
-  { id: "greet", icon: "🍃", title: "Greet the Forest Spirit", hint: "Choose any dialogue option with Totoro.", xp: 40 },
+  { id: "greet", icon: "🍃", title: "Greet the Forest Spirit", hint: "Choose any dialogue option with Mori.", xp: 40 },
   { id: "quest-log", icon: "📜", title: "Read the Quest Log", hint: "Travel to the Work Experience chapter.", xp: 60 },
   { id: "relics", icon: "📖", title: "Enter the Relic Vault", hint: "Travel to the Projects chapter.", xp: 60 },
   { id: "nightfall", icon: "🌙", title: "Cast Time-Shift", hint: "Switch between day and night.", xp: 40 },
@@ -206,8 +206,8 @@ export interface DialogueOption {
 }
 
 export const dialogue = {
-  speaker: "Totoro · Keeper of the Forest",
-  greeting: `Rrrooar~! Welcome, traveler, to ${profile.shortName}'s forest sanctuary. Collect acorns, finish quests, and you might learn a secret or two. Where shall we wander first?`,
+  speaker: "Mori · Spirit of the Camphor Tree",
+  greeting: `Mmm~ a visitor! Welcome, traveler, to ${profile.shortName}'s forest sanctuary. Collect acorns, finish quests, and you might learn a secret or two. Where shall we wander first?`,
   options: [
     {
       label: `Who is ${profile.shortName}?`,

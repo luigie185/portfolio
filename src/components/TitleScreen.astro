@@ -1,5 +1,6 @@
 ---
 import { profile } from '../data/portfolio';
+import ForestSpirit from './ForestSpirit.astro';
 ---
 
 <!--
@@ -18,7 +19,7 @@ import { profile } from '../data/portfolio';
   <div class="title-screen__stars absolute inset-0" aria-hidden="true"></div>
   <div class="absolute top-[12%] right-[14%] w-20 h-20 sm:w-28 sm:h-28 rounded-full bg-[#fef9c3] shadow-[0_0_80px_24px_rgba(254,240,138,0.35)]" aria-hidden="true"></div>
 
-  <!-- Moonlit forest silhouette: hills, camphor tree, and a forest spirit waiting at the bus stop -->
+  <!-- Moonlit forest silhouette: hills and the great camphor tree -->
   <svg class="absolute bottom-0 inset-x-0 w-full h-[38vh]" viewBox="0 0 1440 400" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
     <path d="M0 400V250Q260 190 560 240T1100 220T1440 240V400Z" fill="#163d36" />
     <g fill="#0d2a27">
@@ -27,19 +28,12 @@ import { profile } from '../data/portfolio';
       <circle cx="1080" cy="210" r="45" /><circle cx="1280" cy="215" r="48" />
     </g>
     <path d="M0 400V300Q380 250 760 300T1440 290V400Z" fill="#0d2a27" />
-    <g transform="translate(250 228)" fill="#081a19">
-      <line x1="0" y1="20" x2="0" y2="80" stroke="#081a19" stroke-width="3" />
-      <circle cx="0" cy="16" r="8" fill="#b84330" />
-      <path d="M30 22 27 6 35 18ZM50 22 53 6 45 18Z" />
-      <ellipse cx="40" cy="52" rx="24" ry="30" />
-      <circle cx="33" cy="32" r="2.6" fill="#fffaf0" /><circle cx="47" cy="32" r="2.6" fill="#fffaf0" />
-      <path d="M40 30V-4" stroke="#081a19" stroke-width="2.5" />
-      <path d="M14 -2Q40 -20 66 -2Q40 -8 14 -2Z" fill="#1d4d44" />
-    </g>
     <circle cx="420" cy="230" r="3" fill="#fde68a" class="animate-firefly" />
     <circle cx="820" cy="200" r="2.5" fill="#a7f3d0" class="animate-firefly" style="animation-delay:-1.5s" />
     <circle cx="980" cy="250" r="3" fill="#fde68a" class="animate-firefly" style="animation-delay:-2.7s" />
   </svg>
+
+  <ForestSpirit standalone class="absolute bottom-[7vh] left-[12%] w-20 h-20 sm:w-28 sm:h-28 animate-float-slow" />
 
   <div class="relative max-w-xl space-y-6">
     <p class="font-mono text-xs font-bold uppercase tracking-[0.35em] text-[#fef3c7]/90">
