@@ -1,27 +1,36 @@
 export interface ExperienceItem {
   questId: string;
-  questRank: "S-Rank" | "A-Rank" | "B-Rank";
+  questRank: "S" | "A" | "B";
   role: string;
   company: string;
   companyUrl?: string;
   period: string;
   location: string;
-  expReward: string;
+  /** One-line, story-flavoured summary shown under the title. */
+  lore: string;
   current?: boolean;
+  /** Plain, recruiter-friendly accomplishments. */
   description: string[];
   technologies: string[];
 }
 
+export type RelicEmblem = "orb" | "loom" | "clock" | "tome";
+export type RelicSky = "dawn" | "noon" | "dusk" | "night";
+
 export interface ProjectItem {
   id: string;
   title: string;
+  /** What it actually is, in plain words. */
+  kind: string;
   rarity: number;
   element: string;
+  /** Short italic flavour line, like an item description in a game. */
+  lore: string;
   summary: string;
-  category: string;
-  featured?: boolean;
-  metrics?: string;
+  stats: string[];
   technologies: string[];
+  emblem: RelicEmblem;
+  sky: RelicSky;
   liveUrl?: string;
   repoUrl?: string;
 }
@@ -93,50 +102,50 @@ export const quests: Quest[] = [
 
 export const experiences: ExperienceItem[] = [
   {
-    questId: "MAIN QUEST #03",
-    questRank: "S-Rank",
+    questId: "Quest III",
+    questRank: "S",
     role: "Senior Software Engineer",
     company: "TechNova Studio",
     companyUrl: "https://example.com",
     period: "2024 — Present",
-    location: "Remote Realm",
-    expReward: "+5,000 EXP",
+    location: "Remote",
+    lore: "Tending the studio's busiest web apps, and the people who build them.",
     current: true,
     description: [
-      "Architected and shipped core customer-facing web applications serving 100k+ monthly active adventurers with 99.9% uptime.",
-      "Reduced initial bundle size by 42% and improved Core Web Vitals to green across all key kingdom portals.",
-      "Mentored junior apprentices and established automated CI/CD quality wards and design system standards.",
+      "Architected and shipped core customer-facing web apps serving 100k+ monthly active users at 99.9% uptime.",
+      "Cut initial bundle size by 42% and brought Core Web Vitals to green across every key product page.",
+      "Mentor junior engineers; set up automated CI/CD quality gates and shared design-system standards.",
     ],
     technologies: ["TypeScript", "React", "Next.js", "Tailwind CSS", "PostgreSQL"],
   },
   {
-    questId: "MAIN QUEST #02",
-    questRank: "A-Rank",
+    questId: "Quest II",
+    questRank: "A",
     role: "Full-Stack Developer",
     company: "Vertex Digital",
     companyUrl: "https://example.com",
     period: "2022 — 2024",
-    location: "HybridCitadel",
-    expReward: "+3,400 EXP",
+    location: "Hybrid",
+    lore: "Building the roads between data and the people who need it.",
     description: [
-      "Developed scalable REST and GraphQL APIs alongside responsive frontend interfaces for B2B SaaS guilds.",
-      "Built real-time analytics scrying dashboards and automated workflows that saved clients 10+ hours weekly.",
-      "Collaborated closely with designers to translate Figma scrolls into reusable, accessible UI components.",
+      "Built scalable REST and GraphQL APIs and the responsive interfaces on top of them for B2B SaaS clients.",
+      "Delivered real-time analytics dashboards and workflow automation that saved clients 10+ hours a week.",
+      "Partnered with designers to turn Figma designs into reusable, accessible UI components.",
     ],
     technologies: ["Node.js", "TypeScript", "Astro", "Docker", "Redis"],
   },
   {
-    questId: "MAIN QUEST #01",
-    questRank: "B-Rank",
+    questId: "Quest I",
+    questRank: "B",
     role: "Frontend Developer",
     company: "PixelCraft Agency",
     companyUrl: "https://example.com",
     period: "2021 — 2022",
-    location: "On-site Guild",
-    expReward: "+2,100 EXP",
+    location: "On-site",
+    lore: "Where the journey began — learning to make the web feel fast.",
     description: [
-      "Delivered high-converting marketing sites and interactive web applications with sub-second load times.",
-      "Standardized component grimoires and accessibility audits (WCAG 2.1 AA) across client deliverables.",
+      "Shipped high-converting marketing sites and interactive web apps with sub-second load times.",
+      "Standardized component libraries and WCAG 2.1 AA accessibility audits across client projects.",
     ],
     technologies: ["JavaScript", "HTML/CSS", "Tailwind CSS", "Vite"],
   },
@@ -144,58 +153,66 @@ export const experiences: ExperienceItem[] = [
 
 export const projects: ProjectItem[] = [
   {
-    id: "ARTIFACT-01",
-    title: "PulseMetrics Scrying Orb",
+    id: "No. 01",
+    title: "PulseMetrics",
+    kind: "Privacy-first web analytics",
     rarity: 5,
     element: "Aether · Full-Stack",
+    lore: "A glass orb that hears every footstep in the forest, yet never asks a name.",
     summary:
-      "A lightweight, privacy-first web analytics platform with real-time event streaming, custom funnels, and zero cookie banners.",
-    category: "SaaS / Full-Stack",
-    featured: true,
-    metrics: "< 1.5KB script • 10k+ events/sec",
+      "Lightweight analytics platform with real-time event streaming, custom funnels, and no cookie banners needed.",
+    stats: ["< 1.5 KB script", "10k+ events/sec"],
     technologies: ["TypeScript", "Astro", "ClickHouse", "Tailwind CSS"],
+    emblem: "orb",
+    sky: "dusk",
     liveUrl: "https://example.com",
     repoUrl: "https://github.com/luigie185",
   },
   {
-    id: "ARTIFACT-02",
-    title: "Kinetix Grimoire UI",
+    id: "No. 02",
+    title: "Kinetix UI",
+    kind: "Open-source design system",
     rarity: 5,
     element: "Sunstone · Design System",
+    lore: "Tiles woven on a sunlit loom, each one fits beside any other.",
     summary:
-      "An accessible, zero-dependency design system and component primitives library built for high-density developer tools.",
-    category: "Open Source / UI Kit",
-    featured: true,
-    metrics: "100% Lighthouse • WCAG AA",
+      "Accessible, zero-dependency component primitives built for dense developer tools.",
+    stats: ["100 Lighthouse", "WCAG AA"],
     technologies: ["TypeScript", "Tailwind CSS", "CSS Grid", "Storybook"],
+    emblem: "loom",
+    sky: "noon",
     liveUrl: "https://example.com",
     repoUrl: "https://github.com/luigie185",
   },
   {
-    id: "ARTIFACT-03",
-    title: "Chronos Clockwork Engine",
+    id: "No. 03",
+    title: "Chronos",
+    kind: "Distributed job scheduler",
     rarity: 4,
     element: "Chrono · Backend",
+    lore: "A brass pocket watch that never forgets a promise — and retries if it does.",
     summary:
-      "Distributed background job scheduler and workflow monitor with automatic retries, dead-letter queues, and webhook alerts.",
-    category: "Backend & DevTools",
-    featured: false,
-    metrics: "Sub-15ms dispatch latency",
+      "Background job scheduler and workflow monitor with automatic retries, dead-letter queues, and webhook alerts.",
+    stats: ["< 15 ms dispatch"],
     technologies: ["Node.js", "TypeScript", "Redis", "Docker"],
+    emblem: "clock",
+    sky: "night",
     liveUrl: "https://example.com",
     repoUrl: "https://github.com/luigie185",
   },
   {
-    id: "ARTIFACT-04",
-    title: "NoteFlow Wizard's Tome",
+    id: "No. 04",
+    title: "NoteFlow",
+    kind: "Local-first knowledge base",
     rarity: 4,
     element: "Sylph · Productivity",
+    lore: "A field journal that remembers where every thought was planted.",
     summary:
-      "Local-first knowledge base and markdown grimoire featuring instant fuzzy search, bi-directional links, and keyboard-only navigation.",
-    category: "Productivity App",
-    featured: false,
-    metrics: "Offline-first • Instant search",
+      "Markdown notes with instant fuzzy search, bi-directional links, and full keyboard navigation — works offline.",
+    stats: ["Offline-first", "Instant search"],
     technologies: ["Astro", "TypeScript", "IndexedDB", "Tailwind CSS"],
+    emblem: "tome",
+    sky: "dawn",
     liveUrl: "https://example.com",
     repoUrl: "https://github.com/luigie185",
   },

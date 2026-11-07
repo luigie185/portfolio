@@ -4,100 +4,91 @@ import Acorn from './Acorn.astro';
 import ChapterHeading from './ChapterHeading.astro';
 ---
 
-<section data-section-quest="quest-log" id="experience" class="py-14 scroll-mt-20 border-t-2 border-dashed border-[#c59b47]/50">
+<section data-section-quest="quest-log" id="experience" class="py-14 scroll-mt-20">
   <ChapterHeading
     chapter="Chapter II"
-    eyebrow="📜 Campaign Chronicles"
-    title="Main Story Quests (Work Experience)"
-    badge={`COMPLETED & ACTIVE QUESTS: ${experiences.length}`}
+    eyebrow="📜 The Village Notice Board · Work Experience"
+    title="The Road So Far"
+    badge={`${experiences.length} QUESTS TAKEN`}
   />
 
-  <div class="relative border-l-2 border-[#c59b47] ml-4 space-y-8">
+  <!-- A winding dirt path with stepping stones; each notice is pinned beside it -->
+  <ol class="quest-path relative ml-3 sm:ml-5 space-y-10">
     {
-      experiences.map((exp) => (
-        <div class="relative pl-8 group">
-          <!-- Quest Marker Diamond -->
+      experiences.map((exp, i) => (
+        <li class="relative pl-9 sm:pl-12">
           <span
-            class:list={[
-              'absolute -left-[9px] top-6 h-4 w-4 rotate-45 border-2 transition-transform group-hover:scale-125',
-              exp.current
-                ? 'bg-[#f3b354] border-[#23476e] dark:border-[#fff8e7] ring-4 ring-[#f3b354]/30'
-                : 'bg-[#2e7050] dark:bg-[#59c49d] border-[#fffaf0] dark:border-[#0f1624]',
-            ]}
+            class:list={['quest-stone', exp.current && 'quest-stone--current']}
+            aria-hidden="true"
           />
 
-          <div class="rpg-panel rounded-2xl p-6 transition-transform duration-200 hover:-translate-y-0.5">
-            <!-- Top Quest Stamp Bar -->
-            <div class="flex flex-wrap items-center justify-between gap-2 pb-3 mb-3 border-b border-[#dfd3b8] dark:border-[#2e4063]">
-              <div class="flex items-center gap-2">
-                <span class="px-2.5 py-0.5 rounded-md text-[11px] font-mono font-bold bg-[#23476e] text-[#fff8e7] dark:bg-[#f3b354] dark:text-[#111927]">
-                  {exp.questId}
-                </span>
-                <span class="px-2 py-0.5 rounded-md text-[11px] font-mono font-bold border border-[#c59b47] text-[#d4712a] dark:text-[#f3b354]">
-                  ★ {exp.questRank}
-                </span>
+          <article class:list={['notice', i % 2 ? 'notice--tilt-r' : 'notice--tilt-l']}>
+            <span class="notice-peg" aria-hidden="true" />
+
+            <!-- Rank seal, stamped in red ink -->
+            <div class="notice-seal" aria-label={`Rank ${exp.questRank}`}>
+              <span class="notice-seal__rank">{exp.questRank}</span>
+              <span class="notice-seal__label">rank</span>
+            </div>
+
+            <header class="pr-16 sm:pr-20">
+              <div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] font-mono font-bold uppercase tracking-wider">
+                <span class="text-[#b4552c] dark:text-[#f3b354]">{exp.questId}</span>
+                <span class="text-[#8a7656] dark:text-[#8fa3bf]">{exp.period}</span>
+                <span class="text-[#8a7656] dark:text-[#8fa3bf]">· {exp.location}</span>
                 {exp.current && (
-                  <span class="px-2 py-0.5 rounded-md text-[10px] font-mono font-bold bg-emerald-500/20 text-emerald-800 dark:text-emerald-300">
-                    ACTIVE QUEST
+                  <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-[#2e7050]/12 text-[#2e7050] dark:bg-emerald-300/15 dark:text-emerald-300">
+                    <span class="relative flex h-1.5 w-1.5">
+                      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-current opacity-60" />
+                      <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-current" />
+                    </span>
+                    In progress
                   </span>
                 )}
               </div>
 
-              <div class="flex items-center gap-2 text-xs font-mono font-bold text-[#2e7050] dark:text-[#59c49d]">
-                <span>🏆 {exp.expReward}</span>
-                <span class="text-[#c59b47]">•</span>
-                <span class="text-[#576058] dark:text-[#9fb0c9]">{exp.period}</span>
-              </div>
-            </div>
-
-            <!-- Quest Title & Guild -->
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-3">
-              <h3 class="text-lg sm:text-xl font-bold text-[#252b27] dark:text-[#f5efe2]">
+              <h3 class="mt-2 text-xl sm:text-2xl font-bold leading-snug text-[#2a2620] dark:text-[#f5efe2]">
                 {exp.role}
-                <span class="text-[#c59b47] font-normal mx-1.5">@</span>
+              </h3>
+              <p class="mt-0.5 font-serif-story text-base sm:text-lg text-[#23476e] dark:text-[#8cc4f0]">
+                at{' '}
                 {exp.companyUrl ? (
                   <a
                     href={exp.companyUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    class="text-[#23476e] dark:text-[#68a8e8] hover:underline decoration-[#c59b47] underline-offset-4"
+                    class="font-semibold underline decoration-[#c59b47]/60 decoration-2 underline-offset-4 hover:decoration-[#c59b47]"
                   >
                     {exp.company}
                   </a>
                 ) : (
-                  <span class="text-[#23476e] dark:text-[#68a8e8]">{exp.company}</span>
+                  <span class="font-semibold">{exp.company}</span>
                 )}
-              </h3>
-              <span class="text-xs font-mono text-[#576058] dark:text-[#9fb0c9]">
-                📍 {exp.location}
-              </span>
-            </div>
+              </p>
+              <p class="mt-2 font-serif-story italic text-sm text-[#6b5d45] dark:text-[#a9b8cc]">“{exp.lore}”</p>
+            </header>
 
-            <!-- Quest Objectives List -->
-            <ul class="mt-3 space-y-2 text-sm text-[#434c44] dark:text-[#c7d3e6] leading-relaxed">
+            <ul class="mt-4 space-y-2.5 text-[0.92rem] text-[#3d3a33] dark:text-[#cdd7e6] leading-relaxed">
               {exp.description.map((bullet) => (
-                <li class="flex items-start gap-2.5">
-                  <span class="text-[#d4712a] dark:text-[#f3b354] font-bold mt-0.5 select-none">✔</span>
+                <li class="flex items-start gap-3">
+                  <svg class="mt-1.5 w-3.5 h-3.5 shrink-0" viewBox="0 0 16 16" aria-hidden="true">
+                    <path d="M2 14C2 7 6 3 14 2c-1 8-5 12-12 12Zm0 0 7-7" fill="#6aa84f" stroke="#3f7a3a" stroke-width="1" />
+                  </svg>
                   <span>{bullet}</span>
                 </li>
               ))}
             </ul>
 
-            <!-- Equipped Skill Runes -->
-            <div class="mt-5 pt-3 border-t border-[#dfd3b8]/60 dark:border-[#2e4063]/60 flex flex-wrap items-center gap-1.5">
-              <span class="text-[11px] font-mono font-bold text-[#576058] dark:text-[#9fb0c9] mr-1">
-                EQUIPPED RUNES:
-              </span>
+            <footer class="mt-5 pt-4 notice-divider flex flex-wrap items-center gap-1.5">
+              <span class="sr-only">Technologies:</span>
               {exp.technologies.map((tech) => (
-                <span class="px-2.5 py-0.5 text-xs font-mono font-semibold rounded-lg bg-[#efe5ce] dark:bg-[#1e2c45] text-[#23476e] dark:text-[#8ce0c2] border border-[#c59b47]/50">
-                  {tech}
-                </span>
+                <span class="seed-tag">{tech}</span>
               ))}
-            </div>
-          </div>
-        </div>
+            </footer>
+          </article>
+        </li>
       ))
     }
-    <Acorn id="quests" class="-bottom-5 -left-[17px] z-20" />
-  </div>
+    <Acorn id="quests" class="-bottom-6 -left-[15px] z-20" />
+  </ol>
 </section>

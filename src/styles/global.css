@@ -972,3 +972,344 @@ kbd {
 .theme-switching *::after {
   transition: none !important;
 }
+
+/* ===================================================================== */
+/* Cards                                                                  */
+/* ===================================================================== */
+
+/* Washi paper: warm off-white with long soft fibres (SVG noise stretched) */
+:root {
+  --washi: #fbf5e6;
+  --washi-edge: #e9dcbc;
+  --washi-fibres: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='f' x='0' y='0' width='100%25' height='100%25' filterUnits='userSpaceOnUse'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.02 .25' numOctaves='2' seed='7' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .55 0 0 0 0 .45 0 0 0 0 .3 0 0 0 .7 -.36'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23f)'/%3E%3C/svg%3E");
+  --ink-red: #c2412d;
+}
+.dark {
+  --washi: #172235;
+  --washi-edge: #2b3d5c;
+  --ink-red: #e0644d;
+}
+
+/* ---- Experience: stepping-stone path + pinned notices ---------------- */
+.quest-path::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.5rem;
+  bottom: 0.5rem;
+  width: 6px;
+  margin-left: -3px;
+  border-radius: 6px;
+  background: repeating-linear-gradient(180deg, #d8c59a 0 14px, transparent 14px 22px);
+  opacity: 0.9;
+}
+.dark .quest-path::before {
+  background: repeating-linear-gradient(180deg, #3b4656 0 14px, transparent 14px 22px);
+}
+.quest-stone {
+  position: absolute;
+  left: -14px;
+  top: 1.6rem;
+  width: 28px;
+  height: 18px;
+  border-radius: 50% 50% 46% 54% / 60% 60% 40% 40%;
+  background: radial-gradient(circle at 35% 30%, #c9cfc0, #8f978a 70%);
+  box-shadow: 0 3px 0 rgba(60, 50, 30, 0.25), inset 0 -2px 0 rgba(0, 0, 0, 0.12);
+}
+.quest-stone::after {
+  /* moss */
+  content: "";
+  position: absolute;
+  left: 3px;
+  top: 1px;
+  width: 12px;
+  height: 6px;
+  border-radius: 9999px;
+  background: #6fa654;
+  opacity: 0.85;
+}
+.dark .quest-stone { background: radial-gradient(circle at 35% 30%, #56606c, #2f3742 70%); }
+.dark .quest-stone::after { background: #2f6a50; }
+.quest-stone--current {
+  box-shadow: 0 3px 0 rgba(60, 50, 30, 0.25), 0 0 0 6px rgba(243, 179, 84, 0.25), 0 0 24px 6px rgba(255, 207, 110, 0.55);
+}
+
+.notice {
+  position: relative;
+  padding: 1.6rem 1.5rem 1.4rem;
+  border-radius: 6px 10px 8px 12px / 12px 6px 10px 8px;
+  background-color: var(--washi);
+  background-image: var(--washi-fibres), linear-gradient(180deg, rgba(255, 255, 255, 0.5), transparent 40%);
+  border: 1px solid var(--washi-edge);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.6) inset,
+    0 18px 30px -18px rgba(40, 30, 10, 0.45),
+    0 4px 10px -4px rgba(40, 30, 10, 0.2);
+  transition: transform 0.35s cubic-bezier(0.3, 1.4, 0.5, 1), box-shadow 0.35s ease;
+}
+@media (min-width: 640px) {
+  .notice { padding: 1.9rem 2rem 1.6rem; }
+}
+.dark .notice {
+  background-image: linear-gradient(180deg, rgba(104, 168, 232, 0.1), transparent 50%);
+  box-shadow: 0 18px 34px -16px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(214, 168, 79, 0.15) inset;
+}
+.notice--tilt-l { transform: rotate(-0.6deg); }
+.notice--tilt-r { transform: rotate(0.5deg); }
+.notice:hover {
+  transform: rotate(0deg) translateY(-3px);
+  box-shadow: 0 26px 40px -20px rgba(40, 30, 10, 0.5), 0 6px 14px -6px rgba(40, 30, 10, 0.25);
+}
+.notice-divider { border-top: 1px dashed color-mix(in srgb, var(--washi-edge) 80%, #8a7656); }
+
+/* wooden clothespin holding the notice */
+.notice-peg {
+  position: absolute;
+  top: -14px;
+  left: 50%;
+  width: 14px;
+  height: 30px;
+  margin-left: -7px;
+  border-radius: 4px 4px 3px 3px;
+  background: linear-gradient(90deg, #b48a5f 0 45%, #9b7652 45% 55%, #b48a5f 55%);
+  box-shadow: 0 3px 4px rgba(40, 30, 10, 0.3);
+}
+.notice-peg::after {
+  content: "";
+  position: absolute;
+  left: 3px;
+  right: 3px;
+  top: 8px;
+  height: 3px;
+  border-radius: 2px;
+  background: #6b4e36;
+}
+.dark .notice-peg { background: linear-gradient(90deg, #5a4634 0 45%, #45362a 45% 55%, #5a4634 55%); }
+
+/* red ink rank seal */
+.notice-seal {
+  position: absolute;
+  top: 1.1rem;
+  right: 1.1rem;
+  width: 58px;
+  height: 58px;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  border-radius: 9999px;
+  border: 3px solid var(--ink-red);
+  box-shadow: inset 0 0 0 2px var(--washi), inset 0 0 0 3.5px var(--ink-red);
+  color: var(--ink-red);
+  transform: rotate(-12deg);
+  opacity: 0.88;
+  mix-blend-mode: multiply;
+  /* slightly uneven ink */
+  mask-image: radial-gradient(circle at 30% 70%, #000 60%, rgba(0, 0, 0, 0.75) 100%);
+}
+.dark .notice-seal { mix-blend-mode: normal; }
+.notice-seal__rank {
+  font-family: 'Fraunces', Georgia, serif;
+  font-weight: 700;
+  font-size: 1.6rem;
+  line-height: 1;
+}
+.notice-seal__label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.55rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+/* tech tags as little seed labels */
+.seed-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.18rem 0.6rem 0.18rem 0.5rem;
+  border-radius: 9999px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #3d4a35;
+  background: #e8efd6;
+  border: 1px solid #c7d6a6;
+}
+.seed-tag::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 9999px 0;
+  background: #6aa84f;
+  transform: rotate(45deg);
+}
+.dark .seed-tag {
+  color: #cfe3d6;
+  background: #1c2c3a;
+  border-color: #2e4a4a;
+}
+.dark .seed-tag::before { background: #59c49d; }
+
+/* ---- Projects: collectible relic cards -------------------------------- */
+.relic-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  border-radius: 22px;
+  background:
+    linear-gradient(var(--washi), var(--washi)) padding-box,
+    linear-gradient(145deg, #e8c77a, #b88d3b 40%, #f2d895 60%, #a8792c) border-box;
+  border: 3px solid transparent;
+  box-shadow:
+    0 22px 40px -22px rgba(40, 30, 10, 0.55),
+    0 6px 14px -8px rgba(40, 30, 10, 0.3);
+  transition: transform 0.4s cubic-bezier(0.3, 1.4, 0.5, 1), box-shadow 0.4s ease;
+}
+.dark .relic-card {
+  background:
+    linear-gradient(var(--washi), var(--washi)) padding-box,
+    linear-gradient(145deg, #d6a84f, #6e5524 40%, #e8c77a 60%, #5a4420) border-box;
+  box-shadow: 0 24px 44px -20px rgba(0, 0, 0, 0.75);
+}
+.relic-card:hover {
+  transform: translateY(-6px) rotate(-0.4deg);
+  box-shadow: 0 32px 50px -24px rgba(40, 30, 10, 0.6), 0 0 0 4px rgba(243, 179, 84, 0.18);
+}
+.relic-corner {
+  position: absolute;
+  z-index: 2;
+  width: 26px;
+  height: 26px;
+  fill: #c59b47;
+  filter: drop-shadow(0 1px 0 rgba(255, 255, 255, 0.5));
+}
+.relic-corner--tl { top: -9px; left: -9px; transform: rotate(-90deg); }
+.relic-corner--tr { top: -9px; right: -9px; }
+
+.relic-art {
+  position: relative;
+  overflow: hidden;
+  border-radius: 14px;
+  aspect-ratio: 32 / 15;
+  box-shadow: inset 0 0 0 2px rgba(184, 141, 59, 0.6);
+}
+.relic-art::after {
+  /* inner painted frame + vignette */
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 2px rgba(255, 250, 235, 0.55), inset 0 -30px 40px -20px rgba(30, 20, 10, 0.25);
+  pointer-events: none;
+}
+.relic-vignette {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.relic-emblem {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: emblem-float 4.5s ease-in-out infinite;
+}
+.relic-card:hover .relic-emblem { animation-duration: 1.6s; }
+@keyframes emblem-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+.relic-number {
+  position: absolute;
+  left: 10px;
+  top: 10px;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  font-weight: 700;
+  color: #fff8e7;
+  background: rgba(35, 71, 110, 0.85);
+  backdrop-filter: blur(4px);
+}
+.relic-rarity {
+  position: absolute;
+  right: 10px;
+  top: 8px;
+  font-size: 13px;
+  letter-spacing: -1px;
+  color: rgba(255, 255, 255, 0.45);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+}
+.relic-rarity .is-on {
+  color: #ffd76a;
+  text-shadow: 0 0 6px rgba(255, 215, 106, 0.8), 0 1px 1px rgba(120, 70, 0, 0.6);
+}
+.relic-body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  padding: 1.1rem 0.9rem 0.7rem;
+}
+.relic-lore {
+  margin-top: 0.75rem;
+  padding: 0.55rem 0.8rem;
+  border-left: 3px solid #c59b47;
+  border-radius: 0 10px 10px 0;
+  background: rgba(197, 155, 71, 0.1);
+  font-family: 'Fraunces', Georgia, serif;
+  font-style: italic;
+  font-size: 0.9rem;
+  color: #6b5d45;
+}
+.dark .relic-lore { color: #c2cfe3; background: rgba(214, 168, 79, 0.08); }
+.relic-stat {
+  padding: 0.25rem 0.7rem;
+  border-radius: 10px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #9a4f1f;
+  background: #fbe9cc;
+  border: 1px solid #efc98a;
+}
+.relic-stat span { color: #d4712a; }
+.dark .relic-stat { color: #f3cf8a; background: #2a2a2e; border-color: #5a4a2a; }
+
+/* wooden signpost buttons */
+.signpost {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.55rem 1.1rem;
+  border-radius: 8px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #3b2c1e;
+  background: linear-gradient(180deg, #d9b98b, #c49a66);
+  border: 1px solid #8f6a42;
+  box-shadow: 0 3px 0 #7a5a3a, inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.signpost::before {
+  /* wood grain */
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: repeating-linear-gradient(178deg, transparent 0 5px, rgba(120, 80, 40, 0.12) 5px 6px);
+  pointer-events: none;
+}
+.signpost--primary {
+  flex: 1;
+  color: #fffaf0;
+  background: linear-gradient(180deg, #4f9b5a, #2e7050);
+  border-color: #1f5238;
+  box-shadow: 0 3px 0 #1f5238, inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+.signpost:hover { transform: translateY(-1px); }
+.signpost:active { transform: translateY(2px); box-shadow: 0 1px 0 #7a5a3a; }
+.dark .signpost { color: #f5efe2; background: linear-gradient(180deg, #5a4634, #45362a); border-color: #2c2219; box-shadow: 0 3px 0 #1d1712; }
+.dark .signpost--primary { color: #111927; background: linear-gradient(180deg, #f7c474, #e09f3e); border-color: #a8792c; box-shadow: 0 3px 0 #8a5f1e; }

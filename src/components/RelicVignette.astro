@@ -1,0 +1,118 @@
+---
+/**
+ * A tiny painted landscape at the top of each relic card, at a different time of
+ * day, with the relic's emblem floating above the fields.
+ */
+import type { RelicEmblem, RelicSky } from '../data/portfolio';
+
+interface Props {
+  emblem: RelicEmblem;
+  sky: RelicSky;
+  uid: string;
+}
+const { emblem, sky, uid } = Astro.props;
+
+const skies: Record<RelicSky, { top: string; low: string; sun: string; hill1: string; hill2: string; hill3: string; star?: boolean }> = {
+  dawn: { top: '#f6c7b8', low: '#fde9c8', sun: '#fff1c9', hill1: '#a9c79a', hill2: '#7fae74', hill3: '#5c9158' },
+  noon: { top: '#58aee3', low: '#cdeef2', sun: '#fffbe6', hill1: '#9cc6a3', hill2: '#6aa95c', hill3: '#3f8a42' },
+  dusk: { top: '#6b5aa6', low: '#f2a774', sun: '#ffd98a', hill1: '#8a7a9e', hill2: '#5f6f6a', hill3: '#3c5149' },
+  night: { top: '#0b1730', low: '#24456a', sun: '#fdf3c0', hill1: '#1c3550', hill2: '#163a35', hill3: '#0d2622', star: true },
+};
+const c = skies[sky];
+const id = (n: string) => `${uid}-${n}`;
+---
+
+<svg class="relic-vignette" viewBox="0 0 320 150" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <linearGradient id={id('sky')} x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color={c.top} />
+      <stop offset="0.8" stop-color={c.low} />
+    </linearGradient>
+    <radialGradient id={id('glow')}>
+      <stop offset="0" stop-color="#fff6d6" stop-opacity="0.9" />
+      <stop offset="1" stop-color="#fff6d6" stop-opacity="0" />
+    </radialGradient>
+    <filter id={id('soft')} x="-10%" y="-10%" width="120%" height="120%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="2" seed="3" result="n" />
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="4" />
+    </filter>
+  </defs>
+
+  <rect width="320" height="150" fill={`url(#${id('sky')})`} />
+  {c.star && (
+    <g fill="#fff">
+      <circle cx="40" cy="22" r="1" /><circle cx="90" cy="40" r=".8" /><circle cx="150" cy="16" r="1.1" />
+      <circle cx="230" cy="30" r=".8" /><circle cx="280" cy="14" r="1" /><circle cx="300" cy="50" r=".7" />
+    </g>
+  )}
+  <circle cx={sky === 'dawn' ? 70 : 262} cy={sky === 'dusk' ? 92 : 36} r={sky === 'night' ? 11 : 15} fill={c.sun} opacity=".95" />
+
+  <!-- soft clouds -->
+  <g fill="#ffffff" opacity={sky === 'night' ? 0.12 : 0.75} filter={`url(#${id('soft')})`}>
+    <ellipse cx="60" cy="58" rx="34" ry="9" /><ellipse cx="78" cy="51" rx="18" ry="10" />
+    <ellipse cx="200" cy="46" rx="26" ry="7" />
+  </g>
+
+  <!-- layered hills with tree clumps -->
+  <g filter={`url(#${id('soft')})`}>
+    <path d="M0 110 Q70 84 150 100 T320 92 V150 H0Z" fill={c.hill1} />
+    <path d="M0 122 Q90 104 180 118 T320 112 V150 H0Z" fill={c.hill2} />
+    <circle cx="36" cy="104" r="12" fill={c.hill3} /><circle cx="50" cy="100" r="15" fill={c.hill3} />
+    <circle cx="276" cy="100" r="13" fill={c.hill3} /><circle cx="292" cy="104" r="10" fill={c.hill3} />
+    <path d="M0 136 Q110 124 220 134 T320 130 V150 H0Z" fill={c.hill3} />
+  </g>
+
+  <!-- emblem -->
+  <g class="relic-emblem">
+    <circle cx="160" cy="70" r="46" fill={`url(#${id('glow')})`} />
+    {emblem === 'orb' && (
+      <g>
+        <path d="M144 98 h32 l-5 -10 h-22Z" fill="#7a5a3a" />
+        <rect x="140" y="98" width="40" height="5" rx="2" fill="#5b4636" />
+        <circle cx="160" cy="68" r="22" fill="#bfe6f5" opacity=".85" />
+        <circle cx="160" cy="68" r="22" fill="none" stroke="#ffffff" stroke-width="1.5" opacity=".8" />
+        <path d="M146 70 C152 58 168 58 172 66 C166 62 156 64 154 74 C152 80 162 82 166 76" fill="none" stroke="#6aa8d6" stroke-width="2.2" stroke-linecap="round" />
+        <ellipse cx="152" cy="58" rx="6" ry="3.5" fill="#fff" opacity=".85" transform="rotate(-30 152 58)" />
+      </g>
+    )}
+    {emblem === 'loom' && (
+      <g>
+        <rect x="134" y="44" width="52" height="52" rx="6" fill="#9b7652" />
+        <rect x="138" y="48" width="44" height="44" rx="4" fill="#f4ead2" />
+        <rect x="141" y="51" width="12" height="12" rx="3" fill="#e0533c" />
+        <rect x="154" y="51" width="12" height="12" rx="3" fill="#f3b354" />
+        <rect x="167" y="51" width="12" height="12" rx="3" fill="#5f9f4f" />
+        <rect x="141" y="64" width="12" height="12" rx="3" fill="#68a8e8" />
+        <rect x="154" y="64" width="12" height="12" rx="6" fill="#23476e" />
+        <rect x="167" y="64" width="12" height="12" rx="3" fill="#e0533c" />
+        <rect x="141" y="77" width="12" height="12" rx="3" fill="#5f9f4f" />
+        <rect x="154" y="77" width="12" height="12" rx="3" fill="#68a8e8" />
+        <rect x="167" y="77" width="12" height="12" rx="3" fill="#f3b354" />
+      </g>
+    )}
+    {emblem === 'clock' && (
+      <g>
+        <path d="M160 40 q0 -8 6 -10" fill="none" stroke="#d6a84f" stroke-width="2" />
+        <circle cx="160" cy="44" r="4" fill="none" stroke="#d6a84f" stroke-width="2.5" />
+        <circle cx="160" cy="72" r="25" fill="#d6a84f" />
+        <circle cx="160" cy="72" r="20" fill="#fffaf0" />
+        <g stroke="#5b4636" stroke-width="1.6" stroke-linecap="round">
+          <path d="M160 55v3M160 86v3M143 72h3M174 72h3" />
+          <path d="M160 72 L160 61" stroke-width="2.2" />
+          <path d="M160 72 L169 77" />
+        </g>
+        <circle cx="160" cy="72" r="2" fill="#e0533c" />
+      </g>
+    )}
+    {emblem === 'tome' && (
+      <g>
+        <path d="M130 92 Q145 84 160 90 Q175 84 190 92 V60 Q175 52 160 58 Q145 52 130 60Z" fill="#5f8f4f" />
+        <path d="M134 88 Q147 81 160 86 V60 Q147 54 134 60Z" fill="#fffaf0" />
+        <path d="M186 88 Q173 81 160 86 V60 Q173 54 186 60Z" fill="#f4ead2" />
+        <path d="M139 65 h15 M139 70 h14 M139 75 h15 M166 65 h15 M166 70 h12" stroke="#b9a77d" stroke-width="1.4" stroke-linecap="round" />
+        <path d="M172 76 c3 -6 9 -6 10 -2 c-3 4 -7 4 -10 2Z" fill="#7cb85c" />
+        <path d="M160 58 v28" stroke="#c9b48a" stroke-width="1.2" />
+      </g>
+    )}
+  </g>
+</svg>
