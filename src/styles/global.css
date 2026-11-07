@@ -1,0 +1,158 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@layer base {
+  :root {
+    --bg-canvas: #d9f0ec;
+    --bg-card: rgba(253, 249, 238, 0.88);
+    --text-main: #222b25;
+    --text-muted: #505d53;
+    --border-gold: #b88d3b;
+    --border-inner: #dce3cc;
+    --accent-meadow: #2b6e4c;
+    --accent-royal: #23476e;
+    --accent-sun: #cf6b24;
+  }
+
+  .dark {
+    --bg-canvas: #0b1526;
+    --bg-card: rgba(18, 29, 48, 0.86);
+    --text-main: #f4efe2;
+    --text-muted: #9eb2cc;
+    --border-gold: #d6a84f;
+    --border-inner: #2b3f61;
+    --accent-meadow: #59c49d;
+    --accent-royal: #68a8e8;
+    --accent-sun: #f3b354;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    font-family: 'Nunito', system-ui, -apple-system, sans-serif;
+  }
+
+  h1, h2, h3, .font-serif-story {
+    font-family: 'Fraunces', Georgia, Cambria, 'Times New Roman', serif;
+  }
+
+  code, pre, .font-mono {
+    font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
+  }
+}
+
+/* Gentle Totoro Forest & Ni no Kuni animations */
+@keyframes float-slow {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-7px) rotate(1.5deg);
+  }
+}
+
+@keyframes drift-cloud {
+  0%, 100% {
+    transform: translateX(0px) translateY(0px);
+  }
+  50% {
+    transform: translateX(28px) translateY(-5px);
+  }
+}
+
+@keyframes leaf-sway {
+  0%, 100% {
+    transform: translateY(0px) translateX(0px) rotate(-6deg);
+  }
+  50% {
+    transform: translateY(-10px) translateX(12px) rotate(8deg);
+  }
+}
+
+@keyframes firefly-glow {
+  0%, 100% {
+    opacity: 0.25;
+    transform: scale(0.85) translateY(0px);
+  }
+  50% {
+    opacity: 0.95;
+    transform: scale(1.2) translateY(-8px);
+  }
+}
+
+@keyframes cursor-bounce {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(4px);
+  }
+}
+
+@keyframes spin-slow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-float-slow {
+  animation: float-slow 4.5s ease-in-out infinite;
+}
+
+.animate-drift-cloud {
+  animation: drift-cloud 18s ease-in-out infinite;
+}
+
+.animate-leaf-sway {
+  animation: leaf-sway 7s ease-in-out infinite;
+}
+
+.animate-firefly {
+  animation: firefly-glow 4s ease-in-out infinite;
+}
+
+.animate-cursor-bounce {
+  animation: cursor-bounce 0.8s ease-in-out infinite;
+}
+
+.animate-spin-slow {
+  animation: spin-slow 28s linear infinite;
+}
+
+/* Ni no Kuni "Wizard's Companion" Ornate RPG Panel */
+.rpg-panel {
+  background-color: var(--bg-card);
+  border: 2px solid var(--border-gold);
+  box-shadow:
+    0 10px 30px -6px rgba(24, 38, 28, 0.14),
+    inset 0 0 0 3px var(--bg-card),
+    inset 0 0 0 4.5px var(--border-inner);
+  backdrop-filter: blur(10px);
+}
+
+.dark .rpg-panel {
+  box-shadow:
+    0 12px 34px -6px rgba(4, 8, 18, 0.65),
+    inset 0 0 0 3px rgba(18, 29, 48, 0.92),
+    inset 0 0 0 4.5px var(--border-inner);
+}
+
+/* Tactile RPG Command Button */
+.rpg-btn {
+  position: relative;
+  transition: all 0.15s ease;
+  box-shadow: 0 3px 0 0 #946f25;
+}
+
+.rpg-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 0 0 #946f25;
+}
+
+.rpg-btn:active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 0 #946f25;
+}

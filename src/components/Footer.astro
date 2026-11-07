@@ -1,0 +1,40 @@
+---
+import { profile } from '../data/portfolio';
+const currentYear = new Date().getFullYear();
+---
+
+<footer class="mt-auto border-t-2 border-[#c59b47] bg-[#f2e8cf]/70 dark:bg-[#0b101b]/80 py-10">
+  <div class="max-w-4xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs sm:text-sm font-mono text-[#576058] dark:text-[#9fb0c9]">
+    <div class="flex items-center gap-2.5">
+      <span class="inline-flex h-2.5 w-2.5 rounded-full bg-amber-400 shadow-[0_0_8px_#fbbf24]"></span>
+      <span>
+        WAYSTONE SAVE POINT · © {currentYear} <strong class="text-[#252b27] dark:text-[#f5efe2]">{profile.name}</strong>
+      </span>
+    </div>
+
+    <div class="flex items-center gap-5 font-bold">
+      <a
+        href={`mailto:${profile.email}`}
+        class="hover:text-[#2e7050] dark:hover:text-[#f3b354] transition-colors"
+      >
+        [PIGEON POST]
+      </a>
+      <a
+        href={profile.socials.github}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="hover:text-[#2e7050] dark:hover:text-[#f3b354] transition-colors"
+      >
+        [GITHUB GUILD]
+      </a>
+      <a
+        href={profile.socials.linkedin}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="hover:text-[#2e7050] dark:hover:text-[#f3b354] transition-colors"
+      >
+        [LINKEDIN]
+      </a>
+    </div>
+  </div>
+</footer>

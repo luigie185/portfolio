@@ -1,0 +1,100 @@
+---
+import { profile } from '../data/portfolio';
+---
+
+<header
+  class="sticky top-0 z-50 backdrop-blur-md bg-[#f7f0de]/90 dark:bg-[#0f1624]/90 border-b-2 border-[#c59b47] shadow-sm transition-colors"
+>
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-3">
+    <!-- Left: JRPG Character HUD Status -->
+    <a href="#" class="flex items-center gap-3 group min-w-0">
+      <!-- Level Badge & Emblem -->
+      <div
+        class="relative flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-[#23476e] to-[#162d47] dark:from-[#2b588a] dark:to-[#152840] border-2 border-[#c59b47] text-[#fff8e7] shadow-sm shrink-0 group-hover:scale-105 transition-transform"
+      >
+        <span class="font-serif-story font-bold text-sm tracking-tighter">LV.{profile.level}</span>
+        <span
+          class="absolute -bottom-1 -right-1 w-3.5 h-3.5 rounded-full bg-emerald-500 border-2 border-[#f7f0de] dark:border-[#0f1624]"
+          title="Party Leader Online"
+        ></span>
+      </div>
+
+      <!-- Name & HP/MP Bars -->
+      <div class="min-w-0">
+        <div class="flex items-center gap-2">
+          <span
+            class="font-serif-story font-bold text-sm sm:text-base truncate text-[#252b27] dark:text-[#f5efe2] group-hover:text-[#2e7050] dark:group-hover:text-[#f3b354] transition-colors"
+          >
+            {profile.name}
+          </span>
+        </div>
+
+        <!-- Mini HP & MP Gauges -->
+        <div class="flex items-center gap-3 mt-0.5 text-[10px] font-mono font-semibold">
+          <div class="flex items-center gap-1">
+            <span class="text-emerald-700 dark:text-emerald-400">HP</span>
+            <div class="w-14 sm:w-16 h-1.5 rounded-full bg-black/15 dark:bg-white/10 overflow-hidden">
+              <div class="h-full w-full bg-gradient-to-r from-emerald-500 to-lime-400 rounded-full"></div>
+            </div>
+          </div>
+          <div class="flex items-center gap-1">
+            <span class="text-sky-700 dark:text-sky-400">MP</span>
+            <div class="w-12 sm:w-14 h-1.5 rounded-full bg-black/15 dark:bg-white/10 overflow-hidden">
+              <div class="h-full w-full bg-gradient-to-r from-sky-500 to-cyan-300 rounded-full"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </a>
+
+    <!-- Right: Game Menu Tabs & Time-of-Day Spell Toggle -->
+    <div class="flex items-center gap-2 sm:gap-4 shrink-0">
+      <nav class="hidden md:flex items-center gap-1 text-xs font-mono font-semibold">
+        <a
+          href="#about"
+          class="px-3 py-1.5 rounded-lg text-[#576058] dark:text-[#9fb0c9] hover:bg-[#e9dfc4] dark:hover:bg-[#1c2942] hover:text-[#252b27] dark:hover:text-[#f3b354] transition-colors"
+        >
+          ✦ Status
+        </a>
+        <a
+          href="#experience"
+          class="px-3 py-1.5 rounded-lg text-[#576058] dark:text-[#9fb0c9] hover:bg-[#e9dfc4] dark:hover:bg-[#1c2942] hover:text-[#252b27] dark:hover:text-[#f3b354] transition-colors"
+        >
+          📜 Quests
+        </a>
+        <a
+          href="#projects"
+          class="px-3 py-1.5 rounded-lg text-[#576058] dark:text-[#9fb0c9] hover:bg-[#e9dfc4] dark:hover:bg-[#1c2942] hover:text-[#252b27] dark:hover:text-[#f3b354] transition-colors"
+        >
+          📖 Grimoire
+        </a>
+      </nav>
+
+      <!-- Spell Toggle: Sunstone (Day) / Starlight (Night) -->
+      <button
+        id="theme-toggle"
+        type="button"
+        aria-label="Cast Day or Night Spell"
+        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-mono font-semibold border-2 border-[#c59b47] bg-[#fffaf0] dark:bg-[#1a253a] text-[#23476e] dark:text-[#f3b354] hover:bg-[#f3e8ce] dark:hover:bg-[#22314d] transition-all cursor-pointer shadow-2xs"
+      >
+        <span class="hidden dark:inline-flex items-center gap-1.5">
+          <span>☀️</span>
+          <span>Cast: Dawn</span>
+        </span>
+        <span class="inline-flex dark:hidden items-center gap-1.5">
+          <span>🌙</span>
+          <span>Cast: Nightfall</span>
+        </span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<script>
+  const themeToggle = document.getElementById('theme-toggle');
+  themeToggle?.addEventListener('click', () => {
+    const html = document.documentElement;
+    const isDark = html.classList.toggle('dark');
+    localStorage.setItem('theme', isDark ? 'dark' : 'light');
+  });
+</script>

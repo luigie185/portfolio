@@ -1,0 +1,276 @@
+---
+import { profile } from '../data/portfolio';
+---
+
+<section id="about" class="pt-10 pb-14 sm:pt-14 sm:pb-18 space-y-6">
+  <!-- Main Wizard's Companion Character Sheet -->
+  <div class="rpg-panel rounded-3xl p-6 sm:p-9 relative overflow-hidden">
+    <!-- Rotating Arcane Compass Watermark in Corner -->
+    <svg
+      class="animate-spin-slow pointer-events-none absolute -right-16 -top-16 w-64 h-64 text-[#c59b47]/15 dark:text-[#d6a84f]/10"
+      viewBox="0 0 200 200"
+      fill="none"
+    >
+      <circle cx="100" cy="100" r="88" stroke="currentColor" stroke-width="2" stroke-dasharray="6 4" />
+      <circle cx="100" cy="100" r="68" stroke="currentColor" stroke-width="1.5" />
+      <path d="M100 6v188M6 100h188M34 34l132 132M166 34L34 166" stroke="currentColor" stroke-width="1" />
+      <polygon points="100,18 108,92 182,100 108,108 100,182 92,108 18,100 92,92" fill="currentColor" fill-opacity="0.2" />
+    </svg>
+
+    <!-- Top Guild Header Ribbon -->
+    <div class="flex flex-wrap items-center justify-between gap-2 pb-5 mb-6 border-b border-[#dfd3b8] dark:border-[#2e4063]">
+      <div class="inline-flex items-center gap-2 text-xs font-mono font-bold uppercase tracking-wider text-[#23476e] dark:text-[#f3b354]">
+        <span>📖 THE WIZARD'S COMPANION · HERO REGISTRY</span>
+      </div>
+
+      {
+        profile.availableForWork && (
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono font-semibold bg-emerald-500/15 text-[#1f5c3d] dark:text-emerald-300 border border-emerald-600/30">
+            <span class="relative flex h-2 w-2">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75" />
+              <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+            </span>
+            <span>QUEST STATUS: READY FOR PARTY INVITE</span>
+          </div>
+        )
+      }
+    </div>
+
+    <!-- Main Character Profile & Stats Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center relative z-10">
+      <!-- Left 7 Cols: Character Lore & Actions -->
+      <div class="lg:col-span-7 space-y-4">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-[#23476e] dark:bg-[#253b5e] text-[#fff8e7] text-xs font-mono font-semibold shadow-2xs">
+          <span>⚔️ CLASS: {profile.rpgClass.toUpperCase()}</span>
+        </div>
+
+        <h1 class="text-3xl sm:text-4xl font-bold tracking-tight text-[#252b27] dark:text-[#f5efe2] leading-[1.15]">
+          {profile.name}
+        </h1>
+
+        <p class="text-base sm:text-lg font-serif-story italic text-[#2e7050] dark:text-[#6ee7b7]">
+          “{profile.tagline}”
+        </p>
+
+        <p class="text-sm sm:text-base text-[#49524a] dark:text-[#c2cfe3] leading-relaxed">
+          {profile.about}
+        </p>
+
+        <!-- Action Command Bar -->
+        <div class="flex flex-wrap items-center gap-3 pt-3">
+          <a
+            href="#projects"
+            class="rpg-btn inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-mono font-bold bg-gradient-to-b from-[#e09f3e] to-[#c58324] text-[#1a140b] border border-[#f7cf86]"
+          >
+            <span>▶ OPEN GRIMOIRE</span>
+          </a>
+
+          <a
+            href={`mailto:${profile.email}`}
+            class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-mono font-semibold border-2 border-[#c59b47] bg-[#fffaf0] dark:bg-[#1b273d] text-[#252b27] dark:text-[#f5efe2] hover:bg-[#f2e6cb] dark:hover:bg-[#243452] transition-colors"
+          >
+            <span>✉️ SEND PIGEON POST</span>
+          </a>
+
+          <a
+            href={profile.socials.github}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="GitHub (@luigie185)"
+            class="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl text-xs font-mono font-semibold border border-[#dfd3b8] dark:border-[#2e4063] bg-[#f5ebd4]/70 dark:bg-[#151f33] text-[#252b27] dark:text-[#d6e1f0] hover:border-[#c59b47] transition-colors"
+          >
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+              <path
+                fill-rule="evenodd"
+                clip-rule="evenodd"
+                d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"
+              ></path>
+            </svg>
+            <span>@luigie185</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- Right 5 Cols: Character Attribute Window (Ni no Kuni Familiar / Stat Window) -->
+      <div class="lg:col-span-5">
+        <div
+          class="rounded-2xl border-2 border-[#c59b47] bg-[#f4ead2]/85 dark:bg-[#131d30]/90 p-5 space-y-4 shadow-inner"
+        >
+          <div class="flex items-center justify-between border-b border-[#d6c7a5] dark:border-[#293a59] pb-2.5">
+            <span class="text-xs font-mono font-bold uppercase tracking-wider text-[#23476e] dark:text-[#f3b354]">
+              ✦ Arcane Attributes
+            </span>
+            <span class="text-xs font-mono font-bold text-[#2e7050] dark:text-[#59c49d]">
+              {profile.role}
+            </span>
+          </div>
+
+          <!-- Stat Bars -->
+          <div class="space-y-3">
+            {
+              profile.attributes.map((attr) => (
+                <div class="space-y-1">
+                  <div class="flex justify-between text-xs font-mono font-semibold">
+                    <span class="text-[#252b27] dark:text-[#e2eaf5]">{attr.name}</span>
+                    <span class="text-[#d4712a] dark:text-[#f3b354]">{attr.stat} / 100</span>
+                  </div>
+                  <div class="w-full h-2.5 rounded-full bg-[#ded2b6] dark:bg-[#0c121e] p-0.5 overflow-hidden border border-[#c59b47]/40">
+                    <div
+                      class={`h-full rounded-full bg-gradient-to-r ${attr.color}`}
+                      style={`width: ${attr.stat}%`}
+                    />
+                  </div>
+                </div>
+              ))
+            }
+          </div>
+
+          <!-- Equipped Passive Perks -->
+          <div class="pt-2 border-t border-[#d6c7a5] dark:border-[#293a59] grid grid-cols-3 gap-2 text-center">
+            {
+              profile.highlights.map((item, idx) => (
+                <div class="p-2 rounded-xl bg-[#fffaf0] dark:bg-[#1a2740] border border-[#dfd3b8] dark:border-[#2e4063]">
+                  <p class="text-[10px] font-mono uppercase text-[#d4712a] dark:text-[#f3b354] font-bold">
+                    {idx === 0 ? '🛡️ Role' : idx === 1 ? '🔮 Runes' : '🌿 Trait'}
+                  </p>
+                  <p class="mt-0.5 text-[11px] font-semibold text-[#252b27] dark:text-[#f5efe2] line-clamp-2">
+                    {item.value}
+                  </p>
+                </div>
+              ))
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Interactive Totoro Forest Spirit & Ni no Kuni Dialogue Box -->
+  <div
+    class="rpg-panel rounded-2xl p-5 sm:p-6 border-2 border-[#c59b47]"
+  >
+    <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+      <!-- Totoro Spirit Guide Avatar -->
+      <div
+        class="animate-float-slow relative w-14 h-14 rounded-2xl bg-[#7ec8e3]/30 dark:bg-[#101c2e] border-2 border-[#c59b47] flex items-center justify-center shrink-0 shadow-md"
+      >
+        <svg class="w-11 h-11" viewBox="0 0 64 64" fill="none">
+          <!-- Totoro Ears -->
+          <path d="M21 19l-3-10 7 7zM43 19l3-10-7 7z" fill="#6b7278" />
+          <!-- Totoro Body -->
+          <ellipse cx="32" cy="38" rx="18" ry="19" fill="#6b7278" />
+          <!-- Cream Belly & Chevrons -->
+          <ellipse cx="32" cy="42" rx="12.5" ry="12.5" fill="#f3ebd3" />
+          <path
+            d="M25 37l2.5-2 2.5 2M34 37l2.5-2 2.5 2M28 43l3-2 3 2"
+            stroke="#6b7278"
+            stroke-width="2"
+            stroke-linecap="round"
+          />
+          <!-- Big Ghibli Eyes -->
+          <circle cx="25" cy="26" r="3" fill="#ffffff" />
+          <circle cx="39" cy="26" r="3" fill="#ffffff" />
+          <circle cx="25" cy="26" r="1.4" fill="#111" />
+          <circle cx="39" cy="26" r="1.4" fill="#111" />
+          <!-- Leaf Hat -->
+          <path d="M32 19c-3-4-7-2.5-7-2.5s2 4.5 7 2.5c5 2 7-2.5 7-2.5s-4-1.5-7 2.5z" fill="#4d9b58" />
+        </svg>
+        <span
+          class="absolute -bottom-1.5 px-1.5 py-0.2 bg-[#c59b47] text-[#101c2e] font-mono font-bold text-[9px] rounded uppercase"
+        >
+          TOTORO
+        </span>
+      </div>
+
+      <!-- Dialogue Text & Interactive Prompts -->
+      <div class="flex-1 space-y-3 w-full">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-mono font-bold uppercase tracking-wider text-[#2b6e4c] dark:text-[#f3b354]">
+            🍃 Totoro · Keeper of Tsukamori Forest
+          </span>
+          <span class="text-[11px] font-mono text-[#505d53] dark:text-amber-200/70">Select a dialogue option below</span>
+        </div>
+
+        <p
+          id="npc-dialogue-text"
+          class="text-sm sm:text-base font-medium text-[#252b27] dark:text-[#f5efe2] min-h-[2.5rem] leading-relaxed"
+        >
+          “Tidy! Welcome, traveler, to <strong>Luigie Cyril Francis A. Posod</strong>'s Sanctuary! What part of the Wizard's Companion shall we inspect first?”
+        </p>
+
+        <!-- Interactive RPG Dialogue Choices -->
+        <div class="flex flex-wrap gap-2 pt-1">
+          <button
+            type="button"
+            data-dialogue="“Luigie is an Arcane Full-Stack Artificer who specializes in TypeScript, Astro, React, and high-speed web architecture—crafting web realms with near-zero load times!”"
+            class="npc-choice inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono font-semibold bg-[#23476e]/10 dark:bg-white/10 text-[#23476e] dark:text-[#f3b354] hover:bg-[#c59b47] hover:text-[#131a29] border border-[#c59b47]/60 transition-colors cursor-pointer"
+          >
+            <span class="animate-cursor-bounce">▸</span>
+            <span>Who is Luigie?</span>
+          </button>
+
+          <button
+            type="button"
+            data-dialogue="“Flipping to the Swift Solutions Quest Log! Luigie has completed S-Rank and A-Rank engineering campaigns across remote guilds, boosting performance by 42%.”"
+            data-scroll="#experience"
+            class="npc-choice inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono font-semibold bg-[#23476e]/10 dark:bg-white/10 text-[#23476e] dark:text-[#f3b354] hover:bg-[#c59b47] hover:text-[#131a29] border border-[#c59b47]/60 transition-colors cursor-pointer"
+          >
+            <span>▸</span>
+            <span>Show Quest Log</span>
+          </button>
+
+          <button
+            type="button"
+            data-dialogue="“Behold the Vault of Relics! Each project is forged with 5-star craftsmanship, clean code, and modern web alchemy. Click any relic below to inspect its source scroll!”"
+            data-scroll="#projects"
+            class="npc-choice inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono font-semibold bg-[#23476e]/10 dark:bg-white/10 text-[#23476e] dark:text-[#f3b354] hover:bg-[#c59b47] hover:text-[#131a29] border border-[#c59b47]/60 transition-colors cursor-pointer"
+          >
+            <span>▸</span>
+            <span>Inspect Relics</span>
+          </button>
+
+          <button
+            type="button"
+            data-cast-theme="true"
+            class="npc-choice inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono font-semibold bg-[#23476e]/10 dark:bg-white/10 text-[#2e7050] dark:text-emerald-300 hover:bg-[#c59b47] hover:text-[#131a29] border border-[#c59b47]/60 transition-colors cursor-pointer"
+          >
+            <span>✨</span>
+            <span>Cast Time-Shift Spell</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  const dialogueEl = document.getElementById('npc-dialogue-text');
+  const buttons = document.querySelectorAll('.npc-choice');
+
+  buttons.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const castTheme = btn.getAttribute('data-cast-theme');
+      if (castTheme === 'true') {
+        const html = document.documentElement;
+        const isDark = html.classList.toggle('dark');
+        localStorage.setItem('theme', isDark ? 'dark' : 'light');
+        if (dialogueEl) {
+          dialogueEl.innerHTML = isDark
+            ? '“✨ <em>Spell Cast: Nightfall!</em> Lanterns are lit and fireflies now dance across the starlit kingdom.”'
+            : '“☀️ <em>Spell Cast: Dawnbreak!</em> Warm sunlight returns to the summer meadows of Ding Dong Dell.”';
+        }
+        return;
+      }
+
+      const message = btn.getAttribute('data-dialogue');
+      const scrollTarget = btn.getAttribute('data-scroll');
+      if (message && dialogueEl) {
+        dialogueEl.textContent = message;
+      }
+      if (scrollTarget) {
+        const target = document.querySelector(scrollTarget);
+        target?.scrollIntoView({ behavior: 'smooth' });
+      }
+    });
+  });
+</script>

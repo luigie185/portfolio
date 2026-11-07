@@ -1,0 +1,260 @@
+---
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const {
+  title,
+  description = 'Personal portfolio showcasing software engineering projects and work experience.',
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="generator" content={Astro.generator} />
+    <meta name="description" content={description} />
+    <title>{title}</title>
+
+    <!-- Google Fonts: Fraunces (Storybook Serif), Nunito (Warm Sans), JetBrains Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,400&family=JetBrains+Mono:wght@400;500&family=Nunito:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Prevent flash of incorrect theme -->
+    <script is:inline>
+      const getThemePreference = () => {
+        if (typeof localStorage !== 'undefined' && localStorage.getItem('theme')) {
+          return localStorage.getItem('theme');
+        }
+        return 'light';
+      };
+      const isDark = getThemePreference() === 'dark';
+      document.documentElement.classList[isDark ? 'add' : 'remove']('dark');
+    </script>
+  </head>
+  <body
+    class="text-[#222b25] dark:text-[#f4efe2] antialiased selection:bg-[#2b6e4c]/20 selection:text-[#1f5238] dark:selection:bg-[#f3b354]/25 dark:selection:text-[#f3b354] transition-colors duration-300 min-h-screen flex flex-col relative overflow-x-hidden"
+  >
+    <!-- ========================================================================= -->
+    <!-- MY NEIGHBOR TOTORO SCENIC ILLUSTRATED BACKGROUND (DAY MEADOW & NIGHT SKY) -->
+    <!-- ========================================================================= -->
+    <div class="pointer-events-none fixed inset-0 -z-10 overflow-hidden" aria-hidden="true">
+      <!-- 1. Sky Gradient: Summer Ghibli Cerulean Sky (Day) / Starry Tsukamori Forest (Night) -->
+      <div
+        class="absolute inset-0 bg-gradient-to-b from-[#6ec3e8] via-[#b8e6f5] to-[#dff2c9] dark:from-[#070d19] dark:via-[#11223d] dark:to-[#18333b] transition-colors duration-500"
+      >
+      </div>
+
+      <!-- 2. Glowing Full Moon (Night) / Warm Summer Sun (Day) -->
+      <div
+        class="
+          absolute top-14 right-[10%] sm:right-[15%] w-24 h-24 sm:w-32 sm:h-32 rounded-full
+          bg-[#fff9d6] dark:bg-[#fef08a]
+          shadow-[0_0_80px_30px_rgba(255,250,205,0.75)] dark:shadow-[0_0_90px_25px_rgba(253,224,71,0.35)]
+          transition-all duration-500
+        "
+      >
+      </div>
+
+      <!-- 3. Towering Ghibli Cumulonimbus Summer Clouds -->
+      <svg
+        class="animate-drift-cloud absolute top-10 -left-12 w-80 sm:w-[440px] text-white/90 dark:text-slate-300/10 drop-shadow-sm"
+        viewBox="0 0 400 160"
+        fill="currentColor"
+      >
+        <path
+          d="M65 135h275c28 0 50-20 50-45 0-22-17-41-40-44-8-26-34-46-65-46-26 0-49 14-60 35-9-5-19-8-30-8-29 0-53 21-56 48-24 3-42 22-42 45 0 9 5 15 18 15z"
+        ></path>
+      </svg>
+
+      <svg
+        class="animate-drift-cloud absolute top-28 right-[-40px] w-72 sm:w-[390px] text-white/85 dark:text-slate-300/10"
+        style="animation-delay: -8s;"
+        viewBox="0 0 360 140"
+        fill="currentColor"
+      >
+        <path
+          d="M55 115h240c22 0 40-17 40-38 0-19-14-35-33-38-8-23-30-40-58-40-25 0-46 14-55 34-8-3-16-5-25-5-24 0-43 17-45 40-20 3-35 19-35 38 0 6 4 9 11 9z"
+        ></path>
+      </svg>
+
+      <!-- 4. Floating Camphor Leaves in the Breeze -->
+      <svg
+        class="animate-leaf-sway absolute top-1/4 left-[8%] w-7 h-7 text-[#3b8a5a]/70 dark:text-[#6ee7b7]/40"
+        viewBox="0 0 24 24"
+        fill="currentColor"
+      >
+        <path d="M17 8C8 10 5.9 16.17 3.82 21.34l1.89.66l.95-2.3c.48.17.98.3 1.34.3C19 20 22 3 22 3c-1 2-8 2.25-13 3.25S2 11.5 2 13.5s1.75 3.75 1.75 3.75C7 8 17 8 17 8Z" />
+      </svg>
+      <svg
+        class="animate-leaf-sway absolute top-1/3 right-[10%] w-6 h-6 text-[#4d9b58]/65 dark:text-[#6ee7b7]/35"
+        style="animation-delay: -3.5s;"
+        viewBox="0 0 24 24"
+        fill="currentColor"
+      >
+        <path d="M17 8C8 10 5.9 16.17 3.82 21.34l1.89.66l.95-2.3c.48.17.98.3 1.34.3C19 20 22 3 22 3c-1 2-8 2.25-13 3.25S2 11.5 2 13.5s1.75 3.75 1.75 3.75C7 8 17 8 17 8Z" />
+      </svg>
+
+      <!-- 5. Bottom Scenic Horizon: Full Unclipped Giant Camphor Tree, Rolling Hills, Totoro Trio & Bus Stop -->
+      <svg
+        class="absolute bottom-0 left-0 w-full h-[420px] sm:h-[540px] overflow-visible"
+        viewBox="0 0 1440 560"
+        preserveAspectRatio="xMidYMax slice"
+        fill="none"
+      >
+        <!-- Distant Misty Mountain Ridge -->
+        <path
+          d="M0 560V420Q220 350 480 405T980 385T1440 410V560Z"
+          class="fill-[#88c999]/55 dark:fill-[#132c33]/80 transition-colors duration-500"
+        />
+
+        <!-- =============================================================== -->
+        <!-- GIANT CAMPHOR TREE (KUSINOKI) ON RIGHT HORIZON (FULLY UNCLIPPED) -->
+        <!-- =============================================================== -->
+        <g class="opacity-95">
+          <!-- Massive Gnarled Tree Trunk & Roots -->
+          <path
+            d="M1145 520 C1175 430 1195 340 1185 240 L1265 240 C1255 340 1275 430 1310 520 Z"
+            class="fill-[#5c4938] dark:fill-[#141e28]"
+          />
+          <!-- Left Bough / Branch where Totoro plays Ocarina -->
+          <path
+            d="M1195 310 Q1090 290 1015 315 Q1100 328 1200 338 Z"
+            class="fill-[#5c4938] dark:fill-[#141e28]"
+          />
+          <!-- Upper Supporting Branches -->
+          <path
+            d="M1200 265 Q1135 220 1095 200 L1115 190 Q1160 215 1215 250 Z"
+            class="fill-[#5c4938] dark:fill-[#141e28]"
+          />
+          <path
+            d="M1245 260 Q1300 215 1340 195 L1325 185 Q1285 205 1235 245 Z"
+            class="fill-[#5c4938] dark:fill-[#141e28]"
+          />
+
+          <!-- Lush Multi-Layered Camphor Tree Crown (All well below y=0 so nothing clips!) -->
+          <!-- Back Dark Foliage Layer -->
+          <circle cx="1115" cy="215" r="78" class="fill-[#25633d] dark:fill-[#0c2624]" />
+          <circle cx="1325" cy="220" r="82" class="fill-[#25633d] dark:fill-[#0c2624]" />
+          <circle cx="1220" cy="145" r="95" class="fill-[#25633d] dark:fill-[#0c2624]" />
+
+          <!-- Mid Foliage Layer -->
+          <circle cx="1155" cy="185" r="85" class="fill-[#2f7a4c] dark:fill-[#113330]" />
+          <circle cx="1285" cy="190" r="85" class="fill-[#2f7a4c] dark:fill-[#113330]" />
+          <circle cx="1075" cy="240" r="58" class="fill-[#2f7a4c] dark:fill-[#113330]" />
+          <circle cx="1365" cy="245" r="60" class="fill-[#2f7a4c] dark:fill-[#113330]" />
+
+          <!-- Top & Sunlit/Moonlit Highlight Foliage Clusters -->
+          <circle cx="1220" cy="125" r="82" class="fill-[#3e915c] dark:fill-[#17423e]" />
+          <circle cx="1145" cy="155" r="68" class="fill-[#479c64] dark:fill-[#1b4b46]" />
+          <circle cx="1290" cy="160" r="66" class="fill-[#3b8c58] dark:fill-[#153d39]" />
+          <circle cx="1220" cy="195" r="76" class="fill-[#358251] dark:fill-[#133834]" />
+        </g>
+
+        <!-- Midground Rolling Sayama Meadow Hills -->
+        <path
+          d="M0 560V455Q340 385 720 450T1440 430V560Z"
+          class="fill-[#58a869] dark:fill-[#12302d] transition-colors duration-500"
+        />
+
+        <!-- =============================================================== -->
+        <!-- ICONIC TOTORO, CHU-TOTORO & CHIBI-TOTORO SILHOUETTES ON HILLTOP -->
+        <!-- =============================================================== -->
+        <g transform="translate(115, 362)">
+          <!-- Inari-mae Bus Stop Sign -->
+          <line x1="0" y1="32" x2="0" y2="85" stroke="#3b4d3e" class="dark:stroke-[#0b1719]" stroke-width="3" />
+          <circle cx="0" cy="26" r="9" class="fill-[#e0533c] dark:fill-[#b84330]" stroke="#fff" stroke-width="1.5" />
+          <rect x="-5" y="83" width="10" height="4" class="fill-[#3b4d3e] dark:fill-[#0b1719]" />
+
+          <!-- Warm Vintage Bus Stop Streetlamp (Glows brightly at night!) -->
+          <line x1="-26" y1="12" x2="-26" y2="85" stroke="#2c3a2f" class="dark:stroke-[#091315]" stroke-width="3" />
+          <path d="M-34 12 L-18 12 L-22 4 L-30 4 Z" class="fill-[#2c3a2f] dark:fill-[#091315]" />
+          <circle cx="-26" cy="15" r="6" class="fill-[#fef08a]" />
+          <circle cx="-26" cy="15" r="24" class="fill-[#fde047]/35 dark:fill-[#facc15]/50" />
+
+          <!-- Big Totoro with Leaf Umbrella -->
+          <g transform="translate(28, 12)">
+            <!-- Umbrella Stem & Leaf Canopy -->
+            <path d="M26 25 L26 -12" stroke="#263829" class="dark:stroke-[#081214]" stroke-width="2.5" />
+            <path
+              d="M-2 -10 Q26 -28 54 -10 Q26 -16 -2 -10 Z"
+              class="fill-[#2b6e44] dark:fill-[#1d4d44]"
+            />
+            <!-- Ears -->
+            <path d="M16 14 L13 0 L21 11 Z" class="fill-[#4a5759] dark:fill-[#0c181d]" />
+            <path d="M36 14 L39 0 L31 11 Z" class="fill-[#4a5759] dark:fill-[#0c181d]" />
+            <!-- Plump Body -->
+            <ellipse cx="26" cy="44" rx="24" ry="30" class="fill-[#4a5759] dark:fill-[#0c181d]" />
+            <!-- Cream Belly & Chevrons -->
+            <ellipse cx="26" cy="49" rx="16" ry="20" class="fill-[#e9e2ce] dark:fill-[#2b3f47]" />
+            <path
+              d="M18 39l3-3 3 3M26 37l3-3 3 3M15 46l3-3 3 3M23 45l3-3 3 3M31 46l3-3 3 3"
+              stroke="#4a5759"
+              class="dark:stroke-[#0c181d]"
+              stroke-width="2"
+              stroke-linecap="round"
+            />
+            <!-- Glowing Eyes -->
+            <circle cx="19" cy="22" r="2.8" fill="#ffffff" />
+            <circle cx="33" cy="22" r="2.8" fill="#ffffff" />
+            <circle cx="19" cy="22" r="1.3" fill="#111" />
+            <circle cx="33" cy="22" r="1.3" fill="#111" />
+          </g>
+
+          <!-- Medium Blue Totoro (Chu-Totoro) -->
+          <g transform="translate(88, 42)">
+            <path d="M9 8 L7 -1 L13 6 Z" class="fill-[#3b6e8c] dark:fill-[#122636]" />
+            <path d="M21 8 L23 -1 L17 6 Z" class="fill-[#3b6e8c] dark:fill-[#122636]" />
+            <ellipse cx="15" cy="24" rx="12" ry="16" class="fill-[#3b6e8c] dark:fill-[#122636]" />
+            <ellipse cx="15" cy="27" rx="8" ry="10" class="fill-[#e9e2ce] dark:fill-[#293d47]" />
+            <circle cx="11.5" cy="13" r="1.8" fill="#ffffff" />
+            <circle cx="18.5" cy="13" r="1.8" fill="#ffffff" />
+          </g>
+
+          <!-- Small White Totoro (Chibi-Totoro) -->
+          <g transform="translate(120, 54)">
+            <path d="M5 6 L4 0 L8 5 Z" class="fill-[#f5f3eb] dark:fill-[#9cb3bd]" />
+            <path d="M13 6 L14 0 L10 5 Z" class="fill-[#f5f3eb] dark:fill-[#9cb3bd]" />
+            <ellipse cx="9" cy="16" rx="7.5" ry="10" class="fill-[#f5f3eb] dark:fill-[#9cb3bd]" />
+            <circle cx="7" cy="10" r="1.2" fill="#111" />
+            <circle cx="11" cy="10" r="1.2" fill="#111" />
+          </g>
+        </g>
+
+        <!-- Foreground Lush Grass Silhouette -->
+        <path
+          d="M0 560V490Q420 435 860 485T1440 465V560Z"
+          class="fill-[#39824c] dark:fill-[#0a1f1e] transition-colors duration-500"
+        />
+      </svg>
+
+      <!-- 6. Floating Soot Sprites / Forest Fireflies -->
+      <div
+        class="animate-firefly absolute top-1/4 left-[14%] w-2.5 h-2.5 rounded-full bg-amber-200/80 dark:bg-amber-300/90 blur-[1px] shadow-[0_0_12px_#fcd34d]"
+      >
+      </div>
+      <div
+        class="animate-firefly absolute top-1/3 right-[18%] w-2 h-2 rounded-full bg-lime-200/75 dark:bg-teal-300/85 blur-[1px] shadow-[0_0_10px_#6ee7b7]"
+        style="animation-delay: -1.8s;"
+      >
+      </div>
+      <div
+        class="animate-firefly absolute bottom-1/3 left-[22%] w-2.5 h-2.5 rounded-full bg-amber-300/70 dark:bg-amber-200/85 blur-[1px] shadow-[0_0_12px_#fde68a]"
+        style="animation-delay: -3.2s;"
+      >
+      </div>
+    </div>
+
+    <slot />
+  </body>
+</html>

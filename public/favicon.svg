@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <rect width="64" height="64" rx="16" fill="#7ec8e3"/>
+  <!-- Totoro Ears -->
+  <path d="M20 18l-3-11 8 8zM44 18l3-11-8 8z" fill="#6b7278"/>
+  <!-- Totoro Body -->
+  <ellipse cx="32" cy="39" rx="20" ry="21" fill="#6b7278"/>
+  <!-- Cream Belly -->
+  <ellipse cx="32" cy="43" rx="14" ry="14" fill="#f3ebd3"/>
+  <!-- Belly Chevron Markings -->
+  <path d="M25 37l3-2.5 3 2.5M33 37l3-2.5 3 2.5M22 43l3-2.5 3 2.5M29 42l3-2.5 3 2.5M36 43l3-2.5 3 2.5" stroke="#6b7278" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Eyes -->
+  <circle cx="24" cy="25" r="3.2" fill="#ffffff"/>
+  <circle cx="40" cy="25" r="3.2" fill="#ffffff"/>
+  <circle cx="24" cy="25" r="1.5" fill="#18181b"/>
+  <circle cx="40" cy="25" r="1.5" fill="#18181b"/>
+  <!-- Nose -->
+  <ellipse cx="32" cy="26" rx="2.5" ry="1.4" fill="#27272a"/>
+  <!-- Leaf on Head -->
+  <path d="M32 18c-3-4-8-3-8-3s2 5 8 3c6 2 8-3 8-3s-5-1-8 3z" fill="#4d9b58"/>
+  <path d="M32 15v4" stroke="#2f6937" stroke-width="1.5" stroke-linecap="round"/>
+</svg>
