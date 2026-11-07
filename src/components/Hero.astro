@@ -3,6 +3,14 @@ import Icon from './Icon.astro';
 import { dialogue, profile } from '../data/portfolio';
 import Acorn from './Acorn.astro';
 import ForestSpirit from './ForestSpirit.astro';
+import fs from 'node:fs';
+import path from 'node:path';
+
+// Profile photo: drop public/profile.(jpg|jpeg|png|webp|avif) in and it's used automatically.
+const photoFile = ['avif', 'webp', 'jpg', 'jpeg', 'png']
+  .map((ext) => `profile.${ext}`)
+  .find((f) => fs.existsSync(path.join(process.cwd(), 'public', f)));
+const photo = photoFile ? `/${photoFile}` : null;
 ---
 
 <section id="about" class="pt-10 pb-14 sm:pt-14 sm:pb-[4.5rem] space-y-6">
@@ -28,7 +36,7 @@ import ForestSpirit from './ForestSpirit.astro';
     <!-- Header ribbon -->
     <div class="relative z-10 flex flex-wrap items-center justify-between gap-3 pb-5 mb-7 hero-rule">
       <div class="inline-flex items-center gap-2 text-xs font-mono font-bold uppercase tracking-wider text-[#23476e] dark:text-[#f3b354]">
-        <span class="font-serif-story italic normal-case tracking-normal text-sm whitespace-nowrap text-[#c27a2c] dark:text-[#f3b354]">❦ Chapter I ❦</span>
+        <span class="font-serif-story italic normal-case tracking-normal text-sm whitespace-nowrap text-[#c27a2c] dark:text-[#f3b354]"><Icon name="leaf" class="ornament" /> Chapter I <Icon name="leaf" class="ornament ornament--flip" /></span>
         <span class="text-[#c59b47]" aria-hidden="true">·</span>
         <span>The Traveler's Registry</span>
       </div>
@@ -49,8 +57,8 @@ import ForestSpirit from './ForestSpirit.astro';
       <!-- Left: who, what, and how to reach -->
       <div class="lg:col-span-7">
         <div class="flex items-center gap-4">
-          <!-- Leaf-wreath crest with the traveler's initial -->
-          <div class="hero-crest" aria-hidden="true">
+          <!-- Leaf-wreath crest framing the profile photo (or the initial) -->
+          <div class:list={['hero-crest', photo && 'hero-crest--photo']}>
             <svg viewBox="0 0 80 80">
               <circle cx="40" cy="40" r="34" class="hero-crest__disc" />
               <circle cx="40" cy="40" r="34" fill="none" stroke="#c59b47" stroke-width="2.5" />
@@ -67,8 +75,20 @@ import ForestSpirit from './ForestSpirit.astro';
                   return <ellipse cx={x} cy={y} rx="5" ry="2.4" transform={`rotate(${-20 - i * 17 - 70} ${x} ${y})`} />;
                 })}
               </g>
-              <text x="40" y="50" text-anchor="middle" class="hero-crest__letter">{profile.shortName.charAt(0)}</text>
+              {!photo && <text x="40" y="50" text-anchor="middle" class="hero-crest__letter" aria-hidden="true">{profile.shortName.charAt(0)}</text>}
             </svg>
+            {photo && (
+              <img
+                src={photo}
+                alt={`Portrait of ${profile.name}`}
+                class="hero-crest__photo"
+                width="160"
+                height="160"
+                loading="eager"
+                decoding="async"
+                fetchpriority="high"
+              />
+            )}
             <span class="hero-crest__level">LV {profile.level}</span>
           </div>
 
