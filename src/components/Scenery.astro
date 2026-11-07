@@ -171,8 +171,9 @@ const poles = [
     </g>
   </svg>
 
-  <!-- Landscape -->
-  <svg class="absolute bottom-0 left-0 w-full h-full" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMax slice">
+  <!-- Landscape (STATIC: painted once — nothing inside this SVG may animate,
+       or the brush filters would be recomputed every frame) -->
+  <svg class="scene-static absolute bottom-0 left-0 w-full h-full" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMax slice">
     <defs>
       <!-- Breaks up perfect vector edges into soft, brushy ones -->
       <filter id="brush-soft" x="-10%" y="-10%" width="120%" height="120%">
@@ -273,7 +274,6 @@ const poles = [
       <!-- a hollow between the roots, where something small seems to live -->
       <path d="M1181 557 C1180 540 1186 531 1192 530 C1199 531 1204 541 1203 557 C1196 553 1188 553 1181 557Z" style="fill:var(--scene-hollow)" opacity="0.85" />
       <ellipse cx="1192" cy="548" rx="16" ry="11" class="hollow-glow" />
-      <circle cx="1188.5" cy="544" r="1.4" class="hollow-eyes" /><circle cx="1195.5" cy="544" r="1.4" class="hollow-eyes" />
       <!-- shimenawa rope marking a sacred tree -->
       <path d="M1153 470 Q1190 482 1226 468" style="stroke:var(--scene-rope)" stroke-width="5" fill="none" stroke-linecap="round" />
       <path d="M1170 478v14M1190 481v16M1210 478v14" style="stroke:var(--scene-paper)" stroke-width="4" stroke-linecap="square" />
@@ -299,19 +299,6 @@ const poles = [
         <polygon points={p.pts} style="fill:var(--scene-paddy-shine)" opacity="0.18" />
       ))}
       {paddies.filter((p) => !p.water).map((p) => <polygon points={p.pts} fill="url(#rice-rows)" />)}
-    </g>
-
-    <!-- Wind rolling through the rice: soft bright bands sweeping across -->
-    <g clip-path="url(#paddy-clip)" class="wind-waves">
-      <rect class="wind-wave" x="-600" y="600" width="520" height="160" fill="url(#wind-band)" />
-      <rect class="wind-wave wind-wave--2" x="-600" y="640" width="380" height="120" fill="url(#wind-band)" />
-    </g>
-
-    <!-- Rain ripples on the flooded fields (only while it rains) -->
-    <g class="rain-ripples" clip-path="url(#paddy-clip)">
-      {[[140,700],[320,660],[470,735],[690,690],[860,640],[980,720],[1130,668],[1290,705],[560,630],[1380,650],[240,740],[780,742]].map(([x, y], i) => (
-        <ellipse cx={x} cy={y} rx="14" ry="3.5" class="ripple" style={`animation-delay:${(i * 0.37) % 2.2}s`} />
-      ))}
     </g>
 
     <!-- Dirt path winding toward the farmhouse -->
@@ -355,9 +342,27 @@ const poles = [
       <line x1="70" y1="-6" x2="70" y2="72" style="stroke:var(--scene-pole)" stroke-width="3" />
       <path d="M70 -4 h-12" style="stroke:var(--scene-pole)" stroke-width="2.5" />
       <path d="M53 -2 h10 l-2 8 h-6Z" style="fill:var(--scene-lamp)" />
-      <circle cx="58" cy="10" r="40" class="lamp-glow" />
     </g>
 
+  </svg>
+
+  <!-- Living things & light (no filters; small animations only repaint this layer) -->
+  <svg class="scene-actors absolute bottom-0 left-0 w-full h-full" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMax slice">
+    <!-- Wind rolling through the rice: soft bright bands sweeping across -->
+    <g clip-path="url(#paddy-clip)" class="wind-waves">
+      <rect class="wind-wave" x="-600" y="600" width="520" height="160" fill="url(#wind-band)" />
+      <rect class="wind-wave wind-wave--2" x="-600" y="640" width="380" height="120" fill="url(#wind-band)" />
+    </g>
+
+    <!-- Rain ripples on the flooded fields (only while it rains) -->
+    <g class="rain-ripples" clip-path="url(#paddy-clip)">
+      {[[140,700],[320,660],[470,735],[690,690],[860,640],[980,720],[1130,668],[1290,705],[560,630],[1380,650],[240,740],[780,742]].map(([x, y], i) => (
+        <ellipse cx={x} cy={y} rx="14" ry="3.5" class="ripple" style={`animation-delay:${(i * 0.37) % 2.2}s`} />
+      ))}
+    </g>
+
+    <circle cx="698" cy="638" r="40" class="lamp-glow" />
+    <circle cx="1188.5" cy="544" r="1.4" class="hollow-eyes" /><circle cx="1195.5" cy="544" r="1.4" class="hollow-eyes" />
     <!-- The forest spirit, resting on a mossy stone beside the path -->
     <g transform="translate(150 690)">
       <ForestSpirit />
@@ -379,11 +384,16 @@ const poles = [
       ))}
     </g>
 
-    <!-- Foreground tall summer grass and wildflowers -->
-    <g class="grass-sway-group">
+  </svg>
+
+  <!-- Tall grass: each layer sways as a whole element (GPU transform, no repaint) -->
+  <svg class="scene-grass scene-grass--back absolute bottom-0 left-0 w-full h-full" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMax slice">
+    <g>
       <path d={blades.filter((_, i) => i % 2 === 0).join('')} style="fill:var(--scene-grass-back)" />
     </g>
-    <g class="grass-sway-group grass-sway-group--alt">
+  </svg>
+  <svg class="scene-grass scene-grass--front absolute bottom-0 left-0 w-full h-full" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMax slice">
+    <g>
       <path d={blades.filter((_, i) => i % 2 === 1).join('')} style="fill:var(--scene-grass-front)" />
     </g>
     <g>
@@ -391,11 +401,32 @@ const poles = [
         <circle cx={f.x} cy={f.y} r={f.r} style={`fill:var(${f.warm ? '--scene-flower-warm' : '--scene-flower'})`} />
       ))}
     </g>
-  </svg>
 
-  <!-- Summer shower (toggled by the rain spell) -->
-  <div class="scene-rain scene-rain--far absolute inset-0"></div>
-  <div class="scene-rain scene-rain--near absolute inset-0"></div>
+  <!-- ================= WEATHER (html[data-weather]) =================
+       Every layer is display:none unless its weather is active, and moves
+       only with transform/opacity so it stays on the GPU compositor. -->
+  <div class="wx wx-gloom absolute inset-0"></div>
+  <div class="wx wx-rain absolute inset-x-0"><div class="wx-rain__tile wx-rain__tile--far"></div></div>
+  <div class="wx wx-rain absolute inset-x-0"><div class="wx-rain__tile"></div></div>
+  <div class="wx wx-lightning absolute inset-0"></div>
+  <div class="wx wx-snow absolute inset-x-0"><div class="wx-snow__tile wx-snow__tile--far"></div></div>
+  <div class="wx wx-snow absolute inset-x-0"><div class="wx-snow__tile"></div></div>
+  <div class="wx wx-mist absolute inset-0">
+    <div class="wx-mist__band" style="top:52%"></div>
+    <div class="wx-mist__band wx-mist__band--2" style="top:64%"></div>
+    <div class="wx-mist__band wx-mist__band--3" style="top:76%"></div>
+  </div>
+  <div class="wx wx-breeze absolute inset-0">
+    {Array.from({ length: 9 }, (_, i) => (
+      <svg
+        class="wx-leaf"
+        style={`top:${12 + ((i * 29) % 70)}%; animation-delay:-${(i * 1.37).toFixed(2)}s; animation-duration:${5 + (i % 4)}s; --leaf-hue:${i % 3}`}
+        viewBox="0 0 24 24"
+      >
+        <path d="M4 20C4 10 10 4 21 3c-1 11-7 17-17 17Zm0 0 9-9" />
+      </svg>
+    ))}
+  </div>
 
   <!-- Dandelion seeds drifting on the breeze (day) -->
   <div class="seeds dark:hidden">

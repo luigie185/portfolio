@@ -68,9 +68,18 @@ import { ACORN_IDS, quests } from '../data/portfolio';
         <div class="flex gap-2"><dt><kbd>1</kbd><kbd>2</kbd><kbd>3</kbd></dt><dd>Travel to chapter</dd></div>
         <div class="flex gap-2"><dt><kbd>J</kbd></dt><dd>Open / close journal</dd></div>
         <div class="flex gap-2"><dt><kbd>N</kbd></dt><dd>Day / night spell</dd></div>
-        <div class="flex gap-2"><dt><kbd>R</kbd></dt><dd>Summer shower</dd></div>
+        <div class="flex gap-2"><dt><kbd>R</kbd></dt><dd>Change weather</dd></div>
         <div class="flex gap-2"><dt><kbd>Esc</kbd></dt><dd>Close window</dd></div>
       </dl>
+      <div class="flex flex-wrap items-center justify-between gap-2 pt-1">
+        <span class="text-xs font-mono font-bold uppercase tracking-wider text-[#23476e] dark:text-[#f3b354]">🎨 Graphics</span>
+        <div class="inline-flex rounded-xl border-2 border-[#c59b47] overflow-hidden text-xs font-mono font-bold" role="group" aria-label="Graphics quality">
+          <button type="button" data-gfx="auto" class="gfx-opt px-3 py-1 cursor-pointer">Auto</button>
+          <button type="button" data-gfx="full" class="gfx-opt px-3 py-1 cursor-pointer border-x-2 border-[#c59b47]">Full</button>
+          <button type="button" data-gfx="lite" class="gfx-opt px-3 py-1 cursor-pointer">Lite</button>
+        </div>
+      </div>
+      <p class="text-[11px] text-[#576058] dark:text-[#9fb0c9]">Lite keeps the painting but calms the animations — smoother on older phones and saves battery.</p>
       <button
         type="button"
         data-reset-game

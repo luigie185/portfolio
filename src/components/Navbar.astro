@@ -1,5 +1,5 @@
 ---
-import { ACORN_IDS, XP_PER_LEVEL, profile } from '../data/portfolio';
+import { ACORN_IDS, WEATHERS, XP_PER_LEVEL, profile } from '../data/portfolio';
 
 const links = [
   { href: '#about', icon: '✦', label: 'Status', key: '1' },
@@ -79,6 +79,16 @@ const links = [
       >
         <span aria-hidden="true">🌰</span>
         <span data-hud-acorns>0/{ACORN_IDS.length}</span>
+      </button>
+
+      <button
+        type="button"
+        data-weather-cycle
+        aria-label={`Change the weather (R). Now: ${WEATHERS[0].label}`}
+        title="Change the weather (R)"
+        class="inline-flex items-center justify-center w-9 h-9 rounded-xl text-base border-2 border-[#c59b47] bg-[#fffaf0] dark:bg-[#1a253a] hover:bg-[#f3e8ce] dark:hover:bg-[#22314d] transition-colors cursor-pointer"
+      >
+        <span data-hud-weather aria-hidden="true">{WEATHERS[0].icon}</span>
       </button>
 
       <button

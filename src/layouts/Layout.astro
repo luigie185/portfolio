@@ -43,6 +43,19 @@ const {
         var dark = theme ? theme === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
         root.classList.toggle('dark', dark);
         if (!seen) root.classList.add('show-title');
+
+        // Weather survives reloads within the session.
+        var wx = null;
+        try { wx = sessionStorage.getItem('weather'); } catch (e) {}
+        root.dataset.weather = wx || 'clear';
+
+        // Graphics quality: saved choice, else auto-detect low-power devices.
+        var gfx = null;
+        try { gfx = localStorage.getItem('gfx'); } catch (e) {}
+        var nav = navigator, conn = nav.connection || {};
+        var weak = (nav.deviceMemory && nav.deviceMemory <= 4) ||
+          (nav.hardwareConcurrency && nav.hardwareConcurrency <= 4) || conn.saveData === true;
+        if (gfx === 'lite' || (gfx !== 'full' && weak)) root.classList.add('lite');
       })();
     </script>
   </head>

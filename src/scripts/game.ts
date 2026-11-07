@@ -1,4 +1,4 @@
-import { ACORN_IDS, XP_PER_LEVEL, dialogue, quests } from '../data/portfolio';
+import { ACORN_IDS, WEATHERS, XP_PER_LEVEL, dialogue, quests } from '../data/portfolio';
 import { initDialogue, say } from './dialogue';
 import { read, write, prefersReducedMotion } from './storage';
 
@@ -13,6 +13,7 @@ interface GameState {
   xp: number;
   quests: string[];
   acorns: string[];
+  weathers: string[];
 }
 
 function load(): GameState {
@@ -24,12 +25,13 @@ function load(): GameState {
         xp: Number(s.xp) || 0,
         quests: Array.isArray(s.quests) ? s.quests : [],
         acorns: Array.isArray(s.acorns) ? s.acorns : [],
+        weathers: Array.isArray(s.weathers) ? s.weathers : [],
       };
     }
   } catch {
     /* corrupted save — start fresh */
   }
-  return { xp: 0, quests: [], acorns: [] };
+  return { xp: 0, quests: [], acorns: [], weathers: [] };
 }
 
 const state = load();
@@ -80,17 +82,38 @@ function patMori() {
 }
 
 /* ------------------------------------------------------------------ */
-/* Rain spell                                                          */
+/* Weather                                                             */
 /* ------------------------------------------------------------------ */
 
-function toggleRain() {
-  const raining = document.documentElement.classList.toggle('is-raining');
-  write('rain', raining ? '1' : '0', 'session');
-  document.querySelectorAll('[data-rain-toggle]').forEach((b) => b.setAttribute('aria-pressed', String(raining)));
-  say(raining ? dialogue.rainOn : dialogue.rainOff);
-  moriReact();
-  completeQuest('rain');
+function currentWeather() {
+  return document.documentElement.dataset.weather || 'clear';
 }
+
+function renderWeather() {
+  const w = WEATHERS.find((x) => x.id === currentWeather()) ?? WEATHERS[0];
+  document.querySelectorAll<HTMLElement>('[data-hud-weather]').forEach((el) => (el.textContent = w.icon));
+  document
+    .querySelectorAll('[data-weather-cycle]')
+    .forEach((b) => b.setAttribute('aria-label', `Change the weather (R). Now: ${w.label}`));
+}
+
+function cycleWeather() {
+  const ids = WEATHERS.map((w) => w.id);
+  const next = ids[(ids.indexOf(currentWeather() as (typeof ids)[number]) + 1) % ids.length];
+  document.documentElement.dataset.weather = next;
+  write('weather', next, 'session');
+  renderWeather();
+  say(dialogue.weather[next]);
+  moriReact();
+  completeQuest('weather');
+
+  if (!state.weathers.includes(next)) {
+    state.weathers.push(next);
+    save();
+  }
+  if (ids.every((id) => id === 'clear' || state.weathers.includes(id))) completeQuest('all-weather');
+}
+
 
 /* ------------------------------------------------------------------ */
 /* Rendering                                                           */
@@ -249,9 +272,81 @@ function resetProgress() {
   state.xp = 0;
   state.quests = [];
   state.acorns = [];
+  state.weathers = [];
   save();
   render();
   toast('🍂', 'Journey reset', 'Your acorns have returned to the forest.');
+}
+
+/* ------------------------------------------------------------------ */
+/* Graphics quality (smoothness on every device)                       */
+/* ------------------------------------------------------------------ */
+
+type Gfx = 'auto' | 'full' | 'lite';
+
+function renderGraphics() {
+  const choice = (read('gfx') as Gfx | null) ?? 'auto';
+  document.querySelectorAll<HTMLElement>('[data-gfx]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.gfx === choice)));
+}
+
+function setGraphics(choice: Gfx) {
+  const root = document.documentElement;
+  if (choice === 'auto') {
+    try {
+      localStorage.removeItem('gfx');
+    } catch {
+      /* ignore */
+    }
+    probeFrameRate();
+  } else {
+    write('gfx', choice);
+    root.classList.toggle('lite', choice === 'lite');
+  }
+  renderGraphics();
+  toast('🎨', `Graphics: ${choice === 'auto' ? 'Auto' : choice === 'full' ? 'Full' : 'Lite'}`, choice === 'lite' ? 'Calmer animations, smoother scrolling.' : 'Enjoy the full painting.');
+}
+
+/**
+ * In "auto", watch ~2 seconds of frames once the page settles. If the device
+ * can't hold a smooth frame rate, switch to lite graphics for this visit.
+ */
+function probeFrameRate() {
+  const root = document.documentElement;
+  if (read('gfx') || root.classList.contains('lite') || prefersReducedMotion()) return;
+  const times: number[] = [];
+  let last = 0;
+  const step = (t: number) => {
+    if (last) times.push(t - last);
+    last = t;
+    if (times.length < 120) return requestAnimationFrame(step);
+    if (document.visibilityState !== 'visible') return; // throttled tab, measurements unreliable
+    const sorted = [...times].sort((a, b) => a - b);
+    const p75 = sorted[Math.floor(sorted.length * 0.75)];
+    if (p75 > 26) {
+      root.classList.add('lite');
+      toast('🍃', 'Switched to lite graphics', 'Your device prefers a calmer forest. Change it in the journal.');
+    }
+  };
+  window.setTimeout(() => requestAnimationFrame(step), 2500);
+}
+
+function initGraphics() {
+  renderGraphics();
+  probeFrameRate();
+
+  // On lite devices, pause the decorative scene while scrolling.
+  let scrollTimer: number | undefined;
+  window.addEventListener(
+    'scroll',
+    () => {
+      const root = document.documentElement;
+      if (!root.classList.contains('lite')) return;
+      root.classList.add('is-scrolling');
+      window.clearTimeout(scrollTimer);
+      scrollTimer = window.setTimeout(() => root.classList.remove('is-scrolling'), 160);
+    },
+    { passive: true },
+  );
 }
 
 /* ------------------------------------------------------------------ */
@@ -259,10 +354,8 @@ function resetProgress() {
 /* ------------------------------------------------------------------ */
 
 function init() {
-  if (read('rain', 'session') === '1') {
-    document.documentElement.classList.add('is-raining');
-    document.querySelectorAll('[data-rain-toggle]').forEach((b) => b.setAttribute('aria-pressed', 'true'));
-  }
+  renderWeather();
+  initGraphics();
   render();
   initDialogue();
   document
@@ -285,7 +378,9 @@ function init() {
       );
     }
     if (t.closest('[data-pat-spirit]')) return patMori();
-    if (t.closest('[data-rain-toggle]')) return toggleRain();
+    if (t.closest('[data-weather-cycle]')) return cycleWeather();
+    const gfxBtn = t.closest<HTMLElement>('[data-gfx]');
+    if (gfxBtn) return setGraphics(gfxBtn.dataset.gfx as Gfx);
     if (t.closest('[data-open-journal]')) return openJournal();
     if (t.closest('[data-start-game]')) return closeTitle();
     if (t.closest('[data-reset-game]')) return resetProgress();
@@ -357,7 +452,7 @@ function init() {
         break;
       }
       case 'r':
-        toggleRain();
+        cycleWeather();
         break;
       case '1':
         jump('#about');

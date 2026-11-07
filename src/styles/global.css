@@ -5,7 +5,7 @@
 @layer base {
   :root {
     --bg-canvas: #d9f0ec;
-    --bg-card: rgba(253, 249, 238, 0.86);
+    --bg-card: rgba(253, 249, 238, 0.93);
     --text-main: #222b25;
     --text-muted: #505d53;
     --border-gold: #b88d3b;
@@ -17,7 +17,7 @@
 
   .dark {
     --bg-canvas: #0b1526;
-    --bg-card: rgba(18, 29, 48, 0.86);
+    --bg-card: rgba(18, 29, 48, 0.93);
     --text-main: #f4efe2;
     --text-muted: #9eb2cc;
     --border-gold: #d6a84f;
@@ -130,7 +130,6 @@
     0 10px 30px -6px rgba(24, 38, 28, 0.14),
     inset 0 0 0 3px var(--bg-card),
     inset 0 0 0 4.5px var(--border-inner);
-  backdrop-filter: blur(14px) saturate(1.15);
 }
 
 .dark .rpg-panel {
@@ -168,13 +167,11 @@ body::after {
   inset: 0;
   z-index: 60;
   pointer-events: none;
-  opacity: 0.07;
-  mix-blend-mode: multiply;
+  opacity: 0.05;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .35 0 0 0 0 .28 0 0 0 0 .18 0 0 0 1 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 .dark body::after {
-  opacity: 0.1;
-  mix-blend-mode: screen;
+  opacity: 0.06;
 }
 
 /* Soft painted light blooms in the sky */
@@ -722,15 +719,6 @@ kbd {
 .house-glow { opacity: 0; }
 .dark .house-glow { opacity: 1; }
 
-.grass-sway-group {
-  transform-box: fill-box;
-  transform-origin: bottom center;
-  animation: grass-sway 6s ease-in-out infinite;
-}
-.grass-sway-group--alt {
-  animation-duration: 7.5s;
-  animation-delay: -2s;
-}
 
 
 
@@ -847,7 +835,7 @@ kbd {
 /* ===================================================================== */
 .wind-wave {
   animation: wind-sweep 11s ease-in-out infinite;
-  mix-blend-mode: soft-light;
+  opacity: 0.45;
 }
 .wind-wave--2 { animation-duration: 15s; animation-delay: -6s; }
 .dark .wind-wave { opacity: 0.35; }
@@ -910,52 +898,6 @@ kbd {
   0%, 60%, 100% { opacity: 0; }
   66%, 88% { opacity: 0.9; }
   77% { opacity: 0.1; }
-}
-
-/* Rain spell */
-.scene-rain {
-  opacity: 0;
-  transition: opacity 1.2s ease;
-  background-image: repeating-linear-gradient(
-    100deg,
-    transparent 0 14px,
-    rgba(220, 235, 255, 0.55) 14px 15px,
-    transparent 15px 34px
-  );
-  background-size: 200px 220px;
-  animation: rain-fall 0.45s linear infinite;
-  mask-image: linear-gradient(transparent, #000 15%, #000 85%, transparent);
-}
-.scene-rain--far {
-  background-size: 120px 140px;
-  animation-duration: 0.7s;
-}
-@keyframes rain-fall {
-  from { background-position: 0 0; }
-  to { background-position: -40px 220px; }
-}
-.is-raining .scene-rain--near { opacity: 0.55; }
-.is-raining .scene-rain--far { opacity: 0.35; }
-.is-raining .scene-sky { filter: saturate(0.55) brightness(0.88); }
-.is-raining .scene-sun { opacity: 0.25; transition: opacity 1.2s ease; }
-.is-raining .scene-clouds { filter: saturate(0.4) brightness(0.85); transition: filter 1.2s ease; }
-.is-raining .seeds { display: none; }
-.scene-sky, .scene-clouds { transition: filter 1.2s ease; }
-
-.rain-ripples { opacity: 0; transition: opacity 1s ease; }
-.is-raining .rain-ripples { opacity: 1; }
-.ripple {
-  fill: none;
-  stroke: rgba(255, 255, 255, 0.75);
-  stroke-width: 1.2;
-  transform-box: fill-box;
-  transform-origin: center;
-  animation: ripple 2.2s ease-out infinite;
-}
-.dark .ripple { stroke: rgba(253, 243, 192, 0.5); }
-@keyframes ripple {
-  0% { transform: scale(0.2); opacity: 0.9; }
-  100% { transform: scale(2.2); opacity: 0; }
 }
 
 /* ===================================================================== */
@@ -1313,3 +1255,474 @@ kbd {
 .signpost:active { transform: translateY(2px); box-shadow: 0 1px 0 #7a5a3a; }
 .dark .signpost { color: #f5efe2; background: linear-gradient(180deg, #5a4634, #45362a); border-color: #2c2219; box-shadow: 0 3px 0 #1d1712; }
 .dark .signpost--primary { color: #111927; background: linear-gradient(180deg, #f7c474, #e09f3e); border-color: #a8792c; box-shadow: 0 3px 0 #8a5f1e; }
+
+/* ===================================================================== */
+/* Weather (html[data-weather])                                           */
+/* Every layer is display:none unless active and moves only with          */
+/* transform/opacity, so it stays on the GPU compositor.                  */
+/* ===================================================================== */
+.wx { display: none; pointer-events: none; animation: wx-in 1.2s ease both; }
+@keyframes wx-in { from { opacity: 0; } }
+
+[data-weather="rain"] .wx-rain,
+[data-weather="storm"] .wx-rain,
+[data-weather="storm"] .wx-lightning,
+[data-weather="storm"] .wx-gloom,
+[data-weather="rain"] .wx-gloom,
+[data-weather="snow"] .wx-snow,
+[data-weather="mist"] .wx-mist,
+[data-weather="breeze"] .wx-breeze { display: block; }
+
+/* Rain: a striped tile slid down by exactly one tile height = seamless loop */
+.wx-rain { top: 0; bottom: 0; overflow: hidden; opacity: 0.6; }
+.wx-rain__tile {
+  position: absolute;
+  inset: -220px 0 0;
+  background-image: repeating-linear-gradient(100deg, transparent 0 14px, rgba(220, 235, 255, 0.6) 14px 15px, transparent 15px 34px);
+  background-size: 200px 220px;
+  animation: wx-fall-220 0.42s linear infinite;
+  will-change: transform;
+}
+.wx-rain__tile--far { opacity: 0.6; background-size: 120px 220px; animation-duration: 0.7s; }
+@keyframes wx-fall-220 { to { transform: translate3d(0, 220px, 0); } }
+[data-weather="storm"] .wx-rain { opacity: 0.85; }
+[data-weather="storm"] .wx-rain__tile { animation-duration: 0.3s; }
+
+.wx-gloom { background: linear-gradient(180deg, rgba(40, 52, 70, 0.28), rgba(30, 40, 50, 0.12)); }
+[data-weather="storm"] .wx-gloom { background: linear-gradient(180deg, rgba(20, 26, 40, 0.55), rgba(15, 25, 30, 0.3)); }
+
+.wx-lightning {
+  background: radial-gradient(120% 70% at 70% 10%, rgba(235, 240, 255, 0.95), rgba(200, 215, 255, 0.4) 50%, transparent 80%);
+  opacity: 0;
+  animation: wx-lightning 9s linear infinite;
+}
+@keyframes wx-lightning {
+  0%, 61%, 63.5%, 65%, 88%, 89.5%, 100% { opacity: 0; }
+  62% { opacity: 0.85; }
+  64% { opacity: 0.55; }
+  89% { opacity: 0.6; }
+}
+
+/* Snow: two dotted tiles drifting down at different speeds */
+.wx-snow { top: 0; bottom: 0; overflow: hidden; }
+.wx-snow__tile {
+  position: absolute;
+  inset: -260px -40px 0 0;
+  background-image:
+    radial-gradient(3px 3px at 20px 30px, #fff 50%, transparent 52%),
+    radial-gradient(2px 2px at 90px 120px, #fff 50%, transparent 52%),
+    radial-gradient(4px 4px at 160px 60px, rgba(255, 255, 255, 0.9) 50%, transparent 52%),
+    radial-gradient(2.5px 2.5px at 220px 200px, #fff 50%, transparent 52%),
+    radial-gradient(3px 3px at 60px 220px, rgba(255, 255, 255, 0.85) 50%, transparent 52%);
+  background-size: 260px 260px;
+  animation: wx-fall-260 9s linear infinite;
+  will-change: transform;
+}
+.wx-snow__tile--far { opacity: 0.6; background-size: 180px 260px; animation-duration: 14s; }
+@keyframes wx-fall-260 { to { transform: translate3d(-40px, 260px, 0); } }
+
+/* Mist: wide soft bands drifting across the fields */
+.wx-mist__band {
+  position: absolute;
+  left: -50%;
+  width: 200%;
+  height: 22%;
+  background:
+    radial-gradient(30% 50% at 20% 50%, rgba(255, 255, 255, 0.75), transparent 70%),
+    radial-gradient(28% 45% at 55% 55%, rgba(255, 255, 255, 0.65), transparent 70%),
+    radial-gradient(32% 50% at 85% 45%, rgba(255, 255, 255, 0.7), transparent 70%);
+  animation: wx-mist 40s ease-in-out infinite alternate;
+  will-change: transform;
+}
+.wx-mist__band--2 { animation-duration: 55s; animation-direction: alternate-reverse; opacity: 0.85; }
+.wx-mist__band--3 { animation-duration: 32s; opacity: 0.9; }
+.dark .wx-mist__band { opacity: 0.35; }
+@keyframes wx-mist { from { transform: translate3d(-8%, 0, 0); } to { transform: translate3d(8%, 0, 0); } }
+[data-weather="mist"] .scene-clouds,
+[data-weather="mist"] .scene-sun { opacity: 0.6; }
+
+/* Breeze: leaves gusting across the screen */
+.wx-leaf {
+  position: absolute;
+  left: -40px;
+  width: 22px;
+  height: 22px;
+  fill: hsl(calc(95deg + var(--leaf-hue) * 18deg) 45% 42%);
+  animation: wx-gust linear infinite;
+  will-change: transform;
+}
+.dark .wx-leaf { fill: #2f5a48; }
+@keyframes wx-gust {
+  0% { transform: translate3d(0, 0, 0) rotate(0deg); }
+  30% { transform: translate3d(35vw, -6vh, 0) rotate(220deg); }
+  60% { transform: translate3d(70vw, 3vh, 0) rotate(420deg); }
+  100% { transform: translate3d(112vw, -4vh, 0) rotate(720deg); }
+}
+
+/* Sky & ground reactions (static filters, changed once per weather switch) */
+.scene-sky, .scene-clouds, .scene-sun { transition: filter 1.2s ease, opacity 1.2s ease; }
+[data-weather="rain"] .scene-sky,
+[data-weather="rain"] .scene-clouds { filter: saturate(0.55) brightness(0.88); }
+[data-weather="storm"] .scene-sky,
+[data-weather="storm"] .scene-clouds { filter: saturate(0.35) brightness(0.62); }
+[data-weather="rain"] .scene-sun,
+[data-weather="storm"] .scene-sun { opacity: 0.2; }
+.rain-ripples { opacity: 0; transition: opacity 1s ease; }
+[data-weather="rain"] .rain-ripples,
+[data-weather="storm"] .rain-ripples { opacity: 1; }
+:is([data-weather="rain"], [data-weather="storm"], [data-weather="snow"]) .seeds { display: none; }
+[data-weather="breeze"] .scene-grass { animation-duration: 2.2s !important; }
+[data-weather="breeze"] .wind-wave { opacity: 0.8; animation-duration: 5s; }
+
+/* Snow repaints the countryside through the palette variables */
+[data-weather="snow"] .scene {
+  --scene-sky-top: #7f9fbf; --scene-sky-mid: #b9cddf; --scene-sky-low: #dfe8f0; --scene-sky-horizon: #eef2f6;
+  --scene-cloud-light: #f4f7fb; --scene-cloud-shade: #d3dce8; --scene-cloud-deep: #b3bfd0;
+  --scene-mtn-far: #c9d6e2; --scene-mtn-near: #b6c8d2;
+  --scene-forest-far: #8fa9a0; --scene-forest-far-lit: #e6eeec;
+  --scene-tree-dark: #2f4f45; --scene-tree-mid: #4a6b5f; --scene-tree-lit: #dfe9e6; --scene-tree-sun: #ffffff;
+  --scene-hill-mid: #dbe5e3; --scene-ridge: #c9d6d6;
+  --scene-paddy: #eef3f4; --scene-paddy-alt: #f7fafb; --scene-paddy-deep: #e1e9ec; --scene-paddy-water: #c3d6e2;
+  --scene-rice-row: rgba(120, 140, 160, 0.15);
+  --scene-path: #e9edf0; --scene-moss: #f1f5f6;
+  --scene-house-roof: #f0f4f6; --scene-house-roof-lit: #ffffff;
+  --scene-grass-back: #b7c9c3; --scene-grass-front: #93aba3;
+  --scene-flower: #ffffff; --scene-flower-warm: #e9f1f5;
+}
+.dark[data-weather="snow"] .scene {
+  --scene-sky-top: #0a1424; --scene-sky-mid: #1a2c45; --scene-sky-low: #2c4660; --scene-sky-horizon: #3c5a70;
+  --scene-forest-far-lit: #4a6276; --scene-tree-lit: #5a7186; --scene-tree-sun: #7a92a8;
+  --scene-hill-mid: #3a4f62; --scene-ridge: #33485a;
+  --scene-paddy: #3d5266; --scene-paddy-alt: #45596d; --scene-paddy-deep: #34495c; --scene-paddy-water: #2a4058;
+  --scene-path: #4a5c6e; --scene-moss: #50667a;
+  --scene-house-roof: #5c7084; --scene-house-roof-lit: #6f849a;
+  --scene-grass-back: #2c3f4f; --scene-grass-front: #22323f;
+  --scene-flower: #c9d6e6; --scene-flower-warm: #a9b9cc;
+}
+
+/* ===================================================================== */
+/* Performance                                                            */
+/* ===================================================================== */
+/* GPU-only sway for whole grass layers */
+.scene-grass {
+  transform-origin: 50% 100%;
+  animation: grass-layer-sway 6s ease-in-out infinite;
+  will-change: transform;
+}
+.scene-grass--front { animation-duration: 7.5s; animation-delay: -2s; }
+@keyframes grass-layer-sway {
+  0%, 100% { transform: skewX(0deg); }
+  50% { transform: skewX(-2.2deg); }
+}
+.scene-clouds { will-change: transform; }
+
+/* Sections below the fold skip rendering work until they near the viewport */
+#experience, #projects {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 1400px;
+}
+
+/* "Lite" graphics: set automatically on low-power devices or slow frame
+   rates, or chosen in the journal. Keeps the painting, drops costly bits. */
+.lite .scene [filter] { filter: none; }
+.lite .scene-grass,
+.lite .scene-clouds,
+.lite .fluff,
+.lite .grass-sway { animation: none !important; }
+.lite .seeds,
+.lite .wind-waves,
+.lite .wx-rain__tile--far,
+.lite .wx-snow__tile--far,
+.lite .wx-mist__band--2 { display: none !important; }
+.lite .wx-leaf:nth-child(n + 5) { display: none; }
+.lite body::after { display: none; }
+.lite header { backdrop-filter: none !important; background-color: rgba(247, 240, 222, 0.98); }
+.lite.dark header { background-color: rgba(15, 22, 36, 0.98); }
+.lite .journal::backdrop { backdrop-filter: none; }
+.lite .scene-light ellipse,
+.lite .lamp-glow,
+.lite .hollow-glow,
+.lite .spirit-lantern-glow { filter: none; }
+
+/* Pause the decorative scene while scrolling on lite devices */
+.lite.is-scrolling .scene * { animation-play-state: paused !important; }
+.gfx-opt { background: var(--bg-card); }
+.gfx-opt[aria-pressed="true"] { background: #c59b47; color: #1a140b; }
+
+/* ===================================================================== */
+/* Hero: washi character sheet + Spirit Ledger                           */
+/* ===================================================================== */
+.hero-sheet {
+  padding: 1.5rem;
+  border-radius: 26px;
+  background:
+    var(--washi-fibres) padding-box,
+    linear-gradient(180deg, rgba(255, 255, 255, 0.45), transparent 35%) padding-box,
+    linear-gradient(var(--washi), var(--washi)) padding-box,
+    linear-gradient(145deg, #e8c77a, #b88d3b 40%, #f2d895 60%, #a8792c) border-box;
+  border: 3px solid transparent;
+  box-shadow: 0 28px 50px -28px rgba(40, 30, 10, 0.55), 0 8px 18px -10px rgba(40, 30, 10, 0.25);
+  overflow: hidden;
+}
+@media (min-width: 640px) { .hero-sheet { padding: 2.25rem 2.5rem; } }
+.dark .hero-sheet {
+  background:
+    linear-gradient(180deg, rgba(104, 168, 232, 0.08), transparent 40%) padding-box,
+    linear-gradient(var(--washi), var(--washi)) padding-box,
+    linear-gradient(145deg, #d6a84f, #6e5524 40%, #e8c77a 60%, #5a4420) border-box;
+  box-shadow: 0 28px 50px -24px rgba(0, 0, 0, 0.75);
+}
+.hero-rule { border-bottom: 1px dashed color-mix(in srgb, var(--washi-edge) 70%, #8a7656); }
+.hero-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.3rem 0.8rem;
+  border-radius: 9999px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #1f5c3d;
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(5, 150, 105, 0.3);
+}
+.dark .hero-status { color: #6ee7b7; }
+
+.hero-crest { position: relative; flex-shrink: 0; width: 76px; height: 76px; }
+.hero-crest svg { width: 100%; height: 100%; overflow: visible; }
+.hero-crest__disc { fill: #23476e; }
+.dark .hero-crest__disc { fill: #2b588a; }
+.hero-crest__letter {
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 30px;
+  font-weight: 700;
+  fill: #fff8e7;
+}
+.hero-crest__level {
+  position: absolute;
+  left: 50%;
+  bottom: -8px;
+  transform: translateX(-50%);
+  padding: 1px 7px;
+  border-radius: 9999px;
+  white-space: nowrap;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  font-weight: 700;
+  color: #1a140b;
+  background: linear-gradient(180deg, #f2c46b, #d58f2c);
+  border: 1px solid #fde7b0;
+}
+.hero-class {
+  display: inline-block;
+  padding: 0.2rem 0.7rem;
+  border-radius: 8px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #fff8e7;
+  background: #23476e;
+}
+.dark .hero-class { background: #253b5e; }
+
+.hero-name {
+  position: relative;
+  display: inline-block;
+  font-size: clamp(2rem, 1.4rem + 2.6vw, 3rem);
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+  font-weight: 700;
+  color: #2a2620;
+}
+.dark .hero-name { color: #f5efe2; }
+.hero-name__brush {
+  position: absolute;
+  left: -2%;
+  bottom: -0.35em;
+  width: 70%;
+  height: 0.4em;
+  overflow: visible;
+}
+.hero-name__brush path {
+  fill: none;
+  stroke: #e09f3e;
+  stroke-width: 7;
+  stroke-linecap: round;
+  opacity: 0.55;
+  stroke-dasharray: 420;
+  stroke-dashoffset: 420;
+  animation: brush-draw 1.1s 0.4s cubic-bezier(0.6, 0, 0.3, 1) forwards;
+}
+@keyframes brush-draw { to { stroke-dashoffset: 0; } }
+
+.signpost--lg { padding: 0.7rem 1.25rem; font-size: 0.85rem; }
+.signpost--lg.signpost--primary { flex: 0 0 auto; }
+
+/* Spirit Ledger */
+.ledger {
+  position: relative;
+  padding: 1.25rem 1.25rem 1.1rem;
+  border-radius: 18px;
+  background:
+    repeating-linear-gradient(180deg, transparent 0 27px, rgba(160, 130, 80, 0.12) 27px 28px),
+    linear-gradient(180deg, #f6ecd4, #efe2c2);
+  border: 1px solid #d9c49a;
+  box-shadow: inset 0 0 0 4px rgba(255, 250, 235, 0.6), inset 0 2px 10px rgba(120, 90, 40, 0.12), 0 10px 22px -14px rgba(40, 30, 10, 0.4);
+}
+.dark .ledger {
+  background:
+    repeating-linear-gradient(180deg, transparent 0 27px, rgba(104, 168, 232, 0.06) 27px 28px),
+    linear-gradient(180deg, #131d30, #0f1828);
+  border-color: #2b3d5c;
+  box-shadow: inset 0 0 0 4px rgba(214, 168, 79, 0.06), 0 10px 22px -14px rgba(0, 0, 0, 0.6);
+}
+.ledger::before {
+  /* binding ribbon */
+  content: "";
+  position: absolute;
+  top: -6px;
+  right: 22px;
+  width: 14px;
+  height: 34px;
+  background: var(--ink-red);
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 80%, 0 100%);
+  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.2);
+}
+.ledger__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding-bottom: 0.6rem;
+  border-bottom: 1px dashed #c9b48a;
+  padding-right: 2rem;
+}
+.dark .ledger__head { border-color: #2e4063; }
+.ledger__title {
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #23476e;
+}
+.dark .ledger__title { color: #f3b354; }
+.ledger__sub {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #8a7656;
+}
+.dark .ledger__sub { color: #8fa3bf; }
+
+.ledger-row { display: flex; gap: 0.75rem; align-items: flex-start; }
+.ledger-row__icon {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: #fffaf0;
+  border: 1px solid #d9c49a;
+  box-shadow: 0 2px 0 #d9c49a;
+}
+.ledger-row__icon svg { width: 18px; height: 18px; fill: #2e7050; }
+.dark .ledger-row__icon { background: #1a2740; border-color: #2e4063; box-shadow: 0 2px 0 #2e4063; }
+.dark .ledger-row__icon svg { fill: #59c49d; }
+.ledger-row__name {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #2a2620;
+}
+.dark .ledger-row__name { color: #e2eaf5; }
+.ledger-row__value {
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #c2621f;
+}
+.dark .ledger-row__value { color: #f3b354; }
+.ledger-row__max { font-size: 0.7rem; color: #a08a66; margin-left: 1px; }
+.ledger-row__note { margin-top: 0.25rem; font-size: 0.72rem; color: #7a6a4f; }
+.dark .ledger-row__note { color: #8fa3bf; }
+
+/* wooden gauge with notches; fill grows on the GPU (scaleX) */
+.ledger-gauge {
+  position: relative;
+  margin-top: 0.3rem;
+  height: 10px;
+  border-radius: 9999px;
+  overflow: hidden;
+  background:
+    repeating-linear-gradient(90deg, transparent 0 calc(10% - 1px), rgba(120, 90, 50, 0.25) calc(10% - 1px) 10%),
+    #e2d3b0;
+  box-shadow: inset 0 1px 2px rgba(80, 60, 30, 0.3);
+}
+.dark .ledger-gauge {
+  background: repeating-linear-gradient(90deg, transparent 0 calc(10% - 1px), rgba(255, 255, 255, 0.08) calc(10% - 1px) 10%), #0c121e;
+}
+.ledger-gauge__fill {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #4f9b5a, #8cc464 60%, #f2c46b);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45);
+  transform-origin: left center;
+  transform: scaleX(var(--v));
+  animation: gauge-grow 1.3s var(--d, 0.2s) cubic-bezier(0.3, 1.2, 0.5, 1) both;
+}
+@keyframes gauge-grow { from { transform: scaleX(0); } }
+
+.perk-seal {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.1rem;
+  padding: 0.6rem 0.4rem 0.55rem;
+  border-radius: 14px;
+  text-align: center;
+  background: #fffaf0;
+  border: 1px solid #d9c49a;
+}
+.dark .perk-seal { background: #1a2740; border-color: #2e4063; }
+.perk-seal__icon {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  margin-bottom: 0.15rem;
+  border-radius: 9999px;
+  font-size: 0.9rem;
+  background: rgba(197, 155, 71, 0.18);
+  box-shadow: inset 0 0 0 1.5px rgba(197, 155, 71, 0.6);
+}
+.perk-seal__label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.62rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #c2621f;
+}
+.dark .perk-seal__label { color: #f3b354; }
+.perk-seal__value { font-size: 0.7rem; font-weight: 600; line-height: 1.3; color: #3d3a33; }
+.dark .perk-seal__value { color: #e2eaf5; }
+
+/* Rain ripples on the flooded paddies (shown during rain & storm) */
+.ripple {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.75);
+  stroke-width: 1.2;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: ripple 2.2s ease-out infinite;
+}
+.dark .ripple { stroke: rgba(253, 243, 192, 0.5); }
+@keyframes ripple {
+  0% { transform: scale(0.2); opacity: 0.9; }
+  100% { transform: scale(2.2); opacity: 0; }
+}
+.ledger__head { gap: 0.75rem; }

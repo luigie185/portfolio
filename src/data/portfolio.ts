@@ -55,15 +55,15 @@ export const profile = {
     x: "https://x.com",
   },
   attributes: [
-    { name: "Frontend Sorcery", stat: 94, color: "from-emerald-500 to-teal-400" },
-    { name: "Backend Alchemy", stat: 89, color: "from-sky-500 to-indigo-400" },
-    { name: "System Architecture", stat: 91, color: "from-amber-500 to-orange-400" },
-    { name: "Speed & Optimization", stat: 96, color: "from-rose-500 to-amber-400" },
-  ],
+    { name: "Frontend Sorcery", stat: 94, icon: "brush", note: "Interfaces that feel effortless" },
+    { name: "Backend Alchemy", stat: 89, icon: "gear", note: "APIs, data & reliable services" },
+    { name: "System Architecture", stat: 91, icon: "compass", note: "Clear structure that scales" },
+    { name: "Speed & Optimization", stat: 96, icon: "feather", note: "Fast on every device" },
+  ] as { name: string; stat: number; icon: "brush" | "gear" | "compass" | "feather"; note: string }[],
   highlights: [
-    { label: "🛡️ Role", value: "Full-Stack & Web Performance" },
-    { label: "🔮 Runes", value: "TypeScript, Astro, React, Node.js" },
-    { label: "🌿 Trait", value: "Minimalist, accessible, fast by default" },
+    { icon: "🛡️", label: "Role", value: "Full-Stack & Web Performance" },
+    { icon: "🔮", label: "Runes", value: "TypeScript, Astro, React, Node.js" },
+    { icon: "🌿", label: "Creed", value: "Minimalist, accessible, fast by default" },
   ],
 };
 
@@ -85,6 +85,16 @@ export const XP_PER_LEVEL = 100;
 /** Acorns hidden around the page (ids must match <Acorn id="..."/> usages). */
 export const ACORN_IDS = ["hero", "dialogue", "quests", "relics", "footer"] as const;
 
+/** Weather cycle order (R key / weather charm). */
+export const WEATHERS = [
+  { id: "clear", icon: "☀️", label: "Clear skies" },
+  { id: "rain", icon: "🌧️", label: "Summer shower" },
+  { id: "storm", icon: "⛈️", label: "Thunderstorm" },
+  { id: "mist", icon: "🌫️", label: "Morning mist" },
+  { id: "snow", icon: "❄️", label: "Dreaming snow" },
+  { id: "breeze", icon: "🍃", label: "Big breeze" },
+] as const;
+
 export const quests: Quest[] = [
   { id: "begin", icon: "🌱", title: "Begin the Journey", hint: "Press start on the title screen.", xp: 20 },
   { id: "greet", icon: "🍃", title: "Greet the Forest Spirit", hint: "Choose any dialogue option with Mori.", xp: 40 },
@@ -92,7 +102,8 @@ export const quests: Quest[] = [
   { id: "relics", icon: "📖", title: "Enter the Relic Vault", hint: "Travel to the Projects chapter.", xp: 60 },
   { id: "nightfall", icon: "🌙", title: "Cast Time-Shift", hint: "Switch between day and night.", xp: 40 },
   { id: "pat", icon: "🌱", title: "Befriend Mori", hint: "Give the forest spirit a gentle pat.", xp: 30 },
-  { id: "rain", icon: "🌧️", title: "Summon a Summer Shower", hint: "Ask Mori for rain, or press R.", xp: 40 },
+  { id: "weather", icon: "🌦️", title: "Change the Weather", hint: "Tap the weather charm or press R.", xp: 40 },
+  { id: "all-weather", icon: "🌈", title: "Weather Watcher", hint: "Witness all six kinds of weather.", xp: 80 },
   { id: "journal", icon: "🗺️", title: "Open the Journal", hint: "Press J or tap the journal button.", xp: 20 },
   { id: "acorns", icon: "🌰", title: "Acorn Gatherer", hint: `Find all ${ACORN_IDS.length} acorns hidden across the forest.`, xp: 150 },
   { id: "pigeon", icon: "🕊️", title: "Send a Pigeon Post", hint: "Reach out through the email link.", xp: 80 },
@@ -250,7 +261,13 @@ export const dialogue = {
     "Shh… listen. You can hear the rice fields whispering in the wind.",
     "At night I carry a lantern so lost travelers can find the path home.",
   ],
-  rainOn: "Pitter-patter… a summer shower! Watch the ripples dance across the rice fields.",
-  rainOff: "The rain has passed. Everything smells of wet earth and green leaves.",
+  weather: {
+    clear: "The clouds part. Sunlight on the rice again — my favourite.",
+    rain: "Pitter-patter… a summer shower! Watch the ripples dance across the paddies.",
+    storm: "Eek! Thunder over the mountains. Stay close — the camphor tree will keep us dry.",
+    mist: "Morning mist is rolling over the fields. Everything feels like a secret.",
+    snow: "Snow? In summer?! The forest must be dreaming. Let's make tiny footprints.",
+    breeze: "Whoosh! A big gust — hold on to your hat, the leaves are going on an adventure.",
+  } as Record<string, string>,
   acornsComplete: `You found every acorn! The forest is grateful. Here's the secret: ${profile.shortName} reads every pigeon post — send one and say hi!`,
 };
