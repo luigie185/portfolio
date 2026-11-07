@@ -26,7 +26,19 @@ import RelicVignette from './RelicVignette.astro';
 
           <!-- painted card art -->
           <div class="relic-art">
-            <RelicVignette emblem={project.emblem} sky={project.sky} uid={`relic-${project.emblem}`} />
+            {project.image ? (
+              <img
+                src={project.image}
+                alt={project.imageAlt ?? `${project.title} screenshot`}
+                class="relic-shot"
+                width="960"
+                height="450"
+                loading="lazy"
+                decoding="async"
+              />
+            ) : (
+              <RelicVignette emblem={project.emblem} sky={project.sky} uid={`relic-${project.emblem}`} />
+            )}
             <span class="relic-number">{project.id}</span>
             <span class="relic-rarity" tabindex="0" data-tip={`Rarity ${project.rarity} of 5`} aria-label={`Rarity ${project.rarity} of 5`}>
               {Array.from({ length: 5 }, (_, s) => (

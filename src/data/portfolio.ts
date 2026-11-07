@@ -33,6 +33,9 @@ export interface ProjectItem {
   technologies: string[];
   emblem: RelicEmblem;
   sky: RelicSky;
+  /** Optional real screenshot (in public/) shown as the card art instead of the painted vignette. */
+  image?: string;
+  imageAlt?: string;
   liveUrl?: string;
   repoUrl?: string;
 }
@@ -192,19 +195,20 @@ export const experiences: ExperienceItem[] = [
 export const projects: ProjectItem[] = [
   {
     id: "No. 01",
-    title: "PulseMetrics",
-    kind: "Privacy-first web analytics",
+    title: "PMNA Clothing",
+    kind: "Streetwear brand website",
     rarity: 5,
-    element: "Aether · Full-Stack",
-    lore: "A glass orb that hears every footstep in the forest, yet never asks a name.",
+    element: "Heritage · Streetwear",
+    lore: "A tree of heritage — its roots in local artists, its branches worn on the street.",
     summary:
-      "Lightweight analytics platform with real-time event streaming, custom funnels, and no cookie banners needed.",
-    stats: ["< 1.5 KB script", "10k+ events/sec"],
-    technologies: ["TypeScript", "Astro", "ClickHouse", "Tailwind CSS"],
-    emblem: "orb",
-    sky: "dusk",
-    liveUrl: "https://example.com",
-    repoUrl: "https://github.com/luigie185",
+      "PMNA Clothing offers culturally infused, unique streetwear designed by talented local artists, showcasing their creativity and heritage. Visitors browse the available pieces, and Order takes them straight to the brand's Facebook page.",
+    stats: ["SEO-optimized homepage", "Orders via Facebook"],
+    technologies: ["Astro", "CSS", "JavaScript", "HTML"],
+    emblem: "loom",
+    sky: "night",
+    image: "/projects/pmna-clothing.webp",
+    imageAlt: "PMNA Clothing homepage with the black-and-white PAMANA tree emblem",
+    liveUrl: "https://pmnaclothing.vercel.app/",
   },
   {
     id: "No. 02",
