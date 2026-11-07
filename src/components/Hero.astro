@@ -6,10 +6,13 @@ import ForestSpirit from './ForestSpirit.astro';
 import fs from 'node:fs';
 import path from 'node:path';
 
-// Profile photo: drop public/profile.(jpg|jpeg|png|webp|avif) in and it's used automatically.
-const photoFile = ['avif', 'webp', 'jpg', 'jpeg', 'png']
-  .map((ext) => `profile.${ext}`)
-  .find((f) => fs.existsSync(path.join(process.cwd(), 'public', f)));
+// Profile photo: drop public/Profile.(png|jpg|jpeg|webp|avif) in and it's used automatically.
+// Prefers the optimized public/profile.webp (made by `npm run photo`); matching is
+// case-insensitive so Profile.png works too.
+const publicFiles = fs.existsSync(path.join(process.cwd(), 'public')) ? fs.readdirSync(path.join(process.cwd(), 'public')) : [];
+const photoFile = ['webp', 'avif', 'jpg', 'jpeg', 'png']
+  .map((ext) => publicFiles.find((f) => f.toLowerCase() === `profile.${ext}`))
+  .find(Boolean);
 const photo = photoFile ? `/${photoFile}` : null;
 ---
 
