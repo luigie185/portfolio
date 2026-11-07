@@ -87,7 +87,7 @@ export const ACORN_IDS = ["hero", "dialogue", "quests", "relics", "footer"] as c
 
 /** Weather cycle order (R key / weather charm). */
 export const WEATHERS = [
-  { id: "clear", icon: "☀️", label: "Clear skies" },
+  { id: "clear", icon: "🌤️", label: "Clear skies" },
   { id: "rain", icon: "🌧️", label: "Summer shower" },
   { id: "storm", icon: "⛈️", label: "Thunderstorm" },
   { id: "mist", icon: "🌫️", label: "Morning mist" },

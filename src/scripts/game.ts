@@ -96,7 +96,7 @@ function renderWeather() {
   const w = WEATHERS.find((x) => x.id === currentWeather()) ?? WEATHERS[0];
   document.querySelectorAll<HTMLElement>('[data-hud-weather]').forEach((el) => (el.textContent = w.icon));
   document.querySelectorAll<HTMLElement>('[data-weather-cycle]').forEach((b) => {
-    if (b.closest('header')) {
+    if (b.hasAttribute('data-hud-weather-btn')) {
       b.setAttribute('aria-label', `Change the weather (R). Now: ${w.label}`);
       b.dataset.tip = `Weather: ${w.label} · R to change`;
     }
@@ -131,6 +131,13 @@ function render() {
 
   document.querySelectorAll<HTMLElement>('[data-hud-level]').forEach((el) => (el.textContent = String(level)));
   document.querySelectorAll<HTMLElement>('[data-hud-xp]').forEach((el) => (el.textContent = `${inLevel}/${XP_PER_LEVEL}`));
+  document.querySelectorAll<SVGCircleElement>('[data-hud-xp-ring]').forEach((ring) => {
+    const len = 2 * Math.PI * 20;
+    ring.style.strokeDashoffset = String(len * (1 - inLevel / XP_PER_LEVEL));
+  });
+  document.querySelectorAll<HTMLElement>('[data-hud-crest]').forEach((el) => {
+    el.dataset.tip = `Traveler LV ${level} · ${inLevel}/${XP_PER_LEVEL} XP`;
+  });
   document.querySelectorAll<HTMLElement>('[data-hud-xp-bar]').forEach((el) => {
     el.style.transform = `scaleX(${inLevel / XP_PER_LEVEL})`;
     el.closest('[role="progressbar"]')?.setAttribute('aria-valuenow', String(inLevel));
@@ -278,7 +285,7 @@ function closeTitle() {
   completeQuest('begin');
 }
 
-/** The page underneath settles in (header slides down, hero rises). */
+/** The page underneath settles in (HUD bubble floats up, hero rises). */
 function pageEnter() {
   const root = document.documentElement;
   root.classList.add('page-enter');
@@ -587,7 +594,7 @@ function init() {
         break;
       }
       case 'n': {
-        const btn = document.querySelector<HTMLElement>('header [data-theme-toggle]');
+        const btn = document.querySelector<HTMLElement>('[data-hud-theme-btn]');
         const box = btn?.getBoundingClientRect();
         toggleTheme(box ? { x: box.left + box.width / 2, y: box.top + box.height / 2 } : undefined);
         break;

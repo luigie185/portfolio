@@ -2507,3 +2507,146 @@ kbd {
 @keyframes page-dock-in { from { transform: translate3d(0, 140%, 0); } }
 
 .lite .hud { backdrop-filter: none; }
+
+/* ===================================================================== */
+/* Floating HUD bubble (bottom centre, all devices)                       */
+/* ===================================================================== */
+.hud-bubble {
+  position: fixed;
+  left: 50%;
+  bottom: max(0.9rem, env(safe-area-inset-bottom));
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  max-width: calc(100vw - 1rem);
+  padding: 0.35rem 0.45rem 0.35rem 0.35rem;
+  border-radius: 9999px;
+  transform: translateX(-50%);
+  background:
+    var(--washi-fibres) padding-box,
+    linear-gradient(180deg, #fffaf0, #f6ecd4) padding-box,
+    linear-gradient(145deg, #e8c77a, #b88d3b 40%, #f2d895 60%, #a8792c) border-box;
+  border: 2px solid transparent;
+  box-shadow:
+    0 16px 34px -14px rgba(40, 30, 10, 0.6),
+    0 4px 10px -4px rgba(40, 30, 10, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+.dark .hud-bubble {
+  background:
+    linear-gradient(180deg, #172235, #111a2b) padding-box,
+    linear-gradient(145deg, #d6a84f, #6e5524 40%, #e8c77a 60%, #5a4420) border-box;
+  box-shadow: 0 16px 34px -12px rgba(0, 0, 0, 0.75), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+@media (min-width: 640px) { .hud-bubble { gap: 0.45rem; padding: 0.4rem 0.55rem 0.4rem 0.4rem; } }
+
+.hud-bubble__crest {
+  position: relative;
+  display: block;
+  flex-shrink: 0;
+  width: 46px;
+  height: 46px;
+  border-radius: 9999px;
+  transition: transform 0.25s cubic-bezier(0.3, 1.6, 0.5, 1);
+}
+.hud-bubble__crest:hover { transform: rotate(-8deg) scale(1.06); }
+.hud-bubble__crest svg { width: 100%; height: 100%; overflow: visible; }
+.hud-ring__track { fill: none; stroke: #e2d3b0; stroke-width: 5; }
+.dark .hud-ring__track { stroke: #0a1220; }
+.hud-ring__fill {
+  fill: none;
+  stroke: #6aa84f;
+  stroke-width: 5;
+  stroke-linecap: round;
+  transform: rotate(-90deg);
+  transform-origin: 24px 24px;
+  transition: stroke-dashoffset 0.9s cubic-bezier(0.3, 1.2, 0.5, 1);
+}
+.dark .hud-ring__fill { stroke: #f3b354; }
+.hud-ring__disc { fill: #23476e; stroke: #c59b47; stroke-width: 1.5; }
+.dark .hud-ring__disc { fill: #2b588a; }
+.hud-ring__lv { font-family: 'JetBrains Mono', monospace; font-size: 6.5px; font-weight: 700; fill: #f2d895; letter-spacing: 0.5px; }
+.hud-ring__num { font-family: 'Fraunces', Georgia, serif; font-size: 12px; font-weight: 700; fill: #fff8e7; }
+
+.hud-bubble__sep {
+  width: 1px;
+  height: 26px;
+  margin: 0 0.1rem;
+  background: linear-gradient(180deg, transparent, #c9b48a, transparent);
+}
+.dark .hud-bubble__sep { background: linear-gradient(180deg, transparent, #3a4d6e, transparent); }
+
+.hud-bubble__tabs { display: flex; align-items: center; gap: 0.1rem; }
+.hud-bubble__tab {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  height: 2.5rem;
+  padding: 0 0.65rem;
+  border-radius: 9999px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: #6b5d45;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+.hud-bubble__tab:hover { color: #2a2620; background: rgba(197, 155, 71, 0.15); }
+.hud-bubble__tab[aria-current] { color: #23476e; background: rgba(197, 155, 71, 0.22); box-shadow: inset 0 0 0 1.5px rgba(197, 155, 71, 0.55); }
+.dark .hud-bubble__tab { color: #8fa3bf; }
+.dark .hud-bubble__tab:hover { color: #f5efe2; background: rgba(214, 168, 79, 0.12); }
+.dark .hud-bubble__tab[aria-current] { color: #f3b354; background: rgba(214, 168, 79, 0.16); box-shadow: inset 0 0 0 1.5px rgba(214, 168, 79, 0.45); }
+.hud-bubble__icon { font-size: 1rem; line-height: 1; transition: transform 0.3s cubic-bezier(0.3, 1.6, 0.5, 1); }
+.hud-bubble__tab[aria-current] .hud-bubble__icon { transform: translateY(-1px) scale(1.12); }
+/* labels only where there's room; icons alone on phones */
+.hud-bubble__label { display: none; }
+@media (min-width: 720px) { .hud-bubble__label { display: inline; } }
+
+.hud-bubble__token {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+  flex-shrink: 0;
+  min-width: 2.5rem;
+  height: 2.5rem;
+  padding: 0 0.5rem;
+  border-radius: 9999px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #5b4332;
+  background: radial-gradient(circle at 40% 30%, #fffaf0, #f2e3bf);
+  border: 1.5px solid #c59b47;
+  box-shadow: 0 2px 0 #a8792c, inset 0 1px 0 #fff;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.hud-bubble__token--wide { padding: 0 0.7rem; }
+.hud-bubble__token:hover { transform: translateY(-2px); box-shadow: 0 4px 0 #a8792c, 0 0 0 3px rgba(197, 155, 71, 0.2), inset 0 1px 0 #fff; }
+.hud-bubble__token:active { transform: translateY(1px); box-shadow: 0 1px 0 #a8792c; }
+.dark .hud-bubble__token {
+  color: #f3b354;
+  background: radial-gradient(circle at 40% 30%, #22314d, #141e31);
+  border-color: #8a6a2c;
+  box-shadow: 0 2px 0 #4a3a1a, inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+@media (max-width: 380px) {
+  .hud-bubble__crest { width: 40px; height: 40px; }
+  .hud-bubble__tab { padding: 0 0.5rem; height: 2.3rem; }
+  .hud-bubble__token { min-width: 2.25rem; height: 2.25rem; }
+}
+
+/* level-up pulse follows the round crest */
+.hud-bubble__crest.is-levelup { animation: levelup 0.9s ease; }
+
+/* floats up when the page settles in */
+.page-enter .hud-bubble { animation: hud-bubble-in 0.8s 0.25s cubic-bezier(0.2, 0.9, 0.3, 1.2) both; }
+@keyframes hud-bubble-in { from { transform: translate3d(-50%, 160%, 0); } }
+
+/* toasts sit above the bubble on the right */
+.toast-region { bottom: 5.5rem !important; }
+
+/* without a top header, chapters can sit near the top when jumped to */
+#about, #experience, #projects { scroll-margin-top: 1rem; }
