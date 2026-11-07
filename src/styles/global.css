@@ -1212,6 +1212,14 @@ kbd {
 .wx { display: none; pointer-events: none; animation: wx-in 1.2s ease both; }
 @keyframes wx-in { from { opacity: 0; } }
 
+/* the outgoing weather lingers and fades while the new one fades in */
+:is([data-weather-prev="rain"], [data-weather-prev="storm"]):not([data-weather="rain"], [data-weather="storm"]) :is(.wx-rain, .wx-gloom),
+[data-weather-prev="storm"]:not([data-weather="storm"]) .wx-lightning,
+[data-weather-prev="snow"]:not([data-weather="snow"]) .wx-snow,
+[data-weather-prev="mist"]:not([data-weather="mist"]) .wx-mist,
+[data-weather-prev="breeze"]:not([data-weather="breeze"]) .wx-breeze { display: block; animation: wx-out 1.5s ease forwards; }
+@keyframes wx-out { to { opacity: 0; } }
+
 [data-weather="rain"] .wx-rain,
 [data-weather="storm"] .wx-rain,
 [data-weather="storm"] .wx-lightning,
@@ -3144,3 +3152,36 @@ kbd {
    change at the flip redraws only them, not the big background layer. */
 .scene-actors { will-change: transform; }
 .lite .scene-actors { will-change: auto; }
+
+/* ===================================================================== */
+/* Weather change: a bank of mist drifts across the countryside; the new   */
+/* weather settles in behind it. Horizontal gradient only, so it's drawn   */
+/* as a strip 1vh tall stretched down the screen (cheap, GPU-moved).        */
+/* ===================================================================== */
+.wx-veil {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 300vw;
+  height: 1vh;
+  transform-origin: 0 0;
+  transform: translate3d(-300vw, 0, 0) scaleY(100);
+  pointer-events: none;
+  opacity: 0;
+  background: linear-gradient(90deg,
+    rgba(238, 243, 246, 0) 0%, rgba(238, 243, 246, 0.55) 16%, rgba(238, 243, 246, 0.86) 30%,
+    rgba(244, 247, 249, 0.92) 50%, rgba(238, 243, 246, 0.86) 70%, rgba(238, 243, 246, 0.55) 84%, rgba(238, 243, 246, 0) 100%);
+}
+.dark .wx-veil {
+  background: linear-gradient(90deg,
+    rgba(34, 50, 76, 0) 0%, rgba(34, 50, 76, 0.55) 16%, rgba(40, 58, 86, 0.86) 30%,
+    rgba(46, 64, 92, 0.92) 50%, rgba(40, 58, 86, 0.86) 70%, rgba(34, 50, 76, 0.55) 84%, rgba(34, 50, 76, 0) 100%);
+}
+.wx-changing .wx-veil { animation: veil-pass 1.9s cubic-bezier(0.4, 0, 0.6, 1) forwards; will-change: transform; }
+@keyframes veil-pass {
+  from { opacity: 1; transform: translate3d(-300vw, 0, 0) scaleY(100); }
+  to { opacity: 1; transform: translate3d(100vw, 0, 0) scaleY(100); }
+}
+/* seeds fade rather than blink out when the weather turns */
+.seeds { transition: opacity 1.2s ease; }
+:is([data-weather="rain"], [data-weather="storm"], [data-weather="snow"]) .seeds { display: block; opacity: 0; }

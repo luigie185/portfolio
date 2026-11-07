@@ -90,8 +90,10 @@ function patMori() {
 /* Weather                                                             */
 /* ------------------------------------------------------------------ */
 
+let pendingWeather: string | null = null;
 function currentWeather() {
-  return document.documentElement.dataset.weather || 'clear';
+  // where the sky is heading (a change may still be drifting in)
+  return pendingWeather || document.documentElement.dataset.weather || 'clear';
 }
 
 function renderWeather() {
@@ -107,10 +109,43 @@ function renderWeather() {
 
 type WeatherId = (typeof WEATHERS)[number]['id'];
 
+/**
+ * Weather change: a bank of mist drifts across the screen; when it covers the
+ * middle the new weather takes over, the old one fades out behind it, and the
+ * mist clears. Reduced motion → instant.
+ */
+let wxTimers: number[] = [];
+function transitionWeather(next: string) {
+  const root = document.documentElement;
+  const prev = root.dataset.weather || 'clear';
+  wxTimers.forEach((t) => window.clearTimeout(t));
+  wxTimers = [];
+  if (prefersReducedMotion()) {
+    root.dataset.weather = next;
+    pendingWeather = null;
+    return;
+  }
+  pendingWeather = next;
+  root.classList.remove('wx-changing');
+  void root.offsetWidth; // restart the mist if a change was already drifting by
+  root.classList.add('wx-changing');
+  wxTimers.push(
+    window.setTimeout(() => {
+      root.dataset.weatherPrev = prev;
+      root.dataset.weather = next;
+      pendingWeather = null;
+    }, 850),
+    window.setTimeout(() => {
+      root.classList.remove('wx-changing');
+      delete root.dataset.weatherPrev;
+    }, 2500),
+  );
+}
+
 /** Apply a weather. `manual` = the visitor chose it (dialogue + quest); auto changes are quiet. */
 function setWeather(next: WeatherId, manual: boolean) {
   const ids = WEATHERS.map((w) => w.id);
-  document.documentElement.dataset.weather = next;
+  transitionWeather(next);
   write('weather', next, 'session');
   renderWeather();
   audio.setWeather(next);
@@ -153,7 +188,7 @@ const autoWeatherOn = () => read('auto-weather') !== 'off';
 function scheduleAutoWeather() {
   window.clearTimeout(autoWeatherTimer);
   if (!autoWeatherOn()) return;
-  const delay = 45000 + Math.random() * 45000; // every 45–90 s
+  const delay = 20000 + Math.random() * 15000; // every 20–35 s
   autoWeatherTimer = window.setTimeout(() => {
     if (document.visibilityState === 'visible' && !document.documentElement.classList.contains('show-title')) {
       const options = WEATHER_POOL.filter((w) => w !== currentWeather());
