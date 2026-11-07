@@ -1,64 +1,194 @@
 ---
+/**
+ * Game "press start" screen: a hand-painted moonlit countryside that builds
+ * itself up layer by layer (intro animation), then "dives in" to the page.
+ *
+ * Hidden by default; the inline boot script adds `show-title` to <html> on the
+ * first visit of a session, so visitors without JS (and returning visitors in
+ * the same session) never see it or get blocked by it.
+ */
 import { profile } from '../data/portfolio';
 import ForestSpirit from './ForestSpirit.astro';
+
+function rng(seed: number) {
+  let s = seed;
+  return () => (s = (s * 16807) % 2147483647) / 2147483647;
+}
+const r = rng(5);
+
+// stars
+const stars = Array.from({ length: 70 }, () => ({
+  x: r() * 1440,
+  y: r() * 420,
+  rad: 0.6 + r() * 1.4,
+  d: (r() * 4).toFixed(2),
+}));
+
+// far forest ridge blobs
+const ridge: { x: number; y: number; rad: number }[] = [];
+for (let x = -20; x < 1480; x += 16 + r() * 18) {
+  ridge.push({ x, y: 598 + Math.sin(x / 140) * 10 + r() * 6, rad: 16 + r() * 14 });
+}
+
+// camphor canopy
+const canopy = Array.from({ length: 46 }, () => {
+  const a = r() * Math.PI * 2;
+  const d = Math.sqrt(r());
+  return { x: 1275 + Math.cos(a) * d * 150, y: 420 + Math.sin(a) * d * 95, rad: 26 + r() * 36 };
+}).sort((a, b) => a.y - b.y);
+
+// foreground grass blades
+const blades: string[] = [];
+for (let x = -10; x < 1460; x += 6 + r() * 7) {
+  const h = 40 + r() * 90 + (x < 300 || x > 1150 ? 50 : 0);
+  const lean = (r() - 0.45) * 30;
+  blades.push(`M${x.toFixed(1)} 900Q${(x + lean * 0.4).toFixed(1)} ${(900 - h * 0.6).toFixed(1)} ${(x + lean).toFixed(1)} ${(900 - h).toFixed(1)}Q${(x + lean * 0.3 + 4).toFixed(1)} ${(900 - h * 0.5).toFixed(1)} ${(x + 6).toFixed(1)} 900Z`);
+}
+
+const fireflies = Array.from({ length: 14 }, () => ({
+  x: 8 + r() * 84,
+  y: 52 + r() * 40,
+  d: (r() * 5).toFixed(2),
+  s: (5 + r() * 5).toFixed(2),
+}));
+
+const titleWords = `${profile.shortName}'s Forest Sanctuary`.split(' ');
 ---
 
-<!--
-  Game "press start" screen. Hidden by default; an inline script in the layout adds
-  `show-title` to <html> on the first visit of a session, so visitors without JS
-  (and returning visitors) never see it or get blocked by it.
--->
 <div
   data-title-screen
-  class="title-screen fixed inset-0 z-[100] items-center justify-center p-6 text-center"
+  class="title-screen fixed inset-0 z-[100]"
   role="dialog"
   aria-modal="true"
   aria-labelledby="title-screen-heading"
 >
-  <div class="title-screen__sky absolute inset-0" aria-hidden="true"></div>
-  <div class="title-screen__stars absolute inset-0" aria-hidden="true"></div>
-  <div class="absolute top-[12%] right-[14%] w-20 h-20 sm:w-28 sm:h-28 rounded-full bg-[#fef9c3] shadow-[0_0_80px_24px_rgba(254,240,138,0.35)]" aria-hidden="true"></div>
+  <!-- ======================= painted night scene ======================= -->
+  <div class="ts-scene" aria-hidden="true">
+    <div class="ts-sky"></div>
 
-  <!-- Moonlit forest silhouette: hills and the great camphor tree -->
-  <svg class="absolute bottom-0 inset-x-0 w-full h-[38vh]" viewBox="0 0 1440 400" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
-    <path d="M0 400V250Q260 190 560 240T1100 220T1440 240V400Z" fill="#163d36" />
-    <g fill="#0d2a27">
-      <path d="M1130 380C1150 320 1160 260 1155 200h50c-5 60 5 120 25 180Z" />
-      <circle cx="1120" cy="170" r="70" /><circle cx="1240" cy="175" r="72" /><circle cx="1180" cy="110" r="85" />
-      <circle cx="1080" cy="210" r="45" /><circle cx="1280" cy="215" r="48" />
-    </g>
-    <path d="M0 400V300Q380 250 760 300T1440 290V400Z" fill="#0d2a27" />
-    <circle cx="420" cy="230" r="3" fill="#fde68a" class="animate-firefly" />
-    <circle cx="820" cy="200" r="2.5" fill="#a7f3d0" class="animate-firefly" style="animation-delay:-1.5s" />
-    <circle cx="980" cy="250" r="3" fill="#fde68a" class="animate-firefly" style="animation-delay:-2.7s" />
-  </svg>
+    <svg class="ts-layer ts-stars" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice">
+      {stars.map((s) => <circle cx={s.x} cy={s.y} r={s.rad} style={`animation-delay:${s.d}s`} />)}
+    </svg>
 
-  <ForestSpirit standalone class="absolute bottom-[7vh] left-[12%] w-20 h-20 sm:w-28 sm:h-28 animate-float-slow" />
+    <div class="ts-moon"><span></span></div>
 
-  <div class="relative max-w-xl space-y-6">
-    <p class="font-mono text-xs font-bold uppercase tracking-[0.35em] text-[#fef3c7]/90">
-      ✦ A Forest Portfolio Adventure ✦
-    </p>
-    <h1
-      id="title-screen-heading"
-      class="title-screen__title text-4xl sm:text-6xl font-bold leading-tight text-[#fffaf0]"
-    >
-      {profile.shortName}'s<br />Forest Sanctuary
-    </h1>
-    <p class="font-serif-story italic text-base sm:text-lg text-[#e7f5ec]">
-      “{profile.tagline}”
-    </p>
+    <svg class="ts-layer ts-wisps" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice">
+      <g filter="url(#ts-brush)">
+        <ellipse cx="380" cy="230" rx="210" ry="14" /><ellipse cx="460" cy="250" rx="140" ry="9" />
+        <ellipse cx="1080" cy="300" rx="180" ry="12" />
+      </g>
+    </svg>
 
-    <button
-      type="button"
-      data-start-game
-      class="rpg-btn inline-flex items-center gap-2 px-7 py-3 rounded-2xl text-base font-mono font-bold bg-gradient-to-b from-[#f2c46b] to-[#d58f2c] text-[#1a140b] border-2 border-[#fde7b0] cursor-pointer"
-    >
-      <span class="animate-cursor-bounce" aria-hidden="true">▶</span> Begin Journey
-    </button>
+    <svg class="ts-layer ts-mountains" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMax slice">
+      <defs>
+        <filter id="ts-brush" x="-10%" y="-10%" width="120%" height="120%">
+          <feTurbulence type="fractalNoise" baseFrequency="0.03" numOctaves="2" seed="8" result="n" />
+          <feDisplacementMap in="SourceGraphic" in2="n" scale="9" />
+        </filter>
+        <linearGradient id="ts-haze" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#2c4f68" stop-opacity="0" />
+          <stop offset="1" stop-color="#2c4f68" stop-opacity="0.65" />
+        </linearGradient>
+        <radialGradient id="ts-window">
+          <stop offset="0" stop-color="#ffcf6e" stop-opacity="0.9" />
+          <stop offset="1" stop-color="#ffcf6e" stop-opacity="0" />
+        </radialGradient>
+      </defs>
+      <g filter="url(#ts-brush)">
+        <path d="M-20 900V560Q140 500 300 530Q450 480 620 525Q780 485 940 520Q1120 470 1460 530V900Z" fill="#1d3550" />
+        <path d="M-20 900V590Q200 555 420 575Q640 545 860 580Q1080 555 1460 585V900Z" fill="#1a3343" />
+      </g>
+      <rect x="-20" y="480" width="1480" height="160" fill="url(#ts-haze)" />
+    </svg>
 
-    <p class="title-screen__blink font-mono text-[11px] uppercase tracking-[0.3em] text-[#fef3c7]/80">
-      Press any key to start
-    </p>
+    <svg class="ts-layer ts-forest" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMax slice">
+      <g filter="url(#ts-brush)" fill="#12302f">
+        <path d="M-20 900V612Q720 596 1460 612V900Z" />
+        {ridge.map((b) => <circle cx={b.x} cy={b.y} r={b.rad} />)}
+      </g>
+      <g fill="#1b4440" opacity=".8">
+        {ridge.filter((_, i) => i % 3 === 0).map((b) => <circle cx={b.x - b.rad * 0.25} cy={b.y - b.rad * 0.3} r={b.rad * 0.45} />)}
+      </g>
+      <!-- farmhouse with lit windows -->
+      <g transform="translate(300 600)">
+        <circle cx="45" cy="30" r="40" fill="url(#ts-window)" class="ts-glow" />
+        <circle cx="110" cy="30" r="40" fill="url(#ts-window)" class="ts-glow" />
+        <rect x="14" y="18" width="128" height="30" fill="#2b3341" />
+        <rect x="34" y="26" width="20" height="14" fill="#ffcf6e" />
+        <rect x="98" y="26" width="26" height="14" fill="#ffcf6e" />
+        <path d="M-6 22 L36 -8 L122 -8 L162 22Z" fill="#151b24" />
+      </g>
+    </svg>
+
+    <svg class="ts-layer ts-tree" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMax slice">
+      <g filter="url(#ts-brush)">
+        <path d="M760 900V660Q1000 600 1180 590Q1340 588 1460 610V900Z" fill="#10302b" />
+        <path d="M1250 640C1264 580 1270 520 1265 470h44c-5 50 1 110 22 170Z" fill="#14181e" />
+        {canopy.map((c) => <circle cx={c.x + c.rad * 0.12} cy={c.y + c.rad * 0.18} r={c.rad} fill="#071a18" />)}
+        {canopy.map((c) => <circle cx={c.x} cy={c.y} r={c.rad * 0.86} fill="#0d2724" />)}
+        {canopy.filter((c) => c.y < 340).map((c) => <circle cx={c.x - c.rad * 0.2} cy={c.y - c.rad * 0.3} r={c.rad * 0.45} fill="#1f4c45" />)}
+      </g>
+    </svg>
+
+    <svg class="ts-layer ts-paddies" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMax slice">
+      <path d="M-20 900V650Q720 640 1460 652V900Z" fill="#0f2a25" />
+      {[662, 680, 702, 730, 766].map((y, i) => (
+        <path d={`M-20 ${y}H1460V${y + 8 + i * 3}H-20Z`} fill={i % 2 ? '#16382f' : '#22405c'} opacity={i % 2 ? 1 : 0.85} />
+      ))}
+      <!-- moon reflected in the flooded fields -->
+      <g class="ts-reflection">
+        <ellipse cx="1060" cy="668" rx="34" ry="3" />
+        <ellipse cx="1064" cy="686" rx="44" ry="3.5" />
+        <ellipse cx="1058" cy="708" rx="56" ry="4" />
+        <ellipse cx="1066" cy="737" rx="66" ry="4.5" />
+      </g>
+    </svg>
+
+    <svg class="ts-layer ts-grass" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMax slice">
+      <path d={blades.join('')} fill="#081b18" />
+    </svg>
+
+    <div class="ts-fireflies">
+      {fireflies.map((f) => (
+        <span style={`left:${f.x}%; top:${f.y}%; animation-delay:${f.d}s; animation-duration:${f.s}s`}></span>
+      ))}
+    </div>
+
+    <div class="ts-mori">
+      <ForestSpirit standalone class="w-full h-full" />
+    </div>
+
+    <div class="ts-vignette"></div>
+    <div class="ts-curtain"></div>
+  </div>
+
+  <!-- ======================= title plate ======================= -->
+  <div class="ts-content">
+    <div class="ts-plate">
+      <p class="ts-eyebrow">
+        <span aria-hidden="true">✦</span> A Forest Portfolio Adventure <span aria-hidden="true">✦</span>
+      </p>
+      <h1 id="title-screen-heading" class="ts-title">
+        {titleWords.map((w, i) => (
+          <span class="ts-word" style={`--i:${i}`}>{w}</span>
+        ))}
+      </h1>
+      <svg class="ts-flourish" viewBox="0 0 320 28" aria-hidden="true">
+        <path d="M10 14 H130 M190 14 H310" />
+        <path d="M160 4 C150 10 150 18 160 24 C170 18 170 10 160 4Z" />
+        <path d="M138 14 c6-6 12-6 16 0 c-4 6-10 6-16 0Z M182 14 c-6-6-12-6-16 0 c4 6 10 6 16 0Z" />
+      </svg>
+      <p class="ts-tagline">“{profile.tagline}”</p>
+
+      <div class="ts-menu">
+        <button type="button" data-start-game class="ts-start">
+          <span class="ts-start__cursor" aria-hidden="true">▶</span>
+          <span data-title-cta>Begin Journey</span>
+        </button>
+        <button type="button" data-title-fresh class="ts-fresh" hidden>Start a new journey</button>
+      </div>
+
+      <p class="ts-hint">Press any key to start</p>
+    </div>
   </div>
 </div>

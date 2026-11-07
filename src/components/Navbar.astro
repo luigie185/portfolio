@@ -8,37 +8,38 @@ const links = [
 ];
 ---
 
-<header
-  class="sticky top-0 z-50 backdrop-blur-md bg-[#f7f0de]/90 dark:bg-[#0f1624]/90 border-b-2 border-[#c59b47] shadow-sm transition-colors"
->
-  <div class="max-w-4xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-3">
-    <!-- Left: hero badge + traveler XP -->
-    <a href="#about" class="flex items-center gap-3 group min-w-0">
-      <div
-        data-hud-badge
-        class="hud-badge relative flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-[#23476e] to-[#162d47] dark:from-[#2b588a] dark:to-[#152840] border-2 border-[#c59b47] text-[#fff8e7] shadow-sm shrink-0 group-hover:scale-105 transition-transform"
-        aria-hidden="true"
-      >
-        <span class="font-serif-story font-bold text-sm tracking-tighter">LV.{profile.level}</span>
-        <span
-          class="absolute -bottom-1 -right-1 w-3.5 h-3.5 rounded-full bg-emerald-500 border-2 border-[#f7f0de] dark:border-[#0f1624]"
-        ></span>
-      </div>
+<header class="hud sticky top-0 z-50" data-hud>
+  <div class="max-w-4xl mx-auto px-3 sm:px-6 h-16 flex items-center justify-between gap-2 sm:gap-3">
+    <!-- Left: crest + name + traveler XP -->
+    <a href="#about" class="hud-id group" aria-label={`${profile.name} — back to top`}>
+      <span data-hud-badge class="hud-badge hud-crest" aria-hidden="true">
+        <svg viewBox="0 0 44 44">
+          <circle cx="22" cy="22" r="19" class="hud-crest__disc" />
+          <circle cx="22" cy="22" r="19" fill="none" stroke="#c59b47" stroke-width="2" />
+          <g fill="#5f9f4f">
+            {Array.from({ length: 7 }, (_, i) => {
+              const a = (205 + i * 22) * (Math.PI / 180);
+              const x = 22 + Math.cos(a) * 19, y = 22 + Math.sin(a) * 19;
+              return <ellipse cx={x} cy={y} rx="3.2" ry="1.5" transform={`rotate(${205 + i * 22 + 70} ${x} ${y})`} />;
+            })}
+            {Array.from({ length: 7 }, (_, i) => {
+              const a = (-25 - i * 22) * (Math.PI / 180);
+              const x = 22 + Math.cos(a) * 19, y = 22 + Math.sin(a) * 19;
+              return <ellipse cx={x} cy={y} rx="3.2" ry="1.5" transform={`rotate(${-25 - i * 22 - 70} ${x} ${y})`} />;
+            })}
+          </g>
+          <text x="22" y="20" text-anchor="middle" class="hud-crest__lv">LV</text>
+          <text x="22" y="31" text-anchor="middle" class="hud-crest__num">{profile.level}</text>
+        </svg>
+        <span class="hud-crest__online"></span>
+      </span>
 
-      <div class="min-w-0">
-        <span
-          class="block font-serif-story font-bold text-sm sm:text-base truncate text-[#252b27] dark:text-[#f5efe2] group-hover:text-[#2e7050] dark:group-hover:text-[#f3b354] transition-colors"
-        >
-          {profile.name}
-        </span>
-
-        <!-- Traveler (visitor) XP gauge -->
-        <div class="flex items-center gap-2 mt-0.5 text-[10px] font-mono font-semibold">
-          <span class="text-[#23476e] dark:text-[#f3b354] whitespace-nowrap">
-            You LV.<span data-hud-level>1</span>
-          </span>
-          <div
-            class="w-20 sm:w-28 h-1.5 rounded-full bg-black/15 dark:bg-white/10 overflow-hidden"
+      <span class="min-w-0">
+        <span class="hud-name">{profile.name}</span>
+        <span class="hud-xp">
+          <span class="hud-xp__label">You <b>LV.<span data-hud-level>1</span></b></span>
+          <span
+            class="hud-gauge"
             role="progressbar"
             tabindex="0"
             data-tip="Your traveler XP — explore to level up"
@@ -47,26 +48,19 @@ const links = [
             aria-valuemax={XP_PER_LEVEL}
             aria-valuenow="0"
           >
-            <div
-              data-hud-xp-bar
-              class="h-full w-0 bg-gradient-to-r from-emerald-500 to-lime-400 rounded-full transition-[width] duration-700"
-            >
-            </div>
-          </div>
-          <span class="hidden sm:inline text-[#576058] dark:text-[#9fb0c9]" data-hud-xp>0/{XP_PER_LEVEL}</span>
-        </div>
-      </div>
+            <span data-hud-xp-bar class="hud-gauge__fill"></span>
+          </span>
+          <span class="hud-xp__num hidden sm:inline" data-hud-xp>0/{XP_PER_LEVEL}</span>
+        </span>
+      </span>
     </a>
 
-    <!-- Right: menu tabs, acorn counter, journal, day/night spell -->
-    <div class="flex items-center gap-1.5 sm:gap-3 shrink-0">
-      <nav aria-label="Chapters" class="hidden md:flex items-center gap-1 text-xs font-mono font-semibold">
+    <!-- Right: chapter tabs + tokens -->
+    <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
+      <nav aria-label="Chapters" class="hud-tabs hidden md:flex">
         {
           links.map((l) => (
-            <a
-              href={l.href}
-              class="px-3 py-1.5 rounded-lg text-[#576058] dark:text-[#9fb0c9] hover:bg-[#e9dfc4] dark:hover:bg-[#1c2942] hover:text-[#252b27] dark:hover:text-[#f3b354] transition-colors"
-            >
+            <a href={l.href} class="hud-tab" data-nav-link={l.href.slice(1)}>
               <span aria-hidden="true">{l.icon}</span> {l.label}
             </a>
           ))
@@ -78,7 +72,7 @@ const links = [
         data-open-journal
         data-tip="Acorns found · open the journal (J)"
         aria-label="Open quest journal (J)"
-        class="hud-chip inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-mono font-bold border-2 border-[#c59b47] bg-[#fffaf0] dark:bg-[#1a253a] text-[#7a5a3a] dark:text-[#f3b354] hover:bg-[#f3e8ce] dark:hover:bg-[#22314d] transition-colors cursor-pointer"
+        class="hud-token hud-token--wide"
       >
         <span aria-hidden="true">🌰</span>
         <span data-hud-acorns>0/{ACORN_IDS.length}</span>
@@ -89,7 +83,7 @@ const links = [
         data-weather-cycle
         aria-label={`Change the weather (R). Now: ${WEATHERS[0].label}`}
         data-tip="Weather: Clear skies · R to change"
-        class="inline-flex items-center justify-center w-9 h-9 rounded-xl text-base border-2 border-[#c59b47] bg-[#fffaf0] dark:bg-[#1a253a] hover:bg-[#f3e8ce] dark:hover:bg-[#22314d] transition-colors cursor-pointer"
+        class="hud-token"
       >
         <span data-hud-weather aria-hidden="true">{WEATHERS[0].icon}</span>
       </button>
@@ -100,7 +94,7 @@ const links = [
         data-tip="Day / night spell · N"
         aria-label="Toggle night mode (N)"
         aria-pressed="false"
-        class="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-mono font-semibold border-2 border-[#c59b47] bg-[#fffaf0] dark:bg-[#1a253a] text-[#23476e] dark:text-[#f3b354] hover:bg-[#f3e8ce] dark:hover:bg-[#22314d] transition-colors cursor-pointer"
+        class="hud-token hud-token--theme"
       >
         <span class="hidden dark:inline" aria-hidden="true">☀️</span>
         <span class="dark:hidden" aria-hidden="true">🌙</span>
@@ -113,27 +107,17 @@ const links = [
 </header>
 
 <!-- Mobile game command bar (replaces the desktop tabs on small screens) -->
-<nav
-  aria-label="Chapters"
-  class="md:hidden fixed bottom-3 inset-x-3 z-50 rpg-panel rounded-2xl px-2 py-1.5 flex items-stretch justify-around text-[11px] font-mono font-bold"
->
+<nav aria-label="Chapters" class="hud-dock md:hidden">
   {
     links.map((l) => (
-      <a
-        href={l.href}
-        class="flex flex-col items-center gap-0.5 px-3 py-1 rounded-xl text-[#23476e] dark:text-[#f3b354] active:bg-[#e9dfc4] dark:active:bg-[#1c2942]"
-      >
-        <span aria-hidden="true" class="text-base leading-none">{l.icon}</span>
+      <a href={l.href} class="hud-dock__item" data-nav-link={l.href.slice(1)}>
+        <span aria-hidden="true" class="hud-dock__icon">{l.icon}</span>
         {l.label}
       </a>
     ))
   }
-  <button
-    type="button"
-    data-open-journal
-    class="flex flex-col items-center gap-0.5 px-3 py-1 rounded-xl text-[#23476e] dark:text-[#f3b354] active:bg-[#e9dfc4] dark:active:bg-[#1c2942] cursor-pointer"
-  >
-    <span aria-hidden="true" class="text-base leading-none">🗺️</span>
+  <button type="button" data-open-journal class="hud-dock__item">
+    <span aria-hidden="true" class="hud-dock__icon">🗺️</span>
     Journal
   </button>
 </nav>

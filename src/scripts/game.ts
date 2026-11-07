@@ -132,7 +132,7 @@ function render() {
   document.querySelectorAll<HTMLElement>('[data-hud-level]').forEach((el) => (el.textContent = String(level)));
   document.querySelectorAll<HTMLElement>('[data-hud-xp]').forEach((el) => (el.textContent = `${inLevel}/${XP_PER_LEVEL}`));
   document.querySelectorAll<HTMLElement>('[data-hud-xp-bar]').forEach((el) => {
-    el.style.width = `${(inLevel / XP_PER_LEVEL) * 100}%`;
+    el.style.transform = `scaleX(${inLevel / XP_PER_LEVEL})`;
     el.closest('[role="progressbar"]')?.setAttribute('aria-valuenow', String(inLevel));
   });
   document.querySelectorAll<HTMLElement>('[data-hud-acorns]').forEach(
@@ -261,17 +261,37 @@ function openJournal() {
 
 function closeTitle() {
   const screen = document.querySelector<HTMLElement>('[data-title-screen]');
-  if (!screen || !document.documentElement.classList.contains('show-title')) return;
+  const root = document.documentElement;
+  if (!screen || !root.classList.contains('show-title') || screen.classList.contains('is-leaving')) return;
   write(TITLE_KEY, '1', 'session');
+  const reduced = prefersReducedMotion();
   screen.classList.add('is-leaving');
   window.setTimeout(
     () => {
-      document.documentElement.classList.remove('show-title');
+      root.classList.remove('show-title');
+      screen.classList.remove('is-leaving');
+      pageEnter();
       document.querySelector<HTMLElement>('#main')?.focus({ preventScroll: true });
     },
-    prefersReducedMotion() ? 0 : 450,
+    reduced ? 0 : 900,
   );
   completeQuest('begin');
+}
+
+/** The page underneath settles in (header slides down, hero rises). */
+function pageEnter() {
+  const root = document.documentElement;
+  root.classList.add('page-enter');
+  window.setTimeout(() => root.classList.remove('page-enter'), 1400);
+}
+
+/** Title menu: "Continue" with the saved level when there's progress. */
+function renderTitleMenu() {
+  const cta = document.querySelector<HTMLElement>('[data-title-cta]');
+  const fresh = document.querySelector<HTMLElement>('[data-title-fresh]');
+  const hasSave = state.xp > 0;
+  if (cta) cta.textContent = hasSave ? `Continue Journey · LV ${levelOf(state.xp)}` : 'Begin Journey';
+  if (fresh) fresh.hidden = !hasSave;
 }
 
 function resetProgress() {
@@ -426,6 +446,45 @@ function initTooltips() {
 }
 
 /* ------------------------------------------------------------------ */
+/* HUD: highlight the chapter in view, firm up the bar after scrolling */
+/* ------------------------------------------------------------------ */
+
+function initHud() {
+  const links = document.querySelectorAll<HTMLElement>('[data-nav-link]');
+  const setActive = (id: string) =>
+    links.forEach((a) => {
+      if (a.dataset.navLink === id) a.setAttribute('aria-current', 'location');
+      else a.removeAttribute('aria-current');
+    });
+  const spy = new IntersectionObserver(
+    (entries) => {
+      for (const e of entries) if (e.isIntersecting) setActive(e.target.id);
+    },
+    { rootMargin: '-45% 0px -50% 0px' },
+  );
+  ['about', 'experience', 'projects'].forEach((id) => {
+    const el = document.getElementById(id);
+    if (el) spy.observe(el);
+  });
+  setActive('about');
+
+  const hud = document.querySelector<HTMLElement>('[data-hud]');
+  let ticking = false;
+  window.addEventListener(
+    'scroll',
+    () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        hud?.classList.toggle('is-scrolled', window.scrollY > 12);
+        ticking = false;
+      });
+    },
+    { passive: true },
+  );
+}
+
+/* ------------------------------------------------------------------ */
 /* Wiring                                                              */
 /* ------------------------------------------------------------------ */
 
@@ -433,6 +492,7 @@ function init() {
   renderWeather();
   initGraphics();
   initTooltips();
+  initHud();
   render();
   initDialogue();
   document
@@ -460,6 +520,10 @@ function init() {
     if (gfxBtn) return setGraphics(gfxBtn.dataset.gfx as Gfx);
     if (t.closest('[data-open-journal]')) return openJournal();
     if (t.closest('[data-start-game]')) return closeTitle();
+    if (t.closest('[data-title-fresh]')) {
+      resetProgress();
+      return closeTitle();
+    }
     if (t.closest('[data-reset-game]')) return resetProgress();
 
     const dlg = t.closest<HTMLDialogElement>('[data-journal]');
@@ -547,7 +611,10 @@ function init() {
   });
 
   if (document.documentElement.classList.contains('show-title')) {
-    document.querySelector<HTMLElement>('[data-start-game]')?.focus();
+    renderTitleMenu();
+    document.querySelector<HTMLElement>('[data-start-game]')?.focus({ preventScroll: true });
+  } else {
+    pageEnter();
   }
 
   say(dialogue.greeting);
