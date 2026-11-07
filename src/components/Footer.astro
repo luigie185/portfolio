@@ -1,4 +1,5 @@
 ---
+import Icon from './Icon.astro';
 import { ACORN_IDS, XP_PER_LEVEL, profile, quests } from '../data/portfolio';
 import Acorn from './Acorn.astro';
 import ForestSpirit from './ForestSpirit.astro';
@@ -65,7 +66,7 @@ grass += ' L1440 60 Z';
         <p class="sr-only">{XP_PER_LEVEL} experience points per level.</p>
 
         <button type="button" data-open-journal class="signpost mt-4">
-          <span aria-hidden="true">🗺️</span> Open the journal
+          <Icon name="map" /> Open the journal
         </button>
       </section>
 
@@ -79,7 +80,7 @@ grass += ' L1440 60 Z';
         <ul class="mt-4 flex flex-wrap gap-2.5">
           <li>
             <a href={`mailto:${profile.email}`} data-quest="pigeon" class="signpost signpost--primary">
-              <span aria-hidden="true">🕊️</span> Email
+              <Icon name="bird" /> Email
             </a>
           </li>
           <li>
@@ -99,7 +100,7 @@ grass += ' L1440 60 Z';
       <div class="flex md:flex-col items-center gap-3 md:pt-2">
         <ForestSpirit standalone class="w-16 h-16 shrink-0" />
         <a href="#about" class="back-to-top" data-tip="Back to the top of the meadow">
-          <span aria-hidden="true">↑</span> Back to the meadow
+          <Icon name="arrowUp" /> Back to the meadow
         </a>
       </div>
     </div>

@@ -1,3 +1,5 @@
+import type { IconName } from '../scripts/icons';
+
 export interface ExperienceItem {
   questId: string;
   questRank: "S" | "A" | "B";
@@ -61,9 +63,9 @@ export const profile = {
     { name: "Speed & Optimization", stat: 96, icon: "feather", note: "Fast on every device" },
   ] as { name: string; stat: number; icon: "brush" | "gear" | "compass" | "feather"; note: string }[],
   highlights: [
-    { icon: "🛡️", label: "Role", value: "Full-Stack & Web Performance" },
-    { icon: "🔮", label: "Runes", value: "TypeScript, Astro, React, Node.js" },
-    { icon: "🌿", label: "Creed", value: "Minimalist, accessible, fast by default" },
+    { icon: "shield" as IconName, label: "Role", value: "Full-Stack & Web Performance" },
+    { icon: "gem" as IconName, label: "Runes", value: "TypeScript, Astro, React, Node.js" },
+    { icon: "leaf" as IconName, label: "Creed", value: "Minimalist, accessible, fast by default" },
   ],
 };
 
@@ -76,7 +78,7 @@ export interface Quest {
   title: string;
   hint: string;
   xp: number;
-  icon: string;
+  icon: IconName;
 }
 
 /** XP needed per traveler level. */
@@ -87,26 +89,26 @@ export const ACORN_IDS = ["hero", "dialogue", "quests", "relics", "footer"] as c
 
 /** Weather cycle order (R key / weather charm). */
 export const WEATHERS = [
-  { id: "clear", icon: "🌤️", label: "Clear skies" },
-  { id: "rain", icon: "🌧️", label: "Summer shower" },
-  { id: "storm", icon: "⛈️", label: "Thunderstorm" },
-  { id: "mist", icon: "🌫️", label: "Morning mist" },
-  { id: "snow", icon: "❄️", label: "Dreaming snow" },
-  { id: "breeze", icon: "🍃", label: "Big breeze" },
-] as const;
+  { id: "clear", icon: "clear", label: "Clear skies" },
+  { id: "rain", icon: "rain", label: "Summer shower" },
+  { id: "storm", icon: "storm", label: "Thunderstorm" },
+  { id: "mist", icon: "mist", label: "Morning mist" },
+  { id: "snow", icon: "snow", label: "Dreaming snow" },
+  { id: "breeze", icon: "wind", label: "Big breeze" },
+] as const satisfies readonly { id: string; icon: IconName; label: string }[];
 
 export const quests: Quest[] = [
-  { id: "begin", icon: "🌱", title: "Begin the Journey", hint: "Press start on the title screen.", xp: 20 },
-  { id: "greet", icon: "🍃", title: "Greet the Forest Spirit", hint: "Choose any dialogue option with Mori.", xp: 40 },
-  { id: "quest-log", icon: "📜", title: "Read the Quest Log", hint: "Travel to the Work Experience chapter.", xp: 60 },
-  { id: "relics", icon: "📖", title: "Enter the Relic Vault", hint: "Travel to the Projects chapter.", xp: 60 },
-  { id: "nightfall", icon: "🌙", title: "Cast Time-Shift", hint: "Switch between day and night.", xp: 40 },
-  { id: "pat", icon: "🌱", title: "Befriend Mori", hint: "Give the forest spirit a gentle pat.", xp: 30 },
-  { id: "weather", icon: "🌦️", title: "Change the Weather", hint: "Tap the weather charm or press R.", xp: 40 },
-  { id: "all-weather", icon: "🌈", title: "Weather Watcher", hint: "Witness all six kinds of weather.", xp: 80 },
-  { id: "journal", icon: "🗺️", title: "Open the Journal", hint: "Press J or tap the journal button.", xp: 20 },
-  { id: "acorns", icon: "🌰", title: "Acorn Gatherer", hint: `Find all ${ACORN_IDS.length} acorns hidden across the forest.`, xp: 150 },
-  { id: "pigeon", icon: "🕊️", title: "Send a Pigeon Post", hint: "Reach out through the email link.", xp: 80 },
+  { id: "begin", icon: "compass", title: "Begin the Journey", hint: "Press start on the title screen.", xp: 20 },
+  { id: "greet", icon: "leaf", title: "Greet the Forest Spirit", hint: "Choose any dialogue option with Mori.", xp: 40 },
+  { id: "quest-log", icon: "scroll", title: "Read the Quest Log", hint: "Travel to the Work Experience chapter.", xp: 60 },
+  { id: "relics", icon: "book", title: "Enter the Relic Vault", hint: "Travel to the Projects chapter.", xp: 60 },
+  { id: "nightfall", icon: "moon", title: "Cast Time-Shift", hint: "Switch between day and night.", xp: 40 },
+  { id: "pat", icon: "sprout", title: "Befriend Mori", hint: "Give the forest spirit a gentle pat.", xp: 30 },
+  { id: "weather", icon: "clear", title: "Change the Weather", hint: "Tap the weather charm or press R.", xp: 40 },
+  { id: "all-weather", icon: "rainbow", title: "Weather Watcher", hint: "Witness all six kinds of weather.", xp: 80 },
+  { id: "journal", icon: "map", title: "Open the Journal", hint: "Press J or tap the journal button.", xp: 20 },
+  { id: "acorns", icon: "acorn", title: "Acorn Gatherer", hint: `Find all ${ACORN_IDS.length} acorns hidden across the forest.`, xp: 150 },
+  { id: "pigeon", icon: "bird", title: "Send a Pigeon Post", hint: "Reach out through the email link.", xp: 80 },
 ];
 
 

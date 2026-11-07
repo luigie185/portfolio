@@ -4,13 +4,15 @@
  * device. It replaces the old top header + mobile dock:
  *   [traveler crest with XP ring] | chapter tabs | acorns · weather · day/night
  */
-import { ACORN_IDS, WEATHERS, XP_PER_LEVEL } from '../data/portfolio';
+import { ACORN_IDS, WEATHERS, XP_PER_LEVEL, profile } from '../data/portfolio';
+import Icon from './Icon.astro';
+import type { IconName } from '../scripts/icons';
 
 const links = [
-  { href: '#about', icon: '✦', label: 'Status' },
-  { href: '#experience', icon: '📜', label: 'Quests' },
-  { href: '#projects', icon: '📖', label: 'Relics' },
-];
+  { href: '#about', icon: 'sparkles', label: 'Status' },
+  { href: '#experience', icon: 'scroll', label: 'Quests' },
+  { href: '#projects', icon: 'book', label: 'Relics' },
+] satisfies { href: string; icon: IconName; label: string }[];
 const RING = 2 * Math.PI * 20; // XP ring circumference (r = 20)
 ---
 
@@ -20,9 +22,12 @@ const RING = 2 * Math.PI * 20; // XP ring circumference (r = 20)
     href="#about"
     class="hud-bubble__crest"
     data-hud-badge
-    data-hud-crest
-    data-tip={`Traveler LV 1 · 0/${XP_PER_LEVEL} XP`}
   >
+    <!-- name plate that rises above the crest on hover / keyboard focus -->
+    <span class="hud-nameplate" aria-hidden="true">
+      <span class="hud-nameplate__name">{profile.name}</span>
+      <span class="hud-nameplate__meta" data-hud-crest-meta>Traveler LV 1 · 0/{XP_PER_LEVEL} XP</span>
+    </span>
     <svg viewBox="0 0 48 48" aria-hidden="true">
       <circle cx="24" cy="24" r="20" class="hud-ring__track" />
       <circle
@@ -38,7 +43,7 @@ const RING = 2 * Math.PI * 20; // XP ring circumference (r = 20)
       <text x="24" y="32" text-anchor="middle" class="hud-ring__num" data-hud-level>1</text>
     </svg>
     <span class="sr-only">
-      Traveler level <span data-hud-level>1</span>, <span data-hud-xp>0/{XP_PER_LEVEL}</span> experience. Back to top.
+      {profile.name}. Traveler level <span data-hud-level>1</span>, <span data-hud-xp>0/{XP_PER_LEVEL}</span> experience. Back to top.
     </span>
   </a>
 
@@ -49,7 +54,7 @@ const RING = 2 * Math.PI * 20; // XP ring circumference (r = 20)
     {
       links.map((l) => (
         <a href={l.href} class="hud-bubble__tab" data-nav-link={l.href.slice(1)} data-tip={l.label}>
-          <span class="hud-bubble__icon" aria-hidden="true">{l.icon}</span>
+          <span class="hud-bubble__icon"><Icon name={l.icon} /></span>
           <span class="hud-bubble__label">{l.label}</span>
         </a>
       ))
@@ -66,7 +71,7 @@ const RING = 2 * Math.PI * 20; // XP ring circumference (r = 20)
     aria-label="Open quest journal (J)"
     class="hud-bubble__token hud-bubble__token--wide"
   >
-    <span aria-hidden="true">🌰</span>
+    <Icon name="acorn" />
     <span data-hud-acorns>0/{ACORN_IDS.length}</span>
   </button>
 
@@ -78,7 +83,7 @@ const RING = 2 * Math.PI * 20; // XP ring circumference (r = 20)
     data-tip="Weather: Clear skies · R to change"
     class="hud-bubble__token"
   >
-    <span data-hud-weather aria-hidden="true">{WEATHERS[0].icon}</span>
+    <span data-hud-weather class="inline-flex"><Icon name={WEATHERS[0].icon} /></span>
   </button>
 
   <button
@@ -90,7 +95,7 @@ const RING = 2 * Math.PI * 20; // XP ring circumference (r = 20)
     aria-pressed="false"
     class="hud-bubble__token"
   >
-    <span class="hidden dark:inline" aria-hidden="true">🌅</span>
-    <span class="dark:hidden" aria-hidden="true">🌙</span>
+    <span class="hidden dark:inline-flex"><Icon name="sunrise" /></span>
+    <span class="inline-flex dark:hidden"><Icon name="moon" /></span>
   </button>
 </nav>

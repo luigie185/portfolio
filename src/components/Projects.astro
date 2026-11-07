@@ -1,4 +1,5 @@
 ---
+import Icon from './Icon.astro';
 import { projects } from '../data/portfolio';
 import Acorn from './Acorn.astro';
 import ChapterHeading from './ChapterHeading.astro';
@@ -8,7 +9,8 @@ import RelicVignette from './RelicVignette.astro';
 <section data-section-quest="relics" id="projects" class="py-14 scroll-mt-20">
   <ChapterHeading
     chapter="Chapter III"
-    eyebrow="📖 The Relic Cabinet · Featured Projects"
+    icon="book"
+    eyebrow="The Relic Cabinet · Featured Projects"
     title="Things I've Made"
     badge={`RELICS FOUND: ${projects.length} / ${projects.length}`}
   />
@@ -28,7 +30,7 @@ import RelicVignette from './RelicVignette.astro';
             <span class="relic-number">{project.id}</span>
             <span class="relic-rarity" tabindex="0" data-tip={`Rarity ${project.rarity} of 5`} aria-label={`Rarity ${project.rarity} of 5`}>
               {Array.from({ length: 5 }, (_, s) => (
-                <span class={s < project.rarity ? 'is-on' : ''} aria-hidden="true">★</span>
+                <Icon name="star" class={s < project.rarity ? 'is-on' : ''} />
               ))}
             </span>
           </div>
@@ -50,7 +52,7 @@ import RelicVignette from './RelicVignette.astro';
               {project.stats.map((stat) => (
                 <div class="relic-stat">
                   <dt class="sr-only">Highlight</dt>
-                  <dd><span aria-hidden="true">✦</span> {stat}</dd>
+                  <dd><Icon name="sparkles" /> {stat}</dd>
                 </div>
               ))}
             </dl>

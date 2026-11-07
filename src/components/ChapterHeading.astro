@@ -1,12 +1,14 @@
 ---
+import Icon from './Icon.astro';
 // Storybook-style chapter title used at the top of each section.
 interface Props {
   chapter: string; // e.g. "Chapter II"
   eyebrow: string;
   title: string;
   badge?: string;
+  icon?: import('../scripts/icons').IconName;
 }
-const { chapter, eyebrow, title, badge } = Astro.props;
+const { chapter, eyebrow, title, badge, icon } = Astro.props;
 ---
 
 <div class="mb-10 space-y-3">
@@ -17,7 +19,8 @@ const { chapter, eyebrow, title, badge } = Astro.props;
   </div>
   <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-2">
     <div>
-      <p class="text-xs font-mono font-bold uppercase tracking-widest text-[#2e7050] dark:text-[#59c49d] mb-1">
+      <p class="inline-flex items-center gap-1.5 text-xs font-mono font-bold uppercase tracking-widest text-[#2e7050] dark:text-[#59c49d] mb-1">
+        {icon && <Icon name={icon} class="text-[0.95rem]" />}
         {eyebrow}
       </p>
       <h2 class="text-2xl sm:text-3xl font-bold tracking-tight text-[#252b27] dark:text-[#f5efe2]">

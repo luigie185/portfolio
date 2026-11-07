@@ -400,12 +400,8 @@ body::after {
   background: var(--accent-meadow);
   border-color: var(--accent-meadow);
 }
-.journal-quest.is-complete .journal-quest__check::after {
-  content: "✓";
-  color: #fff;
-  font-size: 0.75rem;
-  font-weight: 800;
-}
+.journal-quest__check .icon { width: 0.8rem; height: 0.8rem; color: #fff; stroke-width: 3.5; opacity: 0; }
+.journal-quest.is-complete .journal-quest__check .icon { opacity: 1; }
 .journal-quest.is-complete {
   border-color: color-mix(in srgb, var(--accent-meadow) 50%, transparent);
 }
@@ -1970,11 +1966,7 @@ kbd {
 }
 .forest-tip[hidden] { display: none; }
 .forest-tip.is-visible { opacity: 1; }
-.forest-tip::before {
-  content: "🍃";
-  margin-right: 0.35rem;
-  font-size: 0.7rem;
-}
+.forest-tip__icon { margin-right: 0.35rem; color: #5f9f4f; vertical-align: -0.15em; }
 .dark .forest-tip { color: #f5efe2; background: #172235; border-color: #d6a84f; box-shadow: 0 8px 18px -8px rgba(0, 0, 0, 0.7); }
 .forest-tip__arrow {
   position: absolute;
@@ -2650,3 +2642,103 @@ kbd {
 
 /* without a top header, chapters can sit near the top when jumped to */
 #about, #experience, #projects { scroll-margin-top: 1rem; }
+
+/* ===================================================================== */
+/* Icons (Lucide line icons, coloured by currentColor)                    */
+/* ===================================================================== */
+.icon {
+  display: inline-block;
+  flex-shrink: 0;
+  width: 1em;
+  height: 1em;
+  stroke-width: 2.1;
+  vertical-align: -0.14em;
+}
+.hud-bubble__icon .icon { width: 1.15rem; height: 1.15rem; }
+.hud-bubble__token .icon { width: 1.15rem; height: 1.15rem; }
+.hud-bubble__token [data-hud-weather] { color: #2e7050; }
+.dark .hud-bubble__token [data-hud-weather] { color: #8cc4f0; }
+.relic-rarity .icon { width: 13px; height: 13px; fill: rgba(255, 255, 255, 0.35); stroke: rgba(255, 255, 255, 0.6); stroke-width: 1.5; filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.35)); }
+.relic-rarity .icon.is-on { fill: #ffd76a; stroke: #b5762a; filter: drop-shadow(0 0 4px rgba(255, 215, 106, 0.8)); }
+.relic-rarity { display: inline-flex; gap: 1px; }
+.relic-stat .icon { color: #d4712a; }
+.perk-seal__icon .icon { width: 0.95rem; height: 0.95rem; color: #9a6a1f; }
+.dark .perk-seal__icon .icon { color: #f3b354; }
+.ledger__title .icon { width: 0.9em; height: 0.9em; color: #c59b47; vertical-align: -0.08em; }
+.game-toast__icon .icon { width: 1.25rem; height: 1.25rem; color: #7a4f12; stroke-width: 2.2; }
+.dark .game-toast__icon .icon { color: #f3b354; }
+.journal-quest__icon { color: #2e7050; }
+.dark .journal-quest__icon { color: #59c49d; }
+.dialogue-nameplate .icon,
+.dialogue-spell .icon,
+.ts-eyebrow .icon { width: 0.95em; height: 0.95em; }
+.ts-eyebrow .icon { color: #f2d895; }
+
+/* ===================================================================== */
+/* Crest name plate (hover / keyboard focus)                              */
+/* ===================================================================== */
+.hud-nameplate {
+  position: absolute;
+  left: -4px;
+  bottom: calc(100% + 14px);
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding: 0.5rem 0.85rem 0.55rem;
+  border-radius: 12px;
+  white-space: nowrap;
+  text-align: left;
+  pointer-events: none;
+  background:
+    var(--washi-fibres) padding-box,
+    linear-gradient(#fbf5e6, #fbf5e6) padding-box,
+    linear-gradient(145deg, #e8c77a, #b88d3b 40%, #f2d895 60%, #a8792c) border-box;
+  border: 2px solid transparent;
+  box-shadow: 0 12px 24px -12px rgba(40, 30, 10, 0.55);
+  opacity: 0;
+  transform: translate3d(0, 8px, 0) scale(0.96);
+  transform-origin: 26px 100%;
+  transition: opacity 0.18s ease, transform 0.25s cubic-bezier(0.3, 1.5, 0.5, 1);
+}
+.hud-nameplate::after {
+  /* little tail pointing down at the crest */
+  content: "";
+  position: absolute;
+  left: 22px;
+  bottom: -7px;
+  width: 12px;
+  height: 12px;
+  background: #fbf5e6;
+  border-right: 2px solid #b88d3b;
+  border-bottom: 2px solid #b88d3b;
+  transform: rotate(45deg);
+}
+.hud-nameplate__name {
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 0.98rem;
+  font-weight: 700;
+  color: #2a2620;
+}
+.hud-nameplate__meta {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.66rem;
+  font-weight: 700;
+  color: #2e7050;
+}
+.dark .hud-nameplate {
+  background:
+    linear-gradient(#172235, #172235) padding-box,
+    linear-gradient(145deg, #d6a84f, #6e5524 40%, #e8c77a 60%, #5a4420) border-box;
+}
+.dark .hud-nameplate::after { background: #172235; border-color: #8a6a2c; }
+.dark .hud-nameplate__name { color: #f5efe2; }
+.dark .hud-nameplate__meta { color: #59c49d; }
+.hud-bubble__crest:hover .hud-nameplate,
+.hud-bubble__crest:focus-visible .hud-nameplate {
+  opacity: 1;
+  transform: translate3d(0, 0, 0) scale(1);
+}
+/* keep the crest's own hover wiggle from tilting the label */
+.hud-bubble__crest:hover { transform: none; }
+.hud-bubble__crest:hover svg { transform: rotate(-8deg) scale(1.06); }
+.hud-bubble__crest svg { transition: transform 0.25s cubic-bezier(0.3, 1.6, 0.5, 1); }

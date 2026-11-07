@@ -1,6 +1,7 @@
 import { ACORN_IDS, WEATHERS, XP_PER_LEVEL, dialogue, quests } from '../data/portfolio';
 import { initDialogue, say } from './dialogue';
 import { read, write, prefersReducedMotion } from './storage';
+import { icon, type IconName } from './icons';
 
 /* ------------------------------------------------------------------ */
 /* State                                                               */
@@ -42,13 +43,13 @@ const levelOf = (xp: number) => Math.floor(xp / XP_PER_LEVEL) + 1;
 /* Toasts                                                              */
 /* ------------------------------------------------------------------ */
 
-function toast(icon: string, title: string, body: string) {
+function toast(iconName: IconName, title: string, body: string) {
   const region = document.querySelector('[data-toast-region]');
   if (!region) return;
   const el = document.createElement('div');
   el.className = 'game-toast';
   el.innerHTML = `<span class="game-toast__icon" aria-hidden="true"></span><div><p class="game-toast__title"></p><p class="game-toast__body"></p></div><span class="game-toast__timer" aria-hidden="true"></span>`;
-  el.querySelector('.game-toast__icon')!.textContent = icon;
+  el.querySelector('.game-toast__icon')!.innerHTML = icon(iconName);
   el.querySelector('.game-toast__title')!.textContent = title;
   el.querySelector('.game-toast__body')!.textContent = body;
   region.appendChild(el);
@@ -94,7 +95,7 @@ function currentWeather() {
 
 function renderWeather() {
   const w = WEATHERS.find((x) => x.id === currentWeather()) ?? WEATHERS[0];
-  document.querySelectorAll<HTMLElement>('[data-hud-weather]').forEach((el) => (el.textContent = w.icon));
+  document.querySelectorAll<HTMLElement>('[data-hud-weather]').forEach((el) => (el.innerHTML = icon(w.icon)));
   document.querySelectorAll<HTMLElement>('[data-weather-cycle]').forEach((b) => {
     if (b.hasAttribute('data-hud-weather-btn')) {
       b.setAttribute('aria-label', `Change the weather (R). Now: ${w.label}`);
@@ -135,8 +136,8 @@ function render() {
     const len = 2 * Math.PI * 20;
     ring.style.strokeDashoffset = String(len * (1 - inLevel / XP_PER_LEVEL));
   });
-  document.querySelectorAll<HTMLElement>('[data-hud-crest]').forEach((el) => {
-    el.dataset.tip = `Traveler LV ${level} · ${inLevel}/${XP_PER_LEVEL} XP`;
+  document.querySelectorAll<HTMLElement>('[data-hud-crest-meta]').forEach((el) => {
+    el.textContent = `Traveler LV ${level} · ${inLevel}/${XP_PER_LEVEL} XP`;
   });
   document.querySelectorAll<HTMLElement>('[data-hud-xp-bar]').forEach((el) => {
     el.style.transform = `scaleX(${inLevel / XP_PER_LEVEL})`;
@@ -176,7 +177,7 @@ export function completeQuest(id: string) {
   moriReact();
   const after = levelOf(state.xp);
   if (after > before) {
-    window.setTimeout(() => toast('⭐', `Level up! Traveler LV.${after}`, 'The forest spirits cheer for you.'), 700);
+    window.setTimeout(() => toast('star', `Level up! Traveler LV.${after}`, 'The forest spirits cheer for you.'), 700);
     document.querySelectorAll('[data-hud-badge]').forEach((el) => {
       el.classList.remove('is-levelup');
       void (el as HTMLElement).offsetWidth;
@@ -184,7 +185,7 @@ export function completeQuest(id: string) {
     });
   }
   if (state.quests.length === quests.length) {
-    window.setTimeout(() => toast('🏆', 'All quests complete!', 'You are now a true Friend of the Forest.'), 1400);
+    window.setTimeout(() => toast('trophy', 'All quests complete!', 'You are now a true Friend of the Forest.'), 1400);
   }
 }
 
@@ -204,7 +205,7 @@ function collectAcorn(id: string, from: HTMLElement) {
 
   const left = ACORN_IDS.length - state.acorns.length;
   moriReact();
-  toast('🌰', 'Acorn found! +10 XP', left > 0 ? `${left} more hidden in the forest.` : 'That was the last one!');
+  toast('acorn', 'Acorn found! +10 XP', left > 0 ? `${left} more hidden in the forest.` : 'That was the last one!');
   if (left === 0) {
     completeQuest('acorns');
     say(dialogue.acornsComplete);
@@ -254,8 +255,8 @@ export function toggleTheme(origin?: { x: number; y: number }) {
   moriReact();
   say(
     dark
-      ? '✨ Spell cast: Nightfall! Mori lights a little lantern, and fireflies rise from the rice fields.'
-      : '☀️ Spell cast: Dawnbreak! Warm sunlight spills back over the summer meadow.',
+      ? 'Spell cast: Nightfall! Mori lights a little lantern, and fireflies rise from the rice fields.'
+      : 'Spell cast: Dawnbreak! Warm sunlight spills back over the summer meadow.',
   );
 }
 
@@ -308,7 +309,7 @@ function resetProgress() {
   state.weathers = [];
   save();
   render();
-  toast('🍂', 'Journey reset', 'Your acorns have returned to the forest.');
+  toast('leaf', 'Journey reset', 'Your acorns have returned to the forest.');
 }
 
 /* ------------------------------------------------------------------ */
@@ -336,7 +337,7 @@ function setGraphics(choice: Gfx) {
     root.classList.toggle('lite', choice === 'lite');
   }
   renderGraphics();
-  toast('🎨', `Graphics: ${choice === 'auto' ? 'Auto' : choice === 'full' ? 'Full' : 'Lite'}`, choice === 'lite' ? 'Calmer animations, smoother scrolling.' : 'Enjoy the full painting.');
+  toast('palette', `Graphics: ${choice === 'auto' ? 'Auto' : choice === 'full' ? 'Full' : 'Lite'}`, choice === 'lite' ? 'Calmer animations, smoother scrolling.' : 'Enjoy the full painting.');
 }
 
 /**
@@ -357,7 +358,7 @@ function probeFrameRate() {
     const p75 = sorted[Math.floor(sorted.length * 0.75)];
     if (p75 > 26) {
       root.classList.add('lite');
-      toast('🍃', 'Switched to lite graphics', 'Your device prefers a calmer forest. Change it in the journal.');
+      toast('leaf', 'Switched to lite graphics', 'Your device prefers a calmer forest. Change it in the journal.');
     }
   };
   window.setTimeout(() => requestAnimationFrame(step), 2500);

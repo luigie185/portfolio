@@ -1,4 +1,5 @@
 ---
+import Icon from './Icon.astro';
 import { dialogue, profile } from '../data/portfolio';
 import Acorn from './Acorn.astro';
 import ForestSpirit from './ForestSpirit.astro';
@@ -72,7 +73,7 @@ import ForestSpirit from './ForestSpirit.astro';
           </div>
 
           <div class="min-w-0">
-            <p class="hero-class"><span aria-hidden="true">⚔️</span> {profile.rpgClass}</p>
+            <p class="hero-class"><Icon name="swords" /> {profile.rpgClass}</p>
             <p class="mt-1 text-sm font-semibold text-[#2e7050] dark:text-[#59c49d]">
               {profile.role} · {profile.location}
             </p>
@@ -99,7 +100,7 @@ import ForestSpirit from './ForestSpirit.astro';
             See my work <span aria-hidden="true">→</span>
           </a>
           <a href={`mailto:${profile.email}`} data-quest="pigeon" class="signpost signpost--lg">
-            <span aria-hidden="true">🕊️</span> Say hello
+            <Icon name="bird" /> Say hello
           </a>
           <a
             href={profile.socials.github}
@@ -120,7 +121,7 @@ import ForestSpirit from './ForestSpirit.astro';
       <div class="lg:col-span-5">
         <div class="ledger">
           <div class="ledger__head">
-            <span class="ledger__title">✦ Spirit Ledger</span>
+            <span class="ledger__title"><Icon name="sparkles" /> Spirit Ledger</span>
             <span class="ledger__sub">Skill levels</span>
           </div>
 
@@ -162,7 +163,7 @@ import ForestSpirit from './ForestSpirit.astro';
             {
               profile.highlights.map((item) => (
                 <li class="perk-seal">
-                  <span class="perk-seal__icon" aria-hidden="true">{item.icon}</span>
+                  <span class="perk-seal__icon"><Icon name={item.icon} /></span>
                   <span class="perk-seal__label">{item.label}</span>
                   <span class="perk-seal__value">{item.value}</span>
                 </li>
@@ -180,7 +181,7 @@ import ForestSpirit from './ForestSpirit.astro';
 
     <!-- name plate tab -->
     <div class="dialogue-nameplate">
-      <span aria-hidden="true">🍃</span> {dialogue.speaker}
+      <Icon name="leaf" /> {dialogue.speaker}
     </div>
 
     <div class="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6">
@@ -223,10 +224,10 @@ import ForestSpirit from './ForestSpirit.astro';
             <p class="dialogue-group-label">Cast a spell</p>
             <div class="flex flex-wrap gap-2" role="group" aria-label="Spells">
               <button type="button" data-theme-toggle aria-pressed="false" data-tip="Switch day and night · N" class="npc-choice dialogue-spell">
-                <span aria-hidden="true">✨</span><span>Time-Shift</span>
+                <Icon name="wand" /><span>Time-Shift</span>
               </button>
               <button type="button" data-weather-cycle data-tip="Change the weather · R" class="npc-choice dialogue-spell">
-                <span aria-hidden="true">🌦️</span><span>Weather</span>
+                <Icon name="clear" /><span>Weather</span>
               </button>
             </div>
           </div>

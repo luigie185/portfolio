@@ -1,4 +1,5 @@
 ---
+import Icon from './Icon.astro';
 /**
  * Game "press start" screen: a hand-painted moonlit countryside that builds
  * itself up layer by layer (intro animation), then "dives in" to the page.
@@ -166,7 +167,7 @@ const titleWords = `${profile.shortName}'s Forest Sanctuary`.split(' ');
   <div class="ts-content">
     <div class="ts-plate">
       <p class="ts-eyebrow">
-        <span aria-hidden="true">✦</span> A Forest Portfolio Adventure <span aria-hidden="true">✦</span>
+        <Icon name="sparkles" /> A Forest Portfolio Adventure <Icon name="sparkles" />
       </p>
       <h1 id="title-screen-heading" class="ts-title">
         {titleWords.map((w, i) => (
