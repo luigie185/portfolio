@@ -2768,29 +2768,6 @@ kbd {
   100% { box-shadow: 0 2px 0 #a8792c, 0 0 0 14px rgba(104, 168, 232, 0); transform: scale(1); }
 }
 
-/* ===================================================================== */
-/* Day ↔ night spell sweep (live, never freezes the scene)                */
-/* ===================================================================== */
-.theme-sweep {
-  position: fixed;
-  z-index: 95;
-  width: 120px;
-  height: 120px;
-  border-radius: 9999px;
-  pointer-events: none;
-  transform: scale(0);
-  will-change: transform, opacity;
-  animation: theme-sweep-grow 0.6s cubic-bezier(0.55, 0, 0.35, 1) forwards;
-}
-.theme-sweep--night {
-  background: radial-gradient(circle, #0d1f3d 0 58%, #173556 66%, rgba(214, 168, 79, 0.9) 69%, rgba(214, 168, 79, 0) 72%);
-}
-.theme-sweep--day {
-  background: radial-gradient(circle, #cdeef8 0 50%, #fff3cf 62%, rgba(255, 236, 170, 0.95) 68%, rgba(255, 236, 170, 0) 72%);
-}
-.theme-sweep.is-fading { animation: theme-sweep-fade 0.6s ease-out forwards; transform: scale(var(--sweep-scale)); }
-@keyframes theme-sweep-grow { to { transform: scale(var(--sweep-scale)); } }
-@keyframes theme-sweep-fade { to { opacity: 0; transform: scale(calc(var(--sweep-scale) * 1.08)); } }
 
 /* ===================================================================== */
 /* Sound controls                                                         */
@@ -2825,3 +2802,115 @@ kbd {
 .dark .volume-row { color: #8fa3bf; }
 .volume-row input[type="range"] { width: 100%; accent-color: #5f9f4f; cursor: pointer; }
 .sound-muted .volume-row { opacity: 0.5; }
+
+/* Journal settings heading (target of the bubble's gear button) */
+.journal-settings-title {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding-top: 0.9rem;
+  margin-top: 0.4rem;
+  border-top: 1px dashed #d9c49a;
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #23476e;
+  scroll-margin-top: 1rem;
+  outline: none;
+}
+.dark .journal-settings-title { color: #f3b354; border-color: #2e4063; }
+.hud-bubble__token--settings .icon { transition: transform 0.5s cubic-bezier(0.3, 1.4, 0.5, 1); }
+.hud-bubble__token--settings:hover .icon { transform: rotate(60deg); }
+
+/* keep the bubble on one line on narrow phones now that it has 5 tokens */
+@media (max-width: 420px) {
+  .hud-bubble { gap: 0.15rem; padding: 0.3rem; }
+  .hud-bubble__sep { margin: 0; }
+  .hud-bubble__tab { padding: 0 0.45rem; height: 2.3rem; }
+  .hud-bubble__token { min-width: 2.2rem; height: 2.2rem; padding: 0 0.35rem; }
+  .hud-bubble__token--wide { padding: 0 0.5rem; }
+  .hud-bubble__crest { width: 40px; height: 40px; }
+}
+@media (max-width: 370px) {
+  .hud-bubble__token--wide [data-hud-acorns] { display: none; }
+  .hud-bubble__tab { padding: 0 0.38rem; }
+}
+
+/* ===================================================================== */
+/* Day ↔ night time-lapse                                                 */
+/* A short (26vh) gradient strip is stretched 10x with scaleY so the GPU   */
+/* texture stays tiny; only transform/opacity animate.                     */
+/* ===================================================================== */
+.time-band {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  z-index: 95;
+  height: 26vh;
+  pointer-events: none;
+  transform-origin: 50% 0;
+  will-change: transform, opacity;
+}
+/* Nightfall: band falls from above — trailing fade, indigo body with a few
+   early stars, rose-orange leading edge at the bottom */
+.time-band--night {
+  background:
+    radial-gradient(1px 0.1px at 20% 52%, rgba(255, 255, 255, 0.9), transparent),
+    radial-gradient(1px 0.1px at 62% 45%, rgba(255, 255, 255, 0.8), transparent),
+    radial-gradient(1px 0.1px at 82% 58%, rgba(255, 255, 255, 0.85), transparent),
+    linear-gradient(180deg,
+      rgba(11, 22, 44, 0) 0%,
+      rgba(11, 22, 44, 0.75) 12%,
+      #0d1f3d 22%,
+      #13284a 62%,
+      #3b3366 72%,
+      #a4547a 78%,
+      #f0946a 83%,
+      rgba(246, 177, 112, 0.6) 88%,
+      rgba(246, 177, 112, 0) 95%);
+  animation: band-fall 0.72s cubic-bezier(0.55, 0.05, 0.4, 1) forwards;
+}
+/* Dawn: band rises from the horizon — golden leading edge on top */
+.time-band--day {
+  background: linear-gradient(0deg,
+    rgba(255, 238, 200, 0) 0%,
+    rgba(255, 238, 200, 0.75) 12%,
+    #fff3d6 22%,
+    #fde3b4 55%,
+    #fbcf8c 68%,
+    #f7b26e 76%,
+    rgba(255, 214, 150, 0.7) 84%,
+    rgba(255, 236, 190, 0) 95%);
+  animation: band-rise 0.72s cubic-bezier(0.55, 0.05, 0.4, 1) forwards;
+}
+/* covering position: the opaque body (22%–62% of 260vh ≈ 104vh) spans the
+   viewport when translated to -57vh */
+@keyframes band-fall {
+  from { transform: translate3d(0, -260vh, 0) scaleY(10); }
+  to { transform: translate3d(0, -57vh, 0) scaleY(10); }
+}
+@keyframes band-rise {
+  from { transform: translate3d(0, 100vh, 0) scaleY(10); }
+  to { transform: translate3d(0, -70vh, 0) scaleY(10); }
+}
+.time-band--night.is-leaving { animation: band-fall-out 0.8s cubic-bezier(0.3, 0, 0.3, 1) forwards; }
+.time-band--day.is-leaving { animation: band-rise-out 0.8s cubic-bezier(0.3, 0, 0.3, 1) forwards; }
+@keyframes band-fall-out {
+  from { transform: translate3d(0, -57vh, 0) scaleY(10); opacity: 1; }
+  to { transform: translate3d(0, 40vh, 0) scaleY(10); opacity: 0; }
+}
+@keyframes band-rise-out {
+  from { transform: translate3d(0, -70vh, 0) scaleY(10); opacity: 1; }
+  to { transform: translate3d(0, -230vh, 0) scaleY(10); opacity: 0; }
+}
+
+/* the sun / moon sets before the flip and rises after it */
+.time-to-night .scene-sun,
+.time-to-day .scene-sun { animation: celestial-set 0.72s cubic-bezier(0.5, 0, 0.75, 0.5) forwards; }
+.time-enter-night .scene-sun,
+.time-enter-day .scene-sun { animation: celestial-rise 1.4s cubic-bezier(0.2, 0.7, 0.3, 1) both; }
+@keyframes celestial-set { to { transform: translate3d(0, 55vh, 0); opacity: 0; } }
+@keyframes celestial-rise { from { transform: translate3d(0, 40vh, 0); opacity: 0; } }
+.time-enter-night .night-stars { animation: stars-in 1.6s ease-out both, twinkle 5s 1.6s ease-in-out infinite alternate; }
+@keyframes stars-in { from { opacity: 0; } }

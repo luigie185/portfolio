@@ -19,8 +19,8 @@ type Bed = 'rain' | 'wind' | 'rumble' | 'hush';
 
 const BED_LEVELS: Record<Weather, Record<Bed, number>> = {
   clear: { rain: 0, wind: 0.3, rumble: 0, hush: 0 },
-  rain: { rain: 0.2, wind: 0.12, rumble: 0, hush: 0 },
-  storm: { rain: 0.32, wind: 0.4, rumble: 0.3, hush: 0 },
+  rain: { rain: 0.09, wind: 0.1, rumble: 0, hush: 0 },
+  storm: { rain: 0.16, wind: 0.35, rumble: 0.28, hush: 0 },
   mist: { rain: 0, wind: 0.1, rumble: 0, hush: 0.35 },
   snow: { rain: 0, wind: 0.2, rumble: 0, hush: 0.4 },
   breeze: { rain: 0, wind: 1.1, rumble: 0, hush: 0 },
@@ -40,12 +40,13 @@ const CHORDS: number[][] = [
 ];
 // F major pentatonic (F G A C D) over two octaves for the melody
 const SCALE = [65, 67, 69, 72, 74, 77, 79, 81, 84];
+// Sparse, unhurried rhythms (beats within a bar) — lots of space between notes
 const RHYTHMS: number[][] = [
-  [0, 1, 2, 3],
-  [0, 1.5, 2, 3],
-  [0, 0.5, 1, 2.5],
-  [0, 2, 3, 3.5],
-  [0, 1, 1.5, 3],
+  [0, 2],
+  [0, 3],
+  [0, 1.5, 3],
+  [1, 3],
+  [0],
   [0, 2.5],
 ];
 
@@ -152,9 +153,9 @@ class ForestAudio {
     this.master.connect(comp).connect(ctx.destination);
 
     this.reverb = ctx.createConvolver();
-    this.reverb.buffer = this.impulse(3.2, 2.6);
+    this.reverb.buffer = this.impulse(4, 2.4);
     this.reverbSend = ctx.createGain();
-    this.reverbSend.gain.value = 0.55;
+    this.reverbSend.gain.value = 0.7;
     this.reverbSend.connect(this.reverb).connect(this.master);
 
     this.musicBus = ctx.createGain();
@@ -279,7 +280,7 @@ class ForestAudio {
   // ------------------------------------------------------------------ music
 
   private get beatLen() {
-    return 60 / (this.night ? 62 : 72);
+    return 60 / (this.night ? 50 : 58);
   }
 
   private scheduleMusic() {
@@ -305,13 +306,14 @@ class ForestAudio {
       // compose a fresh 2-bar motif every 4 bars; repeat it with variation in between
       if (bar % 4 === 0 || this.motif.length === 0) this.composeMotif(chord);
       const varied = bar % 4 === 2;
-      const density = this.night ? 0.65 : 1;
+      const density = this.night ? 0.45 : 0.7;
+      if (bar % 4 === 3) return; // a resting bar every phrase — room to breathe
       for (const n of this.motif) {
         if (n.t >= 4) continue;
         if (Math.random() > density) continue;
         const deg = Math.min(SCALE.length - 1, Math.max(0, n.deg + (varied ? pick([-1, 0, 0, 1]) : 0)));
         const note = SCALE[deg] - (this.night ? 12 : 0);
-        this.bell(note, t + n.t * this.beatLen, this.night ? 0.07 : 0.09);
+        this.bell(note, t + n.t * this.beatLen, this.night ? 0.04 : 0.05, this.musicBus, 3.2);
       }
     }
   }
@@ -321,7 +323,7 @@ class ForestAudio {
     const rhythm = pick(RHYTHMS);
     const chordPcs = chord.map((n) => n % 12);
     this.motif = rhythm.map((t, i) => {
-      let step = pick([-2, -1, -1, 0, 1, 1, 2]);
+      let step = pick([-1, -1, 0, 0, 1, 1]); // small steps only: a gentle, singable line
       if (i === 0) {
         // start on a chord tone near the current position
         const options = SCALE.map((n, d) => ({ d, ok: chordPcs.includes(n % 12) })).filter((o) => o.ok);
@@ -337,12 +339,12 @@ class ForestAudio {
     const ctx = this.ctx!;
     const lp = ctx.createBiquadFilter();
     lp.type = 'lowpass';
-    lp.frequency.value = this.night ? 900 : 1400;
+    lp.frequency.value = this.night ? 650 : 950;
     const g = ctx.createGain();
     g.gain.setValueAtTime(0, t);
-    g.gain.linearRampToValueAtTime(0.05, t + 1.2);
-    g.gain.setValueAtTime(0.05, t + dur - 0.8);
-    g.gain.linearRampToValueAtTime(0, t + dur + 1.2);
+    g.gain.linearRampToValueAtTime(0.04, t + 2.4);
+    g.gain.setValueAtTime(0.04, t + dur - 1.2);
+    g.gain.linearRampToValueAtTime(0, t + dur + 2.2);
     lp.connect(g).connect(this.musicBus);
     for (const n of chord) {
       for (const detune of [-7, 7]) {
@@ -352,7 +354,7 @@ class ForestAudio {
         o.detune.value = detune;
         o.connect(lp);
         o.start(t);
-        o.stop(t + dur + 1.3);
+        o.stop(t + dur + 2.3);
       }
     }
   }
@@ -364,7 +366,7 @@ class ForestAudio {
     o.frequency.value = midiHz(n);
     const g = ctx.createGain();
     g.gain.setValueAtTime(0, t);
-    g.gain.linearRampToValueAtTime(0.12, t + 0.08);
+    g.gain.linearRampToValueAtTime(0.07, t + 0.4);
     g.gain.exponentialRampToValueAtTime(0.001, t + dur);
     o.connect(g).connect(this.musicBus);
     o.start(t);
@@ -376,13 +378,13 @@ class ForestAudio {
     const ctx = this.ctx!;
     const g = ctx.createGain();
     g.gain.setValueAtTime(0, t);
-    g.gain.linearRampToValueAtTime(vol, t + 0.008);
+    g.gain.linearRampToValueAtTime(vol, t + 0.02);
     g.gain.exponentialRampToValueAtTime(0.0008, t + ring);
     const pan = ctx.createStereoPanner();
     pan.pan.value = rand(-0.35, 0.35);
     g.connect(pan).connect(dest);
     if (dest !== this.musicBus) pan.connect(this.reverbSend);
-    for (const [mult, amp] of [[1, 1], [2, 0.25], [3, 0.08]] as const) {
+    for (const [mult, amp] of [[1, 1], [2, 0.12]] as const) {
       const o = ctx.createOscillator();
       o.type = 'sine';
       o.frequency.value = midiHz(n) * mult;
@@ -403,7 +405,7 @@ class ForestAudio {
     const w = this.weather;
 
     if (w === 'rain' || w === 'storm') {
-      const drops = w === 'storm' ? 7 : 4;
+      const drops = w === 'storm' ? 4 : 2;
       for (let i = 0; i < drops; i++) this.droplet(now + Math.random() * 0.2);
     }
     if (w === 'storm' && now >= this.nextThunder) {
@@ -427,7 +429,7 @@ class ForestAudio {
     bp.frequency.value = rand(1800, 5200);
     bp.Q.value = 6;
     const g = ctx.createGain();
-    g.gain.setValueAtTime(rand(0.04, 0.12), t);
+    g.gain.setValueAtTime(rand(0.015, 0.05), t);
     g.gain.exponentialRampToValueAtTime(0.0005, t + 0.03);
     const pan = ctx.createStereoPanner();
     pan.pan.value = rand(-0.8, 0.8);

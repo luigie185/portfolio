@@ -277,45 +277,48 @@ function applyTheme(dark: boolean) {
 }
 
 /**
- * Day ↔ night "spell sweep": a soft circle of the new sky grows from where the
- * spell was cast (GPU transform/opacity only), the theme flips underneath it in
- * a single repaint, then the circle fades away. Unlike a View Transition, the
- * page is never frozen into a snapshot, so the scenery keeps moving throughout.
+ * Day ↔ night as a little time-lapse:
+ *  - Nightfall: the sun sinks behind the hills while a band of evening sky
+ *    (rose-orange edge, deep indigo body) drifts down over the world; the theme
+ *    flips underneath it in one repaint; the moon rises and the stars fade in.
+ *  - Dawn: the moon sinks, a band of golden morning light rises from the
+ *    horizon, and the sun climbs back up.
+ * GPU transform/opacity only, and nothing is frozen into a snapshot, so the
+ * scenery keeps moving throughout. Reduced motion → instant switch.
  */
-let sweeping = false;
-function setTheme(dark: boolean, origin?: { x: number; y: number }) {
+let shifting = false;
+function setTheme(dark: boolean, _origin?: { x: number; y: number }) {
   const root = document.documentElement;
-  if (prefersReducedMotion() || sweeping) {
+  if (prefersReducedMotion() || shifting) {
     applyTheme(dark);
     return;
   }
-  sweeping = true;
-  const x = origin?.x ?? window.innerWidth / 2;
-  const y = origin?.y ?? window.innerHeight - 40;
-  const r = Math.hypot(Math.max(x, window.innerWidth - x), Math.max(y, window.innerHeight - y));
-  const BASE = 120; // small element scaled up → tiny GPU texture
-  const sweep = document.createElement('div');
-  sweep.className = `theme-sweep ${dark ? 'theme-sweep--night' : 'theme-sweep--day'}`;
-  sweep.style.left = `${x - BASE / 2}px`;
-  sweep.style.top = `${y - BASE / 2}px`;
-  sweep.style.setProperty('--sweep-scale', String(((r * 2) / BASE) * 1.15));
-  document.body.appendChild(sweep);
+  shifting = true;
+  const dir = dark ? 'night' : 'day';
+  const band = document.createElement('div');
+  band.className = `time-band time-band--${dir}`;
+  band.setAttribute('aria-hidden', 'true');
+  document.body.appendChild(band);
+  root.classList.add(`time-to-${dir}`); // sun/moon sets
 
   window.setTimeout(() => {
-    // fully covered: flip the theme in one repaint (no colour transitions)
+    // the band covers the screen: flip the theme in a single repaint
     root.classList.add('theme-switching');
     applyTheme(dark);
+    root.classList.remove(`time-to-${dir}`);
+    root.classList.add(`time-enter-${dir}`); // moon/sun rises, stars fade in
     requestAnimationFrame(() =>
       requestAnimationFrame(() => {
         root.classList.remove('theme-switching');
-        sweep.classList.add('is-fading');
-        window.setTimeout(() => {
-          sweep.remove();
-          sweeping = false;
-        }, 650);
+        band.classList.add('is-leaving');
       }),
     );
-  }, 560);
+    window.setTimeout(() => {
+      band.remove();
+      root.classList.remove(`time-enter-${dir}`);
+      shifting = false;
+    }, 1500);
+  }, 720);
 }
 
 export function toggleTheme(origin?: { x: number; y: number }) {
@@ -330,11 +333,20 @@ export function toggleTheme(origin?: { x: number; y: number }) {
   );
 }
 
-function openJournal() {
+function openJournal(section?: string) {
   const dlg = document.querySelector<HTMLDialogElement>('[data-journal]');
-  if (!dlg || dlg.open) return;
-  dlg.showModal();
+  if (!dlg) return;
+  if (!dlg.open) dlg.showModal();
   completeQuest('journal');
+  if (section === 'settings') {
+    const heading = dlg.querySelector<HTMLElement>('[data-journal-settings]');
+    requestAnimationFrame(() => {
+      heading?.scrollIntoView({ block: 'start', behavior: prefersReducedMotion() ? 'auto' : 'smooth' });
+      heading?.focus({ preventScroll: true });
+    });
+  } else {
+    dlg.scrollTop = 0;
+  }
 }
 
 function closeTitle() {
@@ -652,7 +664,8 @@ function init() {
     if (t.closest('[data-sound-toggle]')) return toggleSound();
     const gfxBtn = t.closest<HTMLElement>('[data-gfx]');
     if (gfxBtn) return setGraphics(gfxBtn.dataset.gfx as Gfx);
-    if (t.closest('[data-open-journal]')) return openJournal();
+    const journalBtn = t.closest<HTMLElement>('[data-open-journal]');
+    if (journalBtn) return openJournal(journalBtn.dataset.openJournal || undefined);
     if (t.closest('[data-start-game]')) return closeTitle();
     if (t.closest('[data-title-fresh]')) {
       resetProgress();
