@@ -120,6 +120,7 @@ const poles = [
         <div class="paint-inner">
       <!-- Sky: deep summer cerulean fading to a pale, hazy horizon -->
       <div class="scene-sky absolute inset-0"></div>
+    <div class="horizon-glow absolute inset-0"></div>
       <div class="scene-sun absolute"></div>
       {mode === 'night' && <div class="night-stars absolute inset-0"></div>}
 
@@ -358,6 +359,9 @@ const poles = [
       </div>
     );
   })}
+
+  <!-- golden-hour light that falls over the fields at sunset / sunrise -->
+  <div class="sun-tint absolute inset-0"></div>
 
   <!-- Living things & light (no filters; small animations only repaint this layer) -->
   <svg class="scene-actors absolute bottom-0 left-0 w-full h-full" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMax slice">

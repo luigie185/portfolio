@@ -277,96 +277,29 @@ function applyTheme(dark: boolean) {
 }
 
 /**
- * Day ↔ night: a circle of the new sky grows from the HUD bubble — live.
- * Both paintings are always rendered; each sits in a circular frame centred on
- * the bubble (see .has-reveal-frame). The reveal scales the incoming frame up
- * from a dot while counter-scaling the painting inside by exactly the inverse,
- * so the edge sweeps outward entirely on the GPU: no screenshot, no repaint,
- * and the scenery keeps moving on both sides of the edge.
- * The cards can't be in two themes at once, so they dip out for a moment and
- * return already in the new colours. Reduced motion → instant switch.
+ * Day ↔ night as a real sunset / sunrise (see "Sunset & sunrise" in global.css).
+ * The theme flips while the sky is already darkening (or brightening) and the
+ * cards are briefly dipped, so no colour ever snaps. Reduced motion → instant.
  */
-function layoutRevealFrame() {
-  const root = document.documentElement;
-  const w = window.innerWidth;
-  const h = window.innerHeight;
-  const bubble = document.querySelector('.hud-bubble')?.getBoundingClientRect();
-  const x = bubble ? bubble.left + bubble.width / 2 : w / 2;
-  const y = bubble ? bubble.top + bubble.height / 2 : h - 40;
-  const r = Math.ceil(Math.hypot(Math.max(x, w - x), Math.max(y, h - y)) + 2);
-  const scene = document.querySelector<HTMLElement>('.scene');
-  if (!scene) return;
-  scene.style.setProperty('--rc-x', `${x}px`);
-  scene.style.setProperty('--rc-y', `${y}px`);
-  scene.style.setProperty('--rc-r', `${r}px`);
-  scene.style.setProperty('--vp-w', `${w}px`);
-  scene.style.setProperty('--vp-h', `${h}px`);
-  root.classList.add('has-reveal-frame');
-}
-
-/** Keyframes for scale s(t) on the frame and exactly 1/s(t) on the painting. */
-function revealKeyframes(steps = 24) {
-  const ease = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2); // easeInOutCubic
-  const frame: Keyframe[] = [];
-  const inner: Keyframe[] = [];
-  for (let i = 0; i <= steps; i++) {
-    const t = i / steps;
-    const sc = Math.max(0.002, ease(t));
-    frame.push({ offset: t, transform: `scale(${sc})` });
-    inner.push({ offset: t, transform: `scale(${1 / sc})` });
-  }
-  return { frame, inner };
-}
-
 let shifting = false;
 function setTheme(dark: boolean, _origin?: { x: number; y: number }) {
   const root = document.documentElement;
-  // Only the night painting ever moves, and it always stays on top: it grows out
-  // of the bubble at nightfall and shrinks back into it at dawn. No restacking,
-  // so the layers never need re-rasterizing before, during or after.
-  const frame = document.querySelector<HTMLElement>('.scene-paint--night');
-  const inner = frame?.querySelector<HTMLElement>('.paint-inner');
-  if (prefersReducedMotion() || shifting || !frame || !inner || !root.classList.contains('has-reveal-frame') || !('animate' in Element.prototype)) {
+  if (prefersReducedMotion() || shifting) {
     applyTheme(dark);
     return;
   }
   shifting = true;
-  const DURATION = 1100;
-  const { frame: grow, inner: growInner } = revealKeyframes();
-  const fk = dark ? grow : [...grow].reverse().map((k) => ({ ...k, offset: 1 - (k.offset as number) }));
-  const ik = dark ? growInner : [...growInner].reverse().map((k) => ({ ...k, offset: 1 - (k.offset as number) }));
-
-  frame.style.transition = 'none';
-  frame.style.opacity = '1';
-  root.classList.add('time-shift-out');
-
-  const opts: KeyframeAnimationOptions = { duration: DURATION, easing: 'linear', fill: dark ? 'none' : 'forwards' };
-  const a1 = frame.animate(fk, opts);
-  const a2 = inner.animate(ik, opts);
-
-  window.setTimeout(() => applyTheme(dark), 380); // cards are faded out by now
-  window.setTimeout(() => root.classList.remove('time-shift-out'), DURATION - 150);
-
-  Promise.all([a1.finished, a2.finished].map((p) => p.catch(() => {}))).then(() => {
-    if (dark) {
-      // grew to full size: the stylesheet already says opacity 1 at night
-      frame.style.opacity = '';
-    } else {
-      // shrank into the bubble: hide it before letting it return to full size
-      frame.style.opacity = '0';
-      requestAnimationFrame(() => {
-        a1.cancel();
-        a2.cancel();
-        frame.style.opacity = '';
-      });
-    }
-    requestAnimationFrame(() =>
-      requestAnimationFrame(() => {
-        frame.style.transition = '';
-        shifting = false;
-      }),
-    );
-  });
+  const story = dark ? 'sunset' : 'sunrise';
+  const FLIP = dark ? 1000 : 900; // sun on the horizon / moon gone
+  const TOTAL = dark ? 3600 : 3700;
+  root.classList.add(story);
+  window.setTimeout(() => root.classList.add('time-shift-out'), FLIP - 450);
+  window.setTimeout(() => applyTheme(dark), FLIP);
+  window.setTimeout(() => root.classList.remove('time-shift-out'), FLIP + 250);
+  window.setTimeout(() => {
+    root.classList.remove(story);
+    shifting = false;
+  }, TOTAL);
 }
 
 export function toggleTheme(origin?: { x: number; y: number }) {
@@ -683,8 +616,6 @@ function init() {
   document.addEventListener('visibilitychange', () => document.visibilityState === 'visible' && scheduleAutoWeather());
   initGraphics();
   initTooltips();
-  layoutRevealFrame();
-  window.addEventListener('resize', () => requestAnimationFrame(layoutRevealFrame), { passive: true });
   initSound();
   initHud();
   render();

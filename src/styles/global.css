@@ -3009,34 +3009,8 @@ kbd {
 /*     sets / moon rises, windows and lamps light, fireflies come out    */
 /*  3. cards & HUD fade back in, already in the new colours              */
 /* ===================================================================== */
-/* Each painting sits in a circular frame centred on the HUD bubble that
-   always covers the whole viewport. The day/night reveal scales the frame
-   up from a dot while counter-scaling the painting inside, so the circle
-   grows on the GPU without repainting the brush-filtered artwork.
-   (--rc-* are set by the game script; before that, a plain full rectangle.) */
-.scene-paint { position: absolute; inset: 0; overflow: hidden; }
+.scene-paint { position: absolute; inset: 0; }
 .scene-paint .paint-inner { position: absolute; inset: 0; }
-.has-reveal-frame .scene-paint {
-  inset: auto;
-  left: calc(var(--rc-x) - var(--rc-r));
-  top: calc(var(--rc-y) - var(--rc-r));
-  width: calc(var(--rc-r) * 2);
-  height: calc(var(--rc-r) * 2);
-  border-radius: 50%;
-}
-.has-reveal-frame .scene-paint .paint-inner {
-  inset: auto;
-  left: calc(var(--rc-r) - var(--rc-x));
-  top: calc(var(--rc-r) - var(--rc-y));
-  width: var(--vp-w);
-  height: var(--vp-h);
-  transform-origin: var(--rc-x) var(--rc-y);
-}
-/* pre-promote both frames and paintings at load so the reveal never has to
-   rasterize the filtered artwork mid-switch */
-.has-reveal-frame .scene-paint { will-change: transform, opacity; }
-.has-reveal-frame .scene-paint .paint-inner { will-change: transform; }
-.lite .scene-paint, .lite .scene-paint .paint-inner { will-change: auto !important; }
 /* Both paintings are drawn once at load and kept as GPU layers, so switching
    is a pure compositor opacity fade with no first-time paint at the switch. */
 .scene-paint--night {
@@ -3064,4 +3038,81 @@ kbd {
 
 /* the cards & HUD briefly step aside so the theme never visibly snaps */
 #main, .site-footer, .hud-bubble { transition: opacity 0.6s ease; }
-.time-shift-out :is(#main, .site-footer, .hud-bubble) { opacity: 0; transition: opacity 0.35s ease; }
+.time-shift-out :is(#main, .site-footer, .hud-bubble) { opacity: 0.02; transition: opacity 0.45s ease; }
+
+/* ===================================================================== */
+/* Sunset & sunrise                                                       */
+/* Nightfall: the sun slides down its arc, turning orange, and sinks       */
+/* behind the hills; a sunset glow spreads along the horizon and golden    */
+/* light falls on the fields; the night painting deepens in, the windows   */
+/* light, the stars come out and the moon rises from behind the hills.     */
+/* Daybreak plays the same story in reverse with a pink dawn glow.         */
+/* Everything moves with transform/opacity (GPU), so it stays smooth.      */
+/* ===================================================================== */
+.horizon-glow { opacity: 0; pointer-events: none; }
+.sun-tint { opacity: 0; pointer-events: none; will-change: opacity; }
+.sunset .horizon-glow {
+  background: linear-gradient(180deg,
+    rgba(70, 60, 140, 0) 0%, rgba(120, 80, 150, 0.25) 25%, rgba(232, 120, 110, 0.55) 45%,
+    rgba(255, 150, 90, 0.85) 58%, rgba(255, 196, 120, 0.9) 66%, rgba(255, 210, 150, 0.6) 75%, rgba(255, 210, 150, 0) 90%);
+}
+.sunrise .horizon-glow {
+  background: linear-gradient(180deg,
+    rgba(120, 140, 200, 0) 0%, rgba(190, 160, 210, 0.25) 28%, rgba(250, 170, 175, 0.55) 46%,
+    rgba(255, 196, 160, 0.85) 58%, rgba(255, 226, 170, 0.9) 66%, rgba(255, 236, 200, 0.55) 76%, rgba(255, 236, 200, 0) 90%);
+}
+.sunset .sun-tint { background: linear-gradient(180deg, rgba(255, 140, 80, 0.10), rgba(255, 150, 80, 0.32) 60%, rgba(240, 120, 70, 0.38)); animation: tint-pass 3.4s ease-in-out both; }
+.sunrise .sun-tint { background: linear-gradient(180deg, rgba(255, 180, 190, 0.10), rgba(255, 190, 150, 0.30) 60%, rgba(255, 200, 140, 0.34)); animation: tint-pass 3.6s ease-in-out both; }
+@keyframes tint-pass { 0% { opacity: 0; } 35% { opacity: 1; } 65% { opacity: 0.8; } 100% { opacity: 0; } }
+
+/* the sun turns orange as it nears the horizon */
+.scene-sun::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(circle at 45% 40%, #ffd28a, #ff8a4c 70%);
+  opacity: 0;
+}
+
+/* --- nightfall --- */
+.sunset .palette-day .scene-sun { animation: sun-down 2.1s cubic-bezier(0.45, 0, 0.75, 0.6) forwards; }
+.sunset .palette-day .scene-sun::after { animation: sun-redden 1.6s ease-in forwards; }
+.sunset .palette-day .horizon-glow { animation: glow-in 1.8s ease-out forwards; }
+.sunset .palette-night .horizon-glow { animation: glow-afterglow 2.6s ease-out both; }
+.sunset .palette-night .scene-sun { animation: moon-up 1.9s 1.45s cubic-bezier(0.2, 0.6, 0.3, 1) both; }
+.sunset .palette-night .night-stars { animation: stars-in 1.6s 1.9s ease-out both; }
+
+/* --- daybreak --- */
+.sunrise .palette-night .scene-sun { animation: moon-down 1.6s cubic-bezier(0.45, 0, 0.75, 0.6) forwards; }
+.sunrise .palette-night .horizon-glow { animation: glow-in 1.5s ease-out forwards; }
+.sunrise .palette-day .horizon-glow { animation: glow-afterglow 2.8s 0.9s ease-out both; }
+.sunrise .palette-day .scene-sun { animation: sun-up 2.1s 1.2s cubic-bezier(0.2, 0.6, 0.3, 1) both; }
+.sunrise .palette-day .scene-sun::after { animation: sun-whiten 2.2s 1.2s ease-out both; }
+
+@keyframes sun-down {
+  0% { transform: translate3d(0, 0, 0); }
+  100% { transform: translate3d(10vw, 62vh, 0); }
+}
+@keyframes sun-up {
+  0% { transform: translate3d(-8vw, 62vh, 0); }
+  100% { transform: translate3d(0, 0, 0); }
+}
+@keyframes moon-up {
+  0% { transform: translate3d(6vw, 58vh, 0); }
+  100% { transform: translate3d(0, 0, 0); }
+}
+@keyframes moon-down {
+  0% { transform: translate3d(0, 0, 0); }
+  100% { transform: translate3d(-6vw, 58vh, 0); }
+}
+@keyframes sun-redden { to { opacity: 1; } }
+@keyframes sun-whiten { 0% { opacity: 1; } 100% { opacity: 0; } }
+@keyframes glow-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes glow-afterglow { 0% { opacity: 1; } 100% { opacity: 0; } }
+
+/* the night painting deepens in slowly, a moment after the sun touches the hills */
+.sunset .scene-paint--night,
+.sunrise .scene-paint--night { transition: opacity 1.7s ease-in-out; }
+.sunset .grass-night,
+.sunrise .grass-night { transition: opacity 1.7s ease-in-out; }
