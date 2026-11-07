@@ -26,7 +26,7 @@ import ChapterHeading from './ChapterHeading.astro';
             <span class="notice-peg" aria-hidden="true" />
 
             <!-- Rank seal, stamped in red ink -->
-            <div class="notice-seal" aria-label={`Rank ${exp.questRank}`}>
+            <div class="notice-seal" tabindex="0" data-tip={`Quest rank ${exp.questRank}`} aria-label={`Rank ${exp.questRank}`}>
               <span class="notice-seal__rank">{exp.questRank}</span>
               <span class="notice-seal__label">rank</span>
             </div>

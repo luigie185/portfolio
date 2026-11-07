@@ -1,43 +1,113 @@
 ---
-import { profile } from '../data/portfolio';
+import { ACORN_IDS, XP_PER_LEVEL, profile, quests } from '../data/portfolio';
 import Acorn from './Acorn.astro';
+import ForestSpirit from './ForestSpirit.astro';
 const currentYear = new Date().getFullYear();
+
+// Tall grass blades rising over the top of the signboard (seeded, so builds are identical)
+let seed = 19;
+const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+let grass = 'M0 60';
+for (let x = 0; x <= 1440; x += 9 + rnd() * 10) {
+  const h = 18 + rnd() * 40;
+  const lean = (rnd() - 0.4) * 14;
+  grass += ` L${x.toFixed(1)} 60 Q${(x + lean * 0.5).toFixed(1)} ${(60 - h * 0.6).toFixed(1)} ${(x + lean + 3).toFixed(1)} ${(60 - h).toFixed(1)} Q${(x + 5).toFixed(1)} ${(60 - h * 0.5).toFixed(1)} ${(x + 8).toFixed(1)} 60`;
+}
+grass += ' L1440 60 Z';
 ---
 
-<footer class="relative mt-auto border-t-2 border-[#c59b47] bg-[#f2e8cf]/70 dark:bg-[#0b101b]/80 pt-10 pb-28 md:pb-10">
-  <Acorn id="footer" class="top-3 left-[38%] z-20" />
-  <div class="max-w-4xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs sm:text-sm font-mono text-[#576058] dark:text-[#9fb0c9]">
-    <div class="flex items-center gap-2.5">
-      <span class="inline-flex h-2.5 w-2.5 rounded-full bg-amber-400 shadow-[0_0_8px_#fbbf24]" aria-hidden="true"></span>
-      <span>
-        WAYSTONE SAVE POINT · © {currentYear} <strong class="text-[#252b27] dark:text-[#f5efe2]">{profile.name}</strong>
-      </span>
+<footer class="site-footer relative mt-auto">
+  <!-- tall grass edge where the meadow meets the signboard -->
+  <svg class="site-footer__grass" viewBox="0 0 1440 60" preserveAspectRatio="none" aria-hidden="true">
+    <path d={grass} class="site-footer__blades" />
+    <rect x="0" y="54" width="1440" height="6" class="site-footer__plank-top" />
+  </svg>
+
+  <div class="site-footer__board">
+    <Acorn id="footer" class="top-4 left-[46%] z-20" />
+
+    <div class="max-w-4xl mx-auto px-5 sm:px-6 pt-10 pb-8 grid gap-8 md:grid-cols-[1.15fr_1fr_auto] md:items-start">
+      <!-- Save point -->
+      <section aria-labelledby="save-heading">
+        <div class="flex items-center gap-3">
+          <span class="save-lantern" aria-hidden="true">
+            <svg viewBox="0 0 32 44">
+              <path d="M16 2v6" stroke="#3b2c1e" stroke-width="2" stroke-linecap="round" />
+              <path d="M9 10h14l-2 4H11Z" fill="#3b2c1e" />
+              <rect x="8" y="14" width="16" height="20" rx="7" class="save-lantern__paper" />
+              <path d="M8 21h16M8 27h16" stroke="#c2621f" stroke-width="1" opacity=".6" />
+              <path d="M11 34h10l-1.5 4h-7Z" fill="#3b2c1e" />
+            </svg>
+          </span>
+          <div>
+            <p class="site-footer__eyebrow">❦ End of the Path ❦</p>
+            <h2 id="save-heading" class="site-footer__title">Save Point</h2>
+          </div>
+        </div>
+        <p class="mt-3 text-sm site-footer__text">
+          Your journey is saved in this browser. Rest a while, or come back anytime to finish your quests.
+        </p>
+
+        <dl class="mt-4 grid grid-cols-3 gap-2 max-w-sm">
+          <div class="save-stat">
+            <dt>Level</dt>
+            <dd><span data-hud-level>1</span></dd>
+          </div>
+          <div class="save-stat">
+            <dt>Quests</dt>
+            <dd data-hud-quests>0/{quests.length}</dd>
+          </div>
+          <div class="save-stat">
+            <dt>Acorns</dt>
+            <dd data-hud-acorns>0/{ACORN_IDS.length}</dd>
+          </div>
+        </dl>
+        <p class="sr-only">{XP_PER_LEVEL} experience points per level.</p>
+
+        <button type="button" data-open-journal class="signpost mt-4">
+          <span aria-hidden="true">🗺️</span> Open the journal
+        </button>
+      </section>
+
+      <!-- Send word -->
+      <section aria-labelledby="contact-heading">
+        <p class="site-footer__eyebrow">Send word</p>
+        <h2 id="contact-heading" class="site-footer__title">Let's work together</h2>
+        <p class="mt-2 text-sm site-footer__text">
+          Open to new quests — full-time roles, freelance projects, or just a friendly hello.
+        </p>
+        <ul class="mt-4 flex flex-wrap gap-2.5">
+          <li>
+            <a href={`mailto:${profile.email}`} data-quest="pigeon" class="signpost signpost--primary">
+              <span aria-hidden="true">🕊️</span> Email
+            </a>
+          </li>
+          <li>
+            <a href={profile.socials.github} target="_blank" rel="noopener noreferrer" class="signpost">
+              GitHub<span class="sr-only"> (opens in a new tab)</span>
+            </a>
+          </li>
+          <li>
+            <a href={profile.socials.linkedin} target="_blank" rel="noopener noreferrer" class="signpost">
+              LinkedIn<span class="sr-only"> (opens in a new tab)</span>
+            </a>
+          </li>
+        </ul>
+      </section>
+
+      <!-- Back to the meadow -->
+      <div class="flex md:flex-col items-center gap-3 md:pt-2">
+        <ForestSpirit standalone class="w-16 h-16 shrink-0" />
+        <a href="#about" class="back-to-top" data-tip="Back to the top of the meadow">
+          <span aria-hidden="true">↑</span> Back to the meadow
+        </a>
+      </div>
     </div>
 
-    <div class="flex items-center gap-5 font-bold">
-      <a
-        href={`mailto:${profile.email}`}
-        data-quest="pigeon"
-        class="hover:text-[#2e7050] dark:hover:text-[#f3b354] transition-colors"
-      >
-        [PIGEON POST]
-      </a>
-      <a
-        href={profile.socials.github}
-        target="_blank"
-        rel="noopener noreferrer"
-        class="hover:text-[#2e7050] dark:hover:text-[#f3b354] transition-colors"
-      >
-        [GITHUB GUILD]
-      </a>
-      <a
-        href={profile.socials.linkedin}
-        target="_blank"
-        rel="noopener noreferrer"
-        class="hover:text-[#2e7050] dark:hover:text-[#f3b354] transition-colors"
-      >
-        [LINKEDIN]
-      </a>
+    <div class="site-footer__rule"></div>
+    <div class="max-w-4xl mx-auto px-5 sm:px-6 pt-4 pb-28 md:pb-6 flex flex-col gap-1 items-center text-xs site-footer__fine">
+      <p>© {currentYear} <strong>{profile.name}</strong> · All rights reserved</p>
+      <p>Built with Astro &amp; Tailwind · scenery painted by hand in SVG</p>
     </div>
   </div>
 </footer>

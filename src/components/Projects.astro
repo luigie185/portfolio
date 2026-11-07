@@ -26,7 +26,7 @@ import RelicVignette from './RelicVignette.astro';
           <div class="relic-art">
             <RelicVignette emblem={project.emblem} sky={project.sky} uid={`relic-${project.emblem}`} />
             <span class="relic-number">{project.id}</span>
-            <span class="relic-rarity" aria-label={`Rarity ${project.rarity} of 5`}>
+            <span class="relic-rarity" tabindex="0" data-tip={`Rarity ${project.rarity} of 5`} aria-label={`Rarity ${project.rarity} of 5`}>
               {Array.from({ length: 5 }, (_, s) => (
                 <span class={s < project.rarity ? 'is-on' : ''} aria-hidden="true">★</span>
               ))}

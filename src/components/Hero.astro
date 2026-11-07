@@ -174,71 +174,67 @@ import ForestSpirit from './ForestSpirit.astro';
     </div>
   </div>
 
-  <!-- Forest spirit guide: game-style dialogue box with typewriter text -->
-  <div data-dialogue-box class="dialogue-box rpg-panel relative rounded-2xl p-5 sm:p-6">
-    <Acorn id="dialogue" class="-top-3 right-8 z-20" />
-    <div class="flex flex-col sm:flex-row items-start gap-4">
-      <!-- Mori, the forest spirit guide (pat for a reaction) -->
+  <!-- Forest spirit guide: RPG dialogue window with typewriter text -->
+  <div data-dialogue-box class="dialogue-sheet relative">
+    <Acorn id="dialogue" class="-bottom-3 right-6 z-20" />
+
+    <!-- name plate tab -->
+    <div class="dialogue-nameplate">
+      <span aria-hidden="true">🍃</span> {dialogue.speaker}
+    </div>
+
+    <div class="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6">
+      <!-- Mori's portrait (pat for a reaction) -->
       <button
         type="button"
         data-pat-spirit
+        data-tip="Give Mori a gentle pat"
         aria-label="Pat Mori, the forest spirit"
-        class="spirit-avatar animate-float-slow relative w-[4.5rem] h-[4.5rem] rounded-2xl bg-gradient-to-b from-[#d6eef6] to-[#eef6dc] dark:from-[#0d1f3d] dark:to-[#173556] border-2 border-[#c59b47] flex items-center justify-center shrink-0 shadow-md transition-transform"
+        class="dialogue-portrait spirit-avatar"
       >
-        <ForestSpirit standalone class="w-16 h-16" />
-        <span class="absolute -bottom-2 px-1.5 bg-[#c59b47] text-[#101c2e] font-mono font-bold text-[9px] rounded uppercase">
-          Mori
-        </span>
+        <ForestSpirit standalone class="w-[4.5rem] h-[4.5rem]" />
       </button>
 
-      <div class="flex-1 space-y-3 w-full min-w-0">
-        <div class="flex flex-wrap items-center justify-between gap-2">
-          <span class="text-xs font-mono font-bold uppercase tracking-wider text-[#2b6e4c] dark:text-[#f3b354]">
-            <span aria-hidden="true">🍃</span> {dialogue.speaker}
-          </span>
-          <span class="text-[11px] font-mono text-[#505d53] dark:text-amber-200/70">Pat Mori · click text to skip ▸</span>
+      <div class="flex-1 w-full min-w-0">
+        <!-- speech bubble -->
+        <div class="dialogue-bubble">
+          <!-- Screen readers get the full line once; the animated copy is hidden from them -->
+          <p class="sr-only" aria-live="polite" data-dialogue-sr>{dialogue.greeting}</p>
+          <p aria-hidden="true" class="dialogue-text">
+            <span data-dialogue-visible>{dialogue.greeting}</span><span data-dialogue-caret class="dialogue-caret">▼</span>
+          </p>
         </div>
 
-        <!-- Screen readers get the full line once; the animated copy is hidden from them -->
-        <p class="sr-only" aria-live="polite" data-dialogue-sr>{dialogue.greeting}</p>
-        <p
-          aria-hidden="true"
-          class="dialogue-text text-sm sm:text-base font-medium text-[#252b27] dark:text-[#f5efe2] min-h-[4.5rem] sm:min-h-[3.25rem] leading-relaxed"
-        >
-          “<span data-dialogue-visible>{dialogue.greeting}</span>”<span data-dialogue-caret class="dialogue-caret">▼</span>
-        </p>
-
-        <div class="flex flex-wrap gap-2 pt-1" role="group" aria-label="Dialogue choices">
-          {
-            dialogue.options.map((opt, i) => (
-              <button
-                type="button"
-                data-dialogue-option={i}
-                class="npc-choice inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono font-semibold bg-[#23476e]/10 dark:bg-white/10 text-[#23476e] dark:text-[#f3b354] hover:bg-[#c59b47] hover:text-[#131a29] border border-[#c59b47]/60 transition-colors cursor-pointer"
-              >
-                <span class="npc-choice__cursor" aria-hidden="true">▸</span>
-                <span>{opt.label}</span>
+        <div class="mt-4 grid gap-3 sm:grid-cols-[1fr_auto] sm:items-start">
+          <div>
+            <p class="dialogue-group-label">Ask Mori</p>
+            <div class="flex flex-wrap gap-2" role="group" aria-label="Ask Mori">
+              {
+                dialogue.options.map((opt, i) => (
+                  <button type="button" data-dialogue-option={i} class="npc-choice dialogue-option">
+                    <span class="npc-choice__cursor" aria-hidden="true">▸</span>
+                    <span>{opt.label}</span>
+                  </button>
+                ))
+              }
+            </div>
+          </div>
+          <div>
+            <p class="dialogue-group-label">Cast a spell</p>
+            <div class="flex flex-wrap gap-2" role="group" aria-label="Spells">
+              <button type="button" data-theme-toggle aria-pressed="false" data-tip="Switch day and night · N" class="npc-choice dialogue-spell">
+                <span aria-hidden="true">✨</span><span>Time-Shift</span>
               </button>
-            ))
-          }
-          <button
-            type="button"
-            data-theme-toggle
-            aria-pressed="false"
-            class="npc-choice inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono font-semibold bg-[#23476e]/10 dark:bg-white/10 text-[#2e7050] dark:text-emerald-300 hover:bg-[#c59b47] hover:text-[#131a29] border border-[#c59b47]/60 transition-colors cursor-pointer"
-          >
-            <span class="npc-choice__cursor" aria-hidden="true">✨</span>
-            <span>Cast Time-Shift Spell</span>
-          </button>
-          <button
-            type="button"
-            data-weather-cycle
-            class="npc-choice inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono font-semibold bg-[#23476e]/10 dark:bg-white/10 text-[#23476e] dark:text-sky-300 hover:bg-[#c59b47] hover:text-[#131a29] border border-[#c59b47]/60 transition-colors cursor-pointer"
-          >
-            <span class="npc-choice__cursor" aria-hidden="true">🌦️</span>
-            <span>Change the Weather</span>
-          </button>
+              <button type="button" data-weather-cycle data-tip="Change the weather · R" class="npc-choice dialogue-spell">
+                <span aria-hidden="true">🌦️</span><span>Weather</span>
+              </button>
+            </div>
+          </div>
         </div>
+
+        <p class="dialogue-hint">
+          Click the text to skip · <kbd>J</kbd> journal · <kbd>1</kbd><kbd>2</kbd><kbd>3</kbd> travel
+        </p>
       </div>
     </div>
   </div>

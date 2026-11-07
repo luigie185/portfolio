@@ -47,11 +47,14 @@ function toast(icon: string, title: string, body: string) {
   if (!region) return;
   const el = document.createElement('div');
   el.className = 'game-toast';
-  el.innerHTML = `<span class="game-toast__icon" aria-hidden="true"></span><div><p class="game-toast__title"></p><p class="game-toast__body"></p></div>`;
+  el.innerHTML = `<span class="game-toast__icon" aria-hidden="true"></span><div><p class="game-toast__title"></p><p class="game-toast__body"></p></div><span class="game-toast__timer" aria-hidden="true"></span>`;
   el.querySelector('.game-toast__icon')!.textContent = icon;
   el.querySelector('.game-toast__title')!.textContent = title;
   el.querySelector('.game-toast__body')!.textContent = body;
   region.appendChild(el);
+  // keep the stack short so it never buries the page (2 on phones, 3 on wider screens)
+  const max = window.matchMedia('(max-width: 640px)').matches ? 2 : 3;
+  while (region.children.length > max) region.firstElementChild?.remove();
   window.setTimeout(() => el.classList.add('is-leaving'), 3600);
   window.setTimeout(() => el.remove(), 4200);
 }
@@ -92,9 +95,12 @@ function currentWeather() {
 function renderWeather() {
   const w = WEATHERS.find((x) => x.id === currentWeather()) ?? WEATHERS[0];
   document.querySelectorAll<HTMLElement>('[data-hud-weather]').forEach((el) => (el.textContent = w.icon));
-  document
-    .querySelectorAll('[data-weather-cycle]')
-    .forEach((b) => b.setAttribute('aria-label', `Change the weather (R). Now: ${w.label}`));
+  document.querySelectorAll<HTMLElement>('[data-weather-cycle]').forEach((b) => {
+    if (b.closest('header')) {
+      b.setAttribute('aria-label', `Change the weather (R). Now: ${w.label}`);
+      b.dataset.tip = `Weather: ${w.label} · R to change`;
+    }
+  });
 }
 
 function cycleWeather() {
@@ -350,12 +356,83 @@ function initGraphics() {
 }
 
 /* ------------------------------------------------------------------ */
+/* Tooltips: one themed bubble for every [data-tip] element.           */
+/* Mouse hover or keyboard focus shows it (not touch, where a tap is   */
+/* the action). It flips below when there's no room above and stays    */
+/* inside the viewport.                                                */
+/* ------------------------------------------------------------------ */
+
+function initTooltips() {
+  const tip = document.getElementById('forest-tip');
+  const text = tip?.querySelector<HTMLElement>('.forest-tip__text');
+  if (!tip || !text) return;
+  let current: HTMLElement | null = null;
+  let showTimer: number | undefined;
+
+  const place = (el: HTMLElement) => {
+    const r = el.getBoundingClientRect();
+    const t = tip.getBoundingClientRect();
+    const gap = 10;
+    const below = r.top - t.height - gap < 8;
+    const cx = r.left + r.width / 2;
+    const left = Math.min(Math.max(8, cx - t.width / 2), window.innerWidth - t.width - 8);
+    const top = below ? r.bottom + gap : r.top - t.height - gap;
+    tip.style.transform = `translate3d(${Math.round(left)}px, ${Math.round(top)}px, 0)`;
+    tip.style.setProperty('--arrow-x', `${Math.round(cx - left)}px`);
+    tip.classList.toggle('is-below', below);
+  };
+
+  const show = (el: HTMLElement, delay: number) => {
+    window.clearTimeout(showTimer);
+    showTimer = window.setTimeout(() => {
+      const label = el.dataset.tip;
+      if (!label || !el.isConnected) return;
+      current = el;
+      text.textContent = label;
+      tip.hidden = false;
+      tip.classList.remove('is-visible');
+      place(el);
+      el.setAttribute('aria-describedby', 'forest-tip');
+      requestAnimationFrame(() => tip.classList.add('is-visible'));
+    }, delay);
+  };
+
+  const hide = () => {
+    window.clearTimeout(showTimer);
+    if (current) current.removeAttribute('aria-describedby');
+    current = null;
+    tip.classList.remove('is-visible');
+    tip.hidden = true;
+  };
+
+  document.addEventListener('pointerover', (e) => {
+    if ((e as PointerEvent).pointerType !== 'mouse') return;
+    const el = (e.target as HTMLElement).closest<HTMLElement>('[data-tip]');
+    if (el && el !== current) show(el, 280);
+  });
+  document.addEventListener('pointerout', (e) => {
+    const el = (e.target as HTMLElement).closest<HTMLElement>('[data-tip]');
+    const to = (e as PointerEvent).relatedTarget as HTMLElement | null;
+    if (el && (!to || !el.contains(to))) hide();
+  });
+  document.addEventListener('focusin', (e) => {
+    const el = (e.target as HTMLElement).closest<HTMLElement>('[data-tip]');
+    if (el && el.matches(':focus-visible')) show(el, 0);
+  });
+  document.addEventListener('focusout', hide);
+  document.addEventListener('keydown', (e) => e.key === 'Escape' && hide());
+  document.addEventListener('pointerdown', hide);
+  window.addEventListener('scroll', hide, { passive: true });
+}
+
+/* ------------------------------------------------------------------ */
 /* Wiring                                                              */
 /* ------------------------------------------------------------------ */
 
 function init() {
   renderWeather();
   initGraphics();
+  initTooltips();
   render();
   initDialogue();
   document

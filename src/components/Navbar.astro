@@ -40,6 +40,8 @@ const links = [
           <div
             class="w-20 sm:w-28 h-1.5 rounded-full bg-black/15 dark:bg-white/10 overflow-hidden"
             role="progressbar"
+            tabindex="0"
+            data-tip="Your traveler XP — explore to level up"
             aria-label="Traveler experience"
             aria-valuemin="0"
             aria-valuemax={XP_PER_LEVEL}
@@ -74,6 +76,7 @@ const links = [
       <button
         type="button"
         data-open-journal
+        data-tip="Acorns found · open the journal (J)"
         aria-label="Open quest journal (J)"
         class="hud-chip inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-mono font-bold border-2 border-[#c59b47] bg-[#fffaf0] dark:bg-[#1a253a] text-[#7a5a3a] dark:text-[#f3b354] hover:bg-[#f3e8ce] dark:hover:bg-[#22314d] transition-colors cursor-pointer"
       >
@@ -85,7 +88,7 @@ const links = [
         type="button"
         data-weather-cycle
         aria-label={`Change the weather (R). Now: ${WEATHERS[0].label}`}
-        title="Change the weather (R)"
+        data-tip="Weather: Clear skies · R to change"
         class="inline-flex items-center justify-center w-9 h-9 rounded-xl text-base border-2 border-[#c59b47] bg-[#fffaf0] dark:bg-[#1a253a] hover:bg-[#f3e8ce] dark:hover:bg-[#22314d] transition-colors cursor-pointer"
       >
         <span data-hud-weather aria-hidden="true">{WEATHERS[0].icon}</span>
@@ -94,6 +97,7 @@ const links = [
       <button
         type="button"
         data-theme-toggle
+        data-tip="Day / night spell · N"
         aria-label="Toggle night mode (N)"
         aria-pressed="false"
         class="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-mono font-semibold border-2 border-[#c59b47] bg-[#fffaf0] dark:bg-[#1a253a] text-[#23476e] dark:text-[#f3b354] hover:bg-[#f3e8ce] dark:hover:bg-[#22314d] transition-colors cursor-pointer"
