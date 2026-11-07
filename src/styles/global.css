@@ -1212,22 +1212,30 @@ kbd {
 .wx { display: none; pointer-events: none; animation: wx-in 1.2s ease both; }
 @keyframes wx-in { from { opacity: 0; } }
 
-/* the outgoing weather lingers and fades while the new one fades in */
-:is([data-weather-prev="rain"], [data-weather-prev="storm"]):not([data-weather="rain"], [data-weather="storm"]) :is(.wx-rain, .wx-gloom),
-[data-weather-prev="storm"]:not([data-weather="storm"]) .wx-lightning,
-[data-weather-prev="snow"]:not([data-weather="snow"]) .wx-snow,
-[data-weather-prev="mist"]:not([data-weather="mist"]) .wx-mist,
-[data-weather-prev="breeze"]:not([data-weather="breeze"]) .wx-breeze { display: block; animation: wx-out 1.5s ease forwards; }
+/* Which layers each weather shows (generated from one table: layer -> weathers).
+   The outgoing weather's layers linger and fade while the new one fades in. */
+:is([data-weather-prev="rain"], [data-weather-prev="storm"], [data-weather-prev="drizzle"], [data-weather-prev="sunshower"], [data-weather-prev="typhoon"]):not([data-weather="rain"], [data-weather="storm"], [data-weather="drizzle"], [data-weather="sunshower"], [data-weather="typhoon"]) .wx-rain,
+:is([data-weather-prev="rain"], [data-weather-prev="storm"], [data-weather-prev="drizzle"], [data-weather-prev="typhoon"]):not([data-weather="rain"], [data-weather="storm"], [data-weather="drizzle"], [data-weather="typhoon"]) .wx-gloom,
+:is([data-weather-prev="storm"], [data-weather-prev="typhoon"]):not([data-weather="storm"], [data-weather="typhoon"]) .wx-lightning,
+:is([data-weather-prev="snow"], [data-weather-prev="blizzard"]):not([data-weather="snow"], [data-weather="blizzard"]) .wx-snow,
+:is([data-weather-prev="mist"], [data-weather-prev="haze"], [data-weather-prev="blizzard"]):not([data-weather="mist"], [data-weather="haze"], [data-weather="blizzard"]) .wx-mist,
+:is([data-weather-prev="breeze"], [data-weather-prev="typhoon"]):not([data-weather="breeze"], [data-weather="typhoon"]) .wx-breeze,
+:is([data-weather-prev="sakura"]):not([data-weather="sakura"]) .wx-sakura,
+:is([data-weather-prev="momiji"]):not([data-weather="momiji"]) .wx-momiji,
+:is([data-weather-prev="sunshower"]):not([data-weather="sunshower"]) .wx-rainbow,
+:is([data-weather-prev="heat"]):not([data-weather="heat"]) .wx-heat { display: block; animation: wx-out 1.5s ease forwards; }
 @keyframes wx-out { to { opacity: 0; } }
 
-[data-weather="rain"] .wx-rain,
-[data-weather="storm"] .wx-rain,
-[data-weather="storm"] .wx-lightning,
-[data-weather="storm"] .wx-gloom,
-[data-weather="rain"] .wx-gloom,
-[data-weather="snow"] .wx-snow,
-[data-weather="mist"] .wx-mist,
-[data-weather="breeze"] .wx-breeze { display: block; }
+:is([data-weather="rain"], [data-weather="storm"], [data-weather="drizzle"], [data-weather="sunshower"], [data-weather="typhoon"]) .wx-rain,
+:is([data-weather="rain"], [data-weather="storm"], [data-weather="drizzle"], [data-weather="typhoon"]) .wx-gloom,
+:is([data-weather="storm"], [data-weather="typhoon"]) .wx-lightning,
+:is([data-weather="snow"], [data-weather="blizzard"]) .wx-snow,
+:is([data-weather="mist"], [data-weather="haze"], [data-weather="blizzard"]) .wx-mist,
+:is([data-weather="breeze"], [data-weather="typhoon"]) .wx-breeze,
+:is([data-weather="sakura"]) .wx-sakura,
+:is([data-weather="momiji"]) .wx-momiji,
+:is([data-weather="sunshower"]) .wx-rainbow,
+:is([data-weather="heat"]) .wx-heat { display: block; }
 
 /* Rain: a striped tile slid down by exactly one tile height = seamless loop */
 .wx-rain { top: 0; bottom: 0; overflow: hidden; opacity: 0.6; }
@@ -1318,20 +1326,32 @@ kbd {
 /* Sky & ground reactions (static filters, changed once per weather switch) */
 .scene-sky, .scene-clouds, .scene-sun { transition: filter 1.2s ease, opacity 1.2s ease; }
 [data-weather="rain"] .scene-sky,
-[data-weather="rain"] .scene-clouds { filter: saturate(0.55) brightness(0.88); }
+[data-weather="rain"] .scene-clouds,
+[data-weather="drizzle"] .scene-sky,
+[data-weather="drizzle"] .scene-clouds { filter: saturate(0.55) brightness(0.88); }
+[data-weather="typhoon"] .scene-sky,
+[data-weather="typhoon"] .scene-clouds { filter: saturate(0.4) brightness(0.7); }
 [data-weather="storm"] .scene-sky,
 [data-weather="storm"] .scene-clouds { filter: saturate(0.35) brightness(0.62); }
 [data-weather="rain"] .scene-sun,
+[data-weather="drizzle"] .scene-sun,
+[data-weather="typhoon"] .scene-sun,
 [data-weather="storm"] .scene-sun { opacity: 0.2; }
 .rain-ripples { opacity: 0; transition: opacity 1s ease; }
 [data-weather="rain"] .rain-ripples,
+[data-weather="drizzle"] .rain-ripples,
+[data-weather="sunshower"] .rain-ripples,
+[data-weather="typhoon"] .rain-ripples,
 [data-weather="storm"] .rain-ripples { opacity: 1; }
-:is([data-weather="rain"], [data-weather="storm"], [data-weather="snow"]) .seeds { display: none; }
+:is([data-weather="rain"], [data-weather="storm"], [data-weather="snow"], [data-weather="drizzle"], [data-weather="typhoon"], [data-weather="blizzard"]) .seeds { display: none; }
 [data-weather="breeze"] .scene-grass { animation-duration: 2.2s !important; }
+[data-weather="typhoon"] .scene-grass { animation-duration: 1.1s !important; }
+[data-weather="blizzard"] .scene-grass { animation-duration: 2.6s !important; }
 [data-weather="breeze"] .wind-wave { opacity: 0.8; animation-duration: 5s; }
 
 /* Snow repaints the countryside through the palette variables */
-[data-weather="snow"] .scene {
+[data-weather="snow"] .scene,
+[data-weather="blizzard"] .scene {
   --scene-sky-top: #7f9fbf; --scene-sky-mid: #b9cddf; --scene-sky-low: #dfe8f0; --scene-sky-horizon: #eef2f6;
   --scene-cloud-light: #f4f7fb; --scene-cloud-shade: #d3dce8; --scene-cloud-deep: #b3bfd0;
   --scene-mtn-far: #c9d6e2; --scene-mtn-near: #b6c8d2;
@@ -1345,7 +1365,8 @@ kbd {
   --scene-grass-back: #b7c9c3; --scene-grass-front: #93aba3;
   --scene-flower: #ffffff; --scene-flower-warm: #e9f1f5;
 }
-.dark[data-weather="snow"] .scene {
+.dark[data-weather="snow"] .scene,
+[data-weather="blizzard"] .scene {
   --scene-sky-top: #0a1424; --scene-sky-mid: #1a2c45; --scene-sky-low: #2c4660; --scene-sky-horizon: #3c5a70;
   --scene-forest-far-lit: #4a6276; --scene-tree-lit: #5a7186; --scene-tree-sun: #7a92a8;
   --scene-hill-mid: #3a4f62; --scene-ridge: #33485a;
@@ -1849,7 +1870,8 @@ kbd {
 .site-footer__plank-top { fill: #6b5040; }
 .dark .site-footer__blades { fill: #0a2220; }
 .dark .site-footer__plank-top { fill: #2c2118; }
-[data-weather="snow"] .site-footer__blades { fill: #93aba3; }
+[data-weather="snow"] .site-footer__blades,
+[data-weather="blizzard"] .site-footer__blades { fill: #93aba3; }
 .site-footer__board {
   position: relative;
   color: #f4ead2;
@@ -2971,7 +2993,8 @@ kbd {
   --scene-flower: #b9c7d6;
   --scene-flower-warm: #c9b26a;
 }
-[data-weather="snow"] .scene .palette-day {
+[data-weather="snow"] .scene .palette-day,
+[data-weather="blizzard"] .scene .palette-day {
   --scene-sky-top: #7f9fbf; --scene-sky-mid: #b9cddf; --scene-sky-low: #dfe8f0; --scene-sky-horizon: #eef2f6;
   --scene-cloud-light: #f4f7fb; --scene-cloud-shade: #d3dce8; --scene-cloud-deep: #b3bfd0;
   --scene-mtn-far: #c9d6e2; --scene-mtn-near: #b6c8d2;
@@ -2984,7 +3007,8 @@ kbd {
   --scene-house-roof: #f0f4f6; --scene-house-roof-lit: #ffffff;
   --scene-grass-back: #b7c9c3; --scene-grass-front: #93aba3;
   --scene-flower: #ffffff; --scene-flower-warm: #e9f1f5;}
-[data-weather="snow"] .scene .palette-night {
+[data-weather="snow"] .scene .palette-night,
+[data-weather="blizzard"] .scene .palette-night {
   --scene-sky-top: #7f9fbf; --scene-sky-mid: #b9cddf; --scene-sky-low: #dfe8f0; --scene-sky-horizon: #eef2f6;
   --scene-cloud-light: #f4f7fb; --scene-cloud-shade: #d3dce8; --scene-cloud-deep: #b3bfd0;
   --scene-mtn-far: #c9d6e2; --scene-mtn-near: #b6c8d2;
@@ -2997,7 +3021,8 @@ kbd {
   --scene-house-roof: #f0f4f6; --scene-house-roof-lit: #ffffff;
   --scene-grass-back: #b7c9c3; --scene-grass-front: #93aba3;
   --scene-flower: #ffffff; --scene-flower-warm: #e9f1f5;}
-[data-weather="snow"] .scene .palette-night {
+[data-weather="snow"] .scene .palette-night,
+[data-weather="blizzard"] .scene .palette-night {
   --scene-sky-top: #0a1424; --scene-sky-mid: #1a2c45; --scene-sky-low: #2c4660; --scene-sky-horizon: #3c5a70;
   --scene-forest-far-lit: #4a6276; --scene-tree-lit: #5a7186; --scene-tree-sun: #7a92a8;
   --scene-hill-mid: #3a4f62; --scene-ridge: #33485a;
@@ -3184,8 +3209,255 @@ kbd {
 }
 /* seeds fade rather than blink out when the weather turns */
 .seeds { transition: opacity 1.2s ease; }
-:is([data-weather="rain"], [data-weather="storm"], [data-weather="snow"]) .seeds { display: block; opacity: 0; }
+:is([data-weather="rain"], [data-weather="storm"], [data-weather="snow"], [data-weather="drizzle"], [data-weather="typhoon"], [data-weather="blizzard"], [data-season="winter"], [data-season="tsuyu"]) .seeds { display: block; opacity: 0; }
 
 /* the bubble crest shows your (fixed) level: a full gilt ring */
 .hud-ring__fill--full { stroke: #d6a84f !important; }
 .dark .hud-ring__fill--full { stroke: #f3b354 !important; }
+
+/* ===================================================================== */
+/* Seasons: the whole countryside repaints (trees, ridge, paddies, grass, */
+/* wildflowers, sky) for each of Japan's seasons, in both the day and the */
+/* night painting. Snow / blizzard still cover everything in white.        */
+/* The switch happens under the drifting mist bank, so it never snaps.     */
+/* ===================================================================== */
+[data-season="spring"]:not([data-weather="snow"]):not([data-weather="blizzard"]) .scene .palette-day {
+  --scene-sky-top: #5fa8e0;
+  --scene-sky-low: #e3ecf6;
+  --scene-sky-horizon: #f7eef2;
+  --scene-mtn-far: #b3c3d9;
+  --scene-forest-far: #7aa883;
+  --scene-forest-far-lit: #e8b6c6;
+  --scene-tree-dark: #2d5f3b;
+  --scene-tree-mid: #417f4b;
+  --scene-tree-lit: #f1b5c4;
+  --scene-tree-sun: #ffdbe4;
+  --scene-hill-mid: #7ab067;
+  --scene-ridge: #86b255;
+  --scene-paddy: #a9d593;
+  --scene-paddy-alt: #c1e2a6;
+  --scene-paddy-deep: #9ccc86;
+  --scene-paddy-water: #bfe3ea;
+  --scene-grass-back: #5ba150;
+  --scene-grass-front: #478d41;
+  --scene-flower: #ffe6ee;
+  --scene-flower-warm: #f4a3bd;
+}
+[data-season="spring"]:not([data-weather="snow"]):not([data-weather="blizzard"]) .scene .palette-night {
+  --scene-tree-lit: #5b4660;
+  --scene-tree-sun: #6e5470;
+  --scene-forest-far-lit: #3f3a4f;
+  --scene-flower: #d7b8c8;
+  --scene-flower-warm: #b98aa4;
+}
+[data-season="tsuyu"]:not([data-weather="snow"]):not([data-weather="blizzard"]) .scene .palette-day {
+  --scene-sky-top: #7b93a8;
+  --scene-sky-mid: #a7b9c8;
+  --scene-sky-low: #cdd7de;
+  --scene-sky-horizon: #dde3e1;
+  --scene-sun-glow: rgba(255,246,210,0.3);
+  --scene-cloud-light: #e7ecf0;
+  --scene-cloud-warm: rgba(230,236,240,0.4);
+  --scene-cloud-shade: #bdc8d3;
+  --scene-cloud-deep: #97a4b6;
+  --scene-mtn-far: #9fb2bd;
+  --scene-mtn-near: #86a59e;
+  --scene-haze: #dfe7ea;
+  --scene-forest-far: #4f8a62;
+  --scene-forest-far-lit: #64a070;
+  --scene-tree-dark: #164a2b;
+  --scene-tree-mid: #236a39;
+  --scene-tree-lit: #3c8944;
+  --scene-tree-sun: #6cad57;
+  --scene-paddy: #7fb85e;
+  --scene-paddy-alt: #8fc46a;
+  --scene-paddy-deep: #6eaa52;
+  --scene-paddy-water: #a8c8ce;
+  --scene-grass-back: #2f7a3a;
+  --scene-grass-front: #235f2c;
+  --scene-flower: #a3bdf3;
+  --scene-flower-warm: #c39ce6;
+}
+[data-season="tsuyu"]:not([data-weather="snow"]):not([data-weather="blizzard"]) .scene .palette-night {
+  --scene-flower: #7d8fc4;
+  --scene-flower-warm: #9277b4;
+}
+[data-season="typhoon"]:not([data-weather="snow"]):not([data-weather="blizzard"]) .scene .palette-day {
+  --scene-sky-top: #5d7385;
+  --scene-sky-mid: #8ea1ad;
+  --scene-sky-low: #b8c3c3;
+  --scene-sky-horizon: #cfd3c7;
+  --scene-sun-glow: rgba(255,246,210,0.25);
+  --scene-cloud-light: #d9dfe2;
+  --scene-cloud-warm: rgba(220,226,228,0.4);
+  --scene-cloud-shade: #a8b3bc;
+  --scene-cloud-deep: #7f8c9c;
+  --scene-mtn-far: #8ea2ac;
+  --scene-mtn-near: #7b968c;
+  --scene-haze: #d3dbd8;
+}
+[data-season="typhoon"]:not([data-weather="snow"]):not([data-weather="blizzard"]) .scene .palette-night {
+  --scene-sky-top: #040a16;
+  --scene-sky-mid: #0b1a31;
+}
+[data-season="autumn"]:not([data-weather="snow"]):not([data-weather="blizzard"]) .scene .palette-day {
+  --scene-sky-top: #3f8fd0;
+  --scene-sky-low: #d8e8f1;
+  --scene-sky-horizon: #f3e8d0;
+  --scene-mtn-far: #a9b6c4;
+  --scene-mtn-near: #9aa68a;
+  --scene-forest-far: #a8704a;
+  --scene-forest-far-lit: #cf9658;
+  --scene-tree-dark: #7a2f1c;
+  --scene-tree-mid: #b44a2a;
+  --scene-tree-lit: #e3853a;
+  --scene-tree-sun: #f6c262;
+  --scene-hill-mid: #9c8a40;
+  --scene-ridge: #a8923f;
+  --scene-paddy: #d9b54a;
+  --scene-paddy-alt: #e5c35d;
+  --scene-paddy-deep: #caa53d;
+  --scene-rice-row: rgba(140,100,30,0.28);
+  --scene-paddy-water: #cbc89c;
+  --scene-grass-back: #b0954a;
+  --scene-grass-front: #8f7a36;
+  --scene-flower: #f6e3b0;
+  --scene-flower-warm: #e5533a;
+}
+[data-season="autumn"]:not([data-weather="snow"]):not([data-weather="blizzard"]) .scene .palette-night {
+  --scene-forest-far: #2f2a24;
+  --scene-forest-far-lit: #3b3127;
+  --scene-tree-dark: #1f130e;
+  --scene-tree-mid: #352019;
+  --scene-tree-lit: #553024;
+  --scene-tree-sun: #6b3d27;
+  --scene-hill-mid: #2f2b1e;
+  --scene-ridge: #2d2a1d;
+  --scene-paddy: #4a4128;
+  --scene-paddy-alt: #53492d;
+  --scene-paddy-deep: #3f3722;
+  --scene-paddy-water: #2f3d4f;
+  --scene-grass-back: #2a2416;
+  --scene-grass-front: #1f1b10;
+  --scene-flower: #bfae86;
+  --scene-flower-warm: #9c4a37;
+}
+[data-season="winter"]:not([data-weather="snow"]):not([data-weather="blizzard"]) .scene .palette-day {
+  --scene-sky-top: #7aa6cf;
+  --scene-sky-mid: #b5cee1;
+  --scene-sky-low: #e0eaf0;
+  --scene-sky-horizon: #edf1f2;
+  --scene-mtn-far: #c3d0db;
+  --scene-mtn-near: #aebdc2;
+  --scene-forest-far: #6f7f7a;
+  --scene-forest-far-lit: #8e9a94;
+  --scene-tree-dark: #2b3f36;
+  --scene-tree-mid: #3e5547;
+  --scene-tree-lit: #6b7d6c;
+  --scene-tree-sun: #a6b3a3;
+  --scene-hill-mid: #8b8a6c;
+  --scene-ridge: #9b9070;
+  --scene-paddy: #b7a77e;
+  --scene-paddy-alt: #c4b48a;
+  --scene-paddy-deep: #a8986f;
+  --scene-rice-row: rgba(110,95,60,0.22);
+  --scene-paddy-water: #cad7dd;
+  --scene-grass-back: #9a8f68;
+  --scene-grass-front: #7f7550;
+  --scene-flower: #e9edf0;
+  --scene-flower-warm: #d9cfb0;
+}
+[data-season="winter"]:not([data-weather="snow"]):not([data-weather="blizzard"]) .scene .palette-night {
+  --scene-tree-dark: #0b1416;
+  --scene-tree-mid: #15221f;
+  --scene-tree-lit: #26332f;
+  --scene-tree-sun: #33403b;
+  --scene-hill-mid: #252a28;
+  --scene-ridge: #23282a;
+  --scene-paddy: #2f3437;
+  --scene-paddy-alt: #363b3e;
+  --scene-paddy-deep: #2a2e31;
+  --scene-paddy-water: #334657;
+  --scene-grass-back: #24282a;
+  --scene-grass-front: #1a1d1f;
+  --scene-flower: #aab4bd;
+  --scene-flower-warm: #8e8a7c;
+}
+
+/* ---- weather variants ---- */
+/* tsuyu drizzle: fine, sparse, slow */
+[data-weather="drizzle"] .wx-rain { opacity: 0.32; }
+[data-weather="drizzle"] .wx-rain__tile { animation-duration: 0.9s; }
+[data-weather="drizzle"] .wx-gloom { opacity: 0.55; }
+/* sunshower: light rain catching the sunlight */
+[data-weather="sunshower"] .wx-rain { opacity: 0.38; }
+[data-weather="sunshower"] .wx-rain__tile { background-image: repeating-linear-gradient(100deg, transparent 0 14px, rgba(255, 246, 214, 0.75) 14px 15px, transparent 15px 34px); }
+/* typhoon: rain driven sideways by the wind */
+[data-weather="typhoon"] .wx-rain { opacity: 0.9; transform: rotate(24deg) scale(1.5); }
+[data-weather="typhoon"] .wx-rain__tile { animation-duration: 0.22s; }
+[data-weather="typhoon"] .wx-gloom { background: linear-gradient(180deg, rgba(25, 34, 40, 0.5), rgba(20, 30, 28, 0.28)); }
+[data-weather="typhoon"] .wx-leaf { animation-duration: 2.6s !important; }
+[data-weather="typhoon"] .wx-lightning { animation-duration: 13s; }
+/* blizzard: thick snow blown sideways, whited-out horizon */
+[data-weather="blizzard"] .wx-snow { transform: rotate(-28deg) scale(1.5); }
+[data-weather="blizzard"] .wx-snow__tile { animation-duration: 2.6s; }
+[data-weather="blizzard"] .wx-snow__tile--far { animation-duration: 3.8s; opacity: 0.9; }
+[data-weather="blizzard"] .wx-mist { opacity: 0.6; }
+/* spring haze (kasumi): warm, thin, low */
+[data-weather="haze"] .wx-mist__band {
+  background:
+    radial-gradient(30% 50% at 20% 50%, rgba(255, 238, 236, 0.6), transparent 70%),
+    radial-gradient(28% 45% at 55% 55%, rgba(255, 244, 232, 0.55), transparent 70%),
+    radial-gradient(32% 50% at 85% 45%, rgba(250, 236, 240, 0.6), transparent 70%);
+}
+[data-weather="haze"] .scene-clouds { opacity: 0.8; }
+
+/* ---- falling petals and leaves ---- */
+.wx-fall {
+  position: absolute;
+  top: -6%;
+  width: 16px;
+  height: 16px;
+  animation: wx-fall linear infinite;
+  will-change: transform;
+}
+.wx-petal { fill: #f7c3d2; filter: drop-shadow(0 1px 0 rgba(200, 110, 140, 0.35)); }
+.wx-petal:nth-child(3n) { fill: #ffe0ea; }
+.wx-maple { width: 20px; height: 20px; fill: hsl(calc(12deg + var(--leaf-hue) * 14deg) 78% 50%); }
+.dark .wx-petal { fill: #c99aab; }
+.dark .wx-maple { fill: hsl(calc(12deg + var(--leaf-hue) * 14deg) 45% 34%); }
+@keyframes wx-fall {
+  0% { transform: translate3d(0, 0, 0) rotate(0deg); }
+  25% { transform: translate3d(var(--sway), 28vh, 0) rotate(140deg); }
+  50% { transform: translate3d(calc(var(--sway) * 0.2), 56vh, 0) rotate(260deg); }
+  75% { transform: translate3d(calc(var(--sway) * 1.2), 84vh, 0) rotate(380deg); }
+  100% { transform: translate3d(calc(var(--sway) * 0.6), 112vh, 0) rotate(520deg); }
+}
+.lite .wx-fall:nth-child(n + 7) { display: none; }
+
+/* ---- sunshower rainbow ---- */
+.wx-rainbow {
+  background: radial-gradient(circle at 78% 95%,
+    transparent 0 38%,
+    rgba(160, 120, 255, 0.16) 38.5%, rgba(110, 160, 255, 0.18) 40%, rgba(110, 220, 170, 0.18) 41.5%,
+    rgba(255, 236, 120, 0.2) 43%, rgba(255, 170, 90, 0.18) 44.5%, rgba(255, 110, 110, 0.16) 46%, transparent 47%);
+  mask-image: linear-gradient(180deg, #000 30%, transparent 62%);
+}
+.dark .wx-rainbow { opacity: 0.25; }
+
+/* ---- midsummer heat shimmer ---- */
+.wx-heat { background: linear-gradient(180deg, transparent 40%, rgba(255, 214, 140, 0.12) 60%, rgba(255, 200, 120, 0.16)); }
+.wx-heat__band {
+  position: absolute;
+  left: -10%;
+  width: 120%;
+  height: 5%;
+  background: linear-gradient(180deg, transparent, rgba(255, 250, 235, 0.35), transparent);
+  animation: heat-shimmer 3.2s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+.wx-heat__band--2 { animation-duration: 4.1s; animation-delay: -1.4s; }
+@keyframes heat-shimmer {
+  0%, 100% { transform: translate3d(0, 0, 0) scaleY(1); opacity: 0.4; }
+  50% { transform: translate3d(2%, -6px, 0) scaleY(1.6); opacity: 0.9; }
+}

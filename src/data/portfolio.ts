@@ -87,15 +87,40 @@ export const XP_PER_LEVEL = 100;
 /** Acorns hidden around the page (ids must match <Acorn id="..."/> usages). */
 export const ACORN_IDS = ["hero", "dialogue", "quests", "relics", "footer"] as const;
 
-/** Weather cycle order (R key / weather charm). */
+/** Every weather the forest knows — drawn from Japan's seasons. */
 export const WEATHERS = [
   { id: "clear", icon: "clear", label: "Clear skies" },
-  { id: "rain", icon: "rain", label: "Summer shower" },
-  { id: "storm", icon: "storm", label: "Thunderstorm" },
+  { id: "sakura", icon: "sakura", label: "Sakura petal storm" },
+  { id: "haze", icon: "haze", label: "Spring haze" },
+  { id: "sunshower", icon: "sunshower", label: "Sunshower" },
+  { id: "drizzle", icon: "drizzle", label: "Tsuyu drizzle" },
+  { id: "rain", icon: "rain", label: "Rain" },
   { id: "mist", icon: "mist", label: "Morning mist" },
-  { id: "snow", icon: "snow", label: "Dreaming snow" },
-  { id: "breeze", icon: "wind", label: "Big breeze" },
+  { id: "heat", icon: "heat", label: "Summer heat haze" },
+  { id: "storm", icon: "storm", label: "Evening thunderstorm" },
+  { id: "breeze", icon: "wind", label: "Gusty wind" },
+  { id: "typhoon", icon: "typhoon", label: "Typhoon" },
+  { id: "momiji", icon: "momiji", label: "Falling maple leaves" },
+  { id: "snow", icon: "snow", label: "Snow" },
+  { id: "blizzard", icon: "blizzard", label: "Blizzard" },
 ] as const satisfies readonly { id: string; icon: IconName; label: string }[];
+
+export type WeatherId = (typeof WEATHERS)[number]["id"];
+
+/**
+ * Japan's seasons, in order. The site cycles through them: each plays a few of
+ * its own weathers, then the next season arrives (and the countryside repaints).
+ */
+export const SEASONS = [
+  { id: "spring", label: "Spring", jp: "haru", weathers: ["clear", "sakura", "haze", "sunshower"] },
+  { id: "tsuyu", label: "Rainy season", jp: "tsuyu", weathers: ["drizzle", "rain", "mist"] },
+  { id: "summer", label: "Summer", jp: "natsu", weathers: ["clear", "heat", "storm", "sunshower"] },
+  { id: "typhoon", label: "Typhoon season", jp: "taifū", weathers: ["breeze", "rain", "typhoon"] },
+  { id: "autumn", label: "Autumn", jp: "aki", weathers: ["clear", "momiji", "mist", "rain"] },
+  { id: "winter", label: "Winter", jp: "fuyu", weathers: ["clear", "snow", "blizzard", "breeze"] },
+] as const satisfies readonly { id: string; label: string; jp: string; weathers: readonly WeatherId[] }[];
+
+export type SeasonId = (typeof SEASONS)[number]["id"];
 
 export const quests: Quest[] = [
   { id: "begin", icon: "compass", title: "Begin the Journey", hint: "Press start on the title screen.", xp: 20 },
@@ -105,7 +130,7 @@ export const quests: Quest[] = [
   { id: "nightfall", icon: "moon", title: "Cast Time-Shift", hint: "Switch between day and night.", xp: 40 },
   { id: "pat", icon: "sprout", title: "Befriend Mori", hint: "Give the forest spirit a gentle pat.", xp: 30 },
   { id: "weather", icon: "clear", title: "Change the Weather", hint: "Tap the weather charm or press R.", xp: 40 },
-  { id: "all-weather", icon: "rainbow", title: "Weather Watcher", hint: "Witness all six kinds of weather.", xp: 80 },
+  { id: "all-weather", icon: "rainbow", title: "Through the Year", hint: "Live through all six seasons of the forest.", xp: 80 },
   { id: "journal", icon: "map", title: "Open the Journal", hint: "Press J or tap the journal button.", xp: 20 },
   { id: "acorns", icon: "acorn", title: "Acorn Gatherer", hint: `Find all ${ACORN_IDS.length} acorns hidden across the forest.`, xp: 150 },
   { id: "pigeon", icon: "bird", title: "Send a Pigeon Post", hint: "Reach out through the email link.", xp: 80 },
@@ -265,11 +290,27 @@ export const dialogue = {
   ],
   weather: {
     clear: "The clouds part. Sunlight on the rice again — my favourite.",
-    rain: "Pitter-patter… a summer shower! Watch the ripples dance across the paddies.",
-    storm: "Eek! Thunder over the mountains. Stay close — the camphor tree will keep us dry.",
+    sakura: "Hanafubuki! A blizzard of cherry petals — quick, catch one and make a wish.",
+    haze: "Spring haze — kasumi. The mountains have gone soft and dreamy.",
+    sunshower: "Rain falling while the sun shines… they say a fox is getting married somewhere!",
+    drizzle: "Tsuyu has begun. A fine drizzle that never quite stops — the frogs are delighted.",
+    rain: "Pitter-patter… watch the ripples dance across the paddies.",
     mist: "Morning mist is rolling over the fields. Everything feels like a secret.",
-    snow: "Snow? In summer?! The forest must be dreaming. Let's make tiny footprints.",
+    heat: "Phew, midsummer! Can you hear the cicadas singing in the heat?",
+    storm: "A yūdachi — the evening thunderstorm! Stay close, the camphor tree will keep us dry.",
     breeze: "Whoosh! A big gust — hold on to your hat, the leaves are going on an adventure.",
+    typhoon: "A typhoon is passing! Hold on tight — I've tucked myself behind my stone.",
+    momiji: "The maples are letting go of their red leaves. Momiji season is so pretty.",
+    snow: "Snow! The fields are turning white. Let's make tiny footprints.",
+    blizzard: "Fubuki — a whirling blizzard! Brrr, I can barely see the farmhouse.",
+  } as Record<string, string>,
+  seasons: {
+    spring: "Spring is here! The cherry trees are blooming and the paddies are filling with water.",
+    tsuyu: "Tsuyu, the rainy season, has arrived. Everything turns deep green and dripping.",
+    summer: "Summer! Long bright days, tall grass, and evening thunder.",
+    typhoon: "Typhoon season… the wind is restless. Keep an eye on the sky.",
+    autumn: "Autumn has come. Golden rice, red maples, and crisp, clear air.",
+    winter: "Winter settles over the forest. Quiet fields, frosty mornings… and maybe snow.",
   } as Record<string, string>,
   acornsComplete: `You found every acorn! The forest is grateful. Here's the secret: ${profile.shortName} reads every pigeon post — send one and say hi!`,
 };

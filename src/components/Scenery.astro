@@ -450,6 +450,41 @@ const poles = [
     ))}
   </div>
 
+  <!-- Sakura petal storm (hanafubuki) -->
+  <div class="wx wx-sakura absolute inset-0">
+    {Array.from({ length: 16 }, (_, i) => (
+      <svg
+        class="wx-fall wx-petal"
+        style={`left:${(i * 37) % 100}%; animation-delay:-${(i * 0.83).toFixed(2)}s; animation-duration:${8 + (i % 5)}s; --sway:${(i % 3) * 6 + 8}vw`}
+        viewBox="0 0 20 20"
+      >
+        <path d="M10 2c4 3 6 7 4 12-1 3-3 4-4 4s-3-1-4-4C4 9 6 5 10 2Zm0 0-1 4 1 2 1-2Z" />
+      </svg>
+    ))}
+  </div>
+
+  <!-- Falling maple leaves (momiji) -->
+  <div class="wx wx-momiji absolute inset-0">
+    {Array.from({ length: 12 }, (_, i) => (
+      <svg
+        class="wx-fall wx-maple"
+        style={`left:${(i * 29 + 7) % 100}%; animation-delay:-${(i * 1.1).toFixed(2)}s; animation-duration:${9 + (i % 4)}s; --sway:${(i % 3) * 7 + 6}vw; --leaf-hue:${i % 3}`}
+        viewBox="0 0 24 24"
+      >
+        <path d="M12 2l1.6 4.2 3.6-2-1 4.4 4.6-.6-3 3.4 3.4 2.2-4.6.6.6 3.6L13 16v6h-2v-6l-4.2 1.8.6-3.6-4.6-.6 3.4-2.2-3-3.4 4.6.6-1-4.4 3.6 2Z" />
+      </svg>
+    ))}
+  </div>
+
+  <!-- Sunshower rainbow -->
+  <div class="wx wx-rainbow absolute inset-0"></div>
+
+  <!-- Midsummer heat shimmer over the fields -->
+  <div class="wx wx-heat absolute inset-0">
+    <div class="wx-heat__band" style="top:56%"></div>
+    <div class="wx-heat__band wx-heat__band--2" style="top:62%"></div>
+  </div>
+
   <!-- a bank of mist that drifts across while the weather changes -->
   <div class="wx-veil"></div>
 

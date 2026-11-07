@@ -1,4 +1,4 @@
-import { ACORN_IDS, WEATHERS, XP_PER_LEVEL, dialogue, quests } from '../data/portfolio';
+import { ACORN_IDS, SEASONS, WEATHERS, XP_PER_LEVEL, dialogue, quests, type SeasonId, type WeatherId } from '../data/portfolio';
 import { initDialogue, say } from './dialogue';
 import { read, write, prefersReducedMotion } from './storage';
 import { icon, type IconName } from './icons';
@@ -16,6 +16,7 @@ interface GameState {
   quests: string[];
   acorns: string[];
   weathers: string[];
+  seasons: string[];
 }
 
 function load(): GameState {
@@ -28,12 +29,13 @@ function load(): GameState {
         quests: Array.isArray(s.quests) ? s.quests : [],
         acorns: Array.isArray(s.acorns) ? s.acorns : [],
         weathers: Array.isArray(s.weathers) ? s.weathers : [],
+        seasons: Array.isArray(s.seasons) ? s.seasons : [],
       };
     }
   } catch {
     /* corrupted save — start fresh */
   }
-  return { xp: 0, quests: [], acorns: [], weathers: [] };
+  return { xp: 0, quests: [], acorns: [], weathers: [], seasons: [] };
 }
 
 const state = load();
@@ -91,41 +93,48 @@ function patMori() {
 /* ------------------------------------------------------------------ */
 
 let pendingWeather: string | null = null;
+let pendingSeason: string | null = null;
 function currentWeather() {
   // where the sky is heading (a change may still be drifting in)
   return pendingWeather || document.documentElement.dataset.weather || 'clear';
 }
+function currentSeason(): SeasonId {
+  return (pendingSeason || document.documentElement.dataset.season || 'summer') as SeasonId;
+}
+const seasonOf = (id: string) => SEASONS.find((x) => x.id === id) ?? SEASONS[2];
 
 function renderWeather() {
   const w = WEATHERS.find((x) => x.id === currentWeather()) ?? WEATHERS[0];
+  const season = seasonOf(currentSeason());
   document.querySelectorAll<HTMLElement>('[data-hud-weather]').forEach((el) => (el.innerHTML = icon(w.icon)));
   document.querySelectorAll<HTMLElement>('[data-weather-cycle]').forEach((b) => {
     if (b.hasAttribute('data-hud-weather-btn')) {
-      b.setAttribute('aria-label', `Change the weather (R). Now: ${w.label}`);
-      b.dataset.tip = `Weather: ${w.label} · R to change`;
+      b.setAttribute('aria-label', `Change the weather (R). Now: ${season.label}, ${w.label}`);
+      b.dataset.tip = `${season.label} · ${w.label} · R to change`;
     }
   });
 }
 
-type WeatherId = (typeof WEATHERS)[number]['id'];
-
 /**
- * Weather change: a bank of mist drifts across the screen; when it covers the
- * middle the new weather takes over, the old one fades out behind it, and the
- * mist clears. Reduced motion → instant.
+ * Weather (and season) change: a bank of mist drifts across the screen; when
+ * it covers the middle the new weather — and, at a new season, the repainted
+ * countryside — takes over, the old weather fades out behind it, and the mist
+ * clears. Reduced motion → instant.
  */
 let wxTimers: number[] = [];
-function transitionWeather(next: string) {
+function transitionWeather(next: string, season: string) {
   const root = document.documentElement;
   const prev = root.dataset.weather || 'clear';
   wxTimers.forEach((t) => window.clearTimeout(t));
   wxTimers = [];
   if (prefersReducedMotion()) {
     root.dataset.weather = next;
-    pendingWeather = null;
+    root.dataset.season = season;
+    pendingWeather = pendingSeason = null;
     return;
   }
   pendingWeather = next;
+  pendingSeason = season;
   root.classList.remove('wx-changing');
   void root.offsetWidth; // restart the mist if a change was already drifting by
   root.classList.add('wx-changing');
@@ -133,7 +142,8 @@ function transitionWeather(next: string) {
     window.setTimeout(() => {
       root.dataset.weatherPrev = prev;
       root.dataset.weather = next;
-      pendingWeather = null;
+      root.dataset.season = season;
+      pendingWeather = pendingSeason = null;
     }, 850),
     window.setTimeout(() => {
       root.classList.remove('wx-changing');
@@ -142,18 +152,38 @@ function transitionWeather(next: string) {
   );
 }
 
-/** Apply a weather. `manual` = the visitor chose it (dialogue + quest); auto changes are quiet. */
-function setWeather(next: WeatherId, manual: boolean) {
-  const ids = WEATHERS.map((w) => w.id);
-  transitionWeather(next);
+function noteSeason(season: string) {
+  if (!state.seasons.includes(season)) {
+    state.seasons.push(season);
+    save();
+  }
+  if (SEASONS.every((x) => state.seasons.includes(x.id))) completeQuest('all-weather');
+}
+
+/**
+ * Apply a weather (optionally moving to a new season). `manual` = the visitor
+ * chose it (dialogue + quest); automatic changes are quiet unless a new season
+ * arrives, which Mori always announces.
+ */
+function setWeather(next: WeatherId, manual: boolean, season: SeasonId = currentSeason()) {
+  const newSeason = season !== currentSeason();
+  transitionWeather(next, season);
   write('weather', next, 'session');
+  write('season', season, 'session');
   renderWeather();
   audio.setWeather(next);
+  seasonWeathers = newSeason ? 1 : seasonWeathers + 1;
 
-  if (manual) {
+  if (newSeason) {
+    const info = seasonOf(season);
+    window.setTimeout(() => {
+      say(dialogue.seasons[season]);
+      moriReact();
+      toast(WEATHERS.find((w) => w.id === next)?.icon ?? 'clear', `${info.label} (${info.jp})`, dialogue.seasons[season]);
+    }, 900);
+  } else if (manual) {
     say(dialogue.weather[next]);
     moriReact();
-    completeQuest('weather');
   } else {
     // a gentle glow on the weather token instead of a toast
     document.querySelectorAll('[data-hud-weather-btn]').forEach((el) => {
@@ -162,28 +192,41 @@ function setWeather(next: WeatherId, manual: boolean) {
       el.classList.add('is-shifting');
     });
   }
+  if (manual) completeQuest('weather');
 
   if (!state.weathers.includes(next)) {
     state.weathers.push(next);
     save();
   }
-  if (ids.every((id) => id === 'clear' || state.weathers.includes(id))) completeQuest('all-weather');
+  noteSeason(season);
 }
 
-/** Visitor's weather button / R key: step through the weathers in order. */
+/**
+ * Visitor's weather button / R key: step through this season's weathers; after
+ * the last one, the next season arrives — so pressing on tours the whole year.
+ */
 function cycleWeather() {
-  const ids = WEATHERS.map((w) => w.id);
-  const next = ids[(ids.indexOf(currentWeather() as WeatherId) + 1) % ids.length];
-  setWeather(next, true);
+  const season = seasonOf(currentSeason());
+  const list = season.weathers as readonly WeatherId[];
+  const i = list.indexOf(currentWeather() as WeatherId);
+  if (i >= 0 && i < list.length - 1) {
+    setWeather(list[i + 1], true, season.id);
+  } else {
+    const nextSeason = SEASONS[(SEASONS.indexOf(season) + 1) % SEASONS.length];
+    setWeather(nextSeason.weathers[0], true, nextSeason.id);
+  }
   scheduleAutoWeather(); // the visitor's choice gets a full spell before the sky moves on
 }
 
-/* ---- automatic weather: a random, mostly-clear rotation ---- */
-
-const WEATHER_POOL: WeatherId[] = ['clear', 'clear', 'clear', 'clear', 'rain', 'rain', 'breeze', 'breeze', 'mist', 'snow', 'storm'];
+/* ---- automatic weather: the year turns on its own ---- */
+// Each season plays about three of its weathers (20–35 s each), then the next
+// season arrives with one of its own.
+const WEATHERS_PER_SEASON = 3;
+let seasonWeathers = 1;
 let autoWeatherTimer: number | undefined;
 
 const autoWeatherOn = () => read('auto-weather') !== 'off';
+const pick = <T,>(xs: readonly T[]) => xs[Math.floor(Math.random() * xs.length)];
 
 function scheduleAutoWeather() {
   window.clearTimeout(autoWeatherTimer);
@@ -191,8 +234,14 @@ function scheduleAutoWeather() {
   const delay = 20000 + Math.random() * 15000; // every 20–35 s
   autoWeatherTimer = window.setTimeout(() => {
     if (document.visibilityState === 'visible' && !document.documentElement.classList.contains('show-title')) {
-      const options = WEATHER_POOL.filter((w) => w !== currentWeather());
-      setWeather(options[Math.floor(Math.random() * options.length)], false);
+      const season = seasonOf(currentSeason());
+      if (seasonWeathers >= WEATHERS_PER_SEASON) {
+        const nextSeason = SEASONS[(SEASONS.indexOf(season) + 1) % SEASONS.length];
+        setWeather(pick(nextSeason.weathers), false, nextSeason.id);
+      } else {
+        const options = (season.weathers as readonly WeatherId[]).filter((w) => w !== currentWeather());
+        setWeather(pick(options.length ? options : season.weathers), false, season.id);
+      }
     }
     scheduleAutoWeather();
   }, delay);
@@ -426,6 +475,7 @@ function resetProgress() {
   state.quests = [];
   state.acorns = [];
   state.weathers = [];
+  state.seasons = [];
   save();
   render();
   toast('leaf', 'Journey reset', 'Your acorns have returned to the forest.');
@@ -666,6 +716,7 @@ function initSound() {
 
 function init() {
   renderWeather();
+  noteSeason(currentSeason());
   renderAutoWeather();
   scheduleAutoWeather();
   document.addEventListener('visibilitychange', () => document.visibilityState === 'visible' && scheduleAutoWeather());

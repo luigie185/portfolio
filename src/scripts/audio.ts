@@ -14,16 +14,26 @@
  */
 import { read, write } from './storage';
 
-type Weather = 'clear' | 'rain' | 'storm' | 'mist' | 'snow' | 'breeze';
+type Weather =
+  | 'clear' | 'rain' | 'storm' | 'mist' | 'snow' | 'breeze'
+  | 'sakura' | 'haze' | 'sunshower' | 'drizzle' | 'heat' | 'typhoon' | 'momiji' | 'blizzard';
 type Bed = 'rain' | 'wind' | 'rumble' | 'hush';
 
 const BED_LEVELS: Record<Weather, Record<Bed, number>> = {
   clear: { rain: 0, wind: 0.3, rumble: 0, hush: 0 },
+  sakura: { rain: 0, wind: 0.45, rumble: 0, hush: 0 },
+  haze: { rain: 0, wind: 0.12, rumble: 0, hush: 0.25 },
+  sunshower: { rain: 0.06, wind: 0.15, rumble: 0, hush: 0 },
+  drizzle: { rain: 0.05, wind: 0.08, rumble: 0, hush: 0.15 },
   rain: { rain: 0.09, wind: 0.1, rumble: 0, hush: 0 },
-  storm: { rain: 0.16, wind: 0.35, rumble: 0.28, hush: 0 },
   mist: { rain: 0, wind: 0.1, rumble: 0, hush: 0.35 },
-  snow: { rain: 0, wind: 0.2, rumble: 0, hush: 0.4 },
+  heat: { rain: 0, wind: 0.08, rumble: 0, hush: 0 },
+  storm: { rain: 0.16, wind: 0.35, rumble: 0.28, hush: 0 },
   breeze: { rain: 0, wind: 1.1, rumble: 0, hush: 0 },
+  typhoon: { rain: 0.2, wind: 1.3, rumble: 0.2, hush: 0 },
+  momiji: { rain: 0, wind: 0.5, rumble: 0, hush: 0 },
+  snow: { rain: 0, wind: 0.2, rumble: 0, hush: 0.4 },
+  blizzard: { rain: 0, wind: 1.2, rumble: 0, hush: 0.45 },
 };
 
 // --- music material (original) ------------------------------------------
@@ -264,7 +274,8 @@ class ForestAudio {
   }
 
   private musicLevel() {
-    const duck = this.weather === 'storm' ? 0.45 : this.weather === 'rain' ? 0.8 : 1;
+    const w = this.weather;
+    const duck = w === 'storm' || w === 'typhoon' || w === 'blizzard' ? 0.45 : w === 'rain' ? 0.8 : 1;
     return this.musicVol * 0.55 * duck;
   }
 
@@ -404,20 +415,48 @@ class ForestAudio {
     const now = ctx.currentTime;
     const w = this.weather;
 
-    if (w === 'rain' || w === 'storm') {
-      const drops = w === 'storm' ? 4 : 2;
-      for (let i = 0; i < drops; i++) this.droplet(now + Math.random() * 0.2);
-    }
-    if (w === 'storm' && now >= this.nextThunder) {
+    const drops = { rain: 2, storm: 4, typhoon: 5, drizzle: 1, sunshower: 1 } as Partial<Record<Weather, number>>;
+    for (let i = 0; i < (drops[w] ?? 0); i++) if (w !== 'drizzle' || Math.random() < 0.5) this.droplet(now + Math.random() * 0.2);
+    if ((w === 'storm' || w === 'typhoon') && now >= this.nextThunder) {
       this.thunder(now + 0.05);
-      this.nextThunder = now + rand(7, 16);
+      this.nextThunder = now + (w === 'typhoon' ? rand(12, 22) : rand(7, 16));
     }
-    const calm = w === 'clear' || w === 'breeze' || w === 'mist';
+    const calm = ['clear', 'breeze', 'mist', 'sakura', 'haze', 'sunshower', 'momiji'].includes(w);
     if (calm && !this.night && Math.random() < 0.06) this.birdPhrase(now + 0.05);
-    if (calm && this.night && Math.random() < 0.22) this.cricket(now + 0.05);
-    if ((w === 'snow' && Math.random() < 0.1) || (w === 'mist' && Math.random() < 0.04)) {
+    if ((calm || w === 'heat') && this.night && Math.random() < 0.22) this.cricket(now + 0.05);
+    if (w === 'heat' && !this.night && Math.random() < 0.09) this.cicada(now + 0.05);
+    if ((w === 'snow' && Math.random() < 0.1) || ((w === 'mist' || w === 'haze') && Math.random() < 0.04)) {
       this.bell(pick([84, 86, 88, 91, 93]), now + 0.05, 0.04, this.ambBus, 2.4);
     }
+  }
+
+  /** A summer cicada: a buzzing, pulsing high band that swells and fades. */
+  private cicada(t: number) {
+    const ctx = this.ctx!;
+    const dur = rand(2.5, 5);
+    const src = ctx.createBufferSource();
+    src.buffer = this.white;
+    const bp = ctx.createBiquadFilter();
+    bp.type = 'bandpass';
+    bp.frequency.value = rand(4200, 6200);
+    bp.Q.value = 9;
+    const pulse = ctx.createGain();
+    pulse.gain.value = 0.5;
+    const lfo = ctx.createOscillator();
+    lfo.frequency.value = rand(28, 42);
+    const lfoAmt = ctx.createGain();
+    lfoAmt.gain.value = 0.5;
+    lfo.connect(lfoAmt).connect(pulse.gain);
+    const g = ctx.createGain();
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(0.05, t + dur * 0.35);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    const pan = ctx.createStereoPanner();
+    pan.pan.value = rand(-0.9, 0.9);
+    src.connect(bp).connect(pulse).connect(g).connect(pan).connect(this.ambBus);
+    src.start(t, Math.random() * 2, dur + 0.1);
+    lfo.start(t);
+    lfo.stop(t + dur + 0.1);
   }
 
   private droplet(t: number) {

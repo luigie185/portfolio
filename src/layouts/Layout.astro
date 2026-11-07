@@ -47,15 +47,32 @@ const {
 
         // Weather survives reloads within the session.
         var wx = null;
-        try { wx = sessionStorage.getItem('weather'); } catch (e) {}
-        // First visit this session: let the sky pick a (mostly clear) weather.
+        // Season + weather survive reloads within the session; a first visit
+        // starts at a random season with one of its own weathers (mostly calm).
+        var season = null;
+        try { wx = sessionStorage.getItem('weather'); season = sessionStorage.getItem('season'); } catch (e) {}
+        var seasons = {
+          spring: ['clear', 'clear', 'sakura', 'sakura', 'haze', 'sunshower'],
+          tsuyu: ['drizzle', 'drizzle', 'rain', 'mist'],
+          summer: ['clear', 'clear', 'heat', 'storm', 'sunshower'],
+          typhoon: ['breeze', 'breeze', 'rain', 'typhoon'],
+          autumn: ['clear', 'clear', 'momiji', 'momiji', 'mist', 'rain'],
+          winter: ['clear', 'snow', 'snow', 'blizzard', 'breeze']
+        };
+        if (!season || !seasons[season]) {
+          var names = Object.keys(seasons);
+          season = names[Math.floor(Math.random() * names.length)];
+          wx = null;
+        }
         var auto = null;
         try { auto = localStorage.getItem('auto-weather'); } catch (e) {}
-        if (!wx && auto !== 'off') {
-          var pool = ['clear','clear','clear','clear','rain','rain','breeze','breeze','mist','snow','storm'];
+        if (!wx) {
+          var pool = auto === 'off' ? ['clear'] : seasons[season];
           wx = pool[Math.floor(Math.random() * pool.length)];
+          if (auto === 'off' && seasons[season].indexOf('clear') < 0) wx = seasons[season][0];
         }
-        root.dataset.weather = wx || 'clear';
+        root.dataset.season = season;
+        root.dataset.weather = wx;
 
         // Graphics quality: saved choice, else auto-detect low-power devices.
         var gfx = null;
