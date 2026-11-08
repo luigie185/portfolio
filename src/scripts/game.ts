@@ -1,4 +1,4 @@
-import { ACORN_IDS, SEASONS, WEATHERS, XP_PER_LEVEL, dialogue, quests, type SeasonId, type WeatherId } from '../data/portfolio';
+import { ACORN_IDS, SEASONS, codingDetails, codingLevel, profile, WEATHERS, XP_PER_LEVEL, dialogue, quests, type SeasonId, type WeatherId } from '../data/portfolio';
 import { initDialogue, say } from './dialogue';
 import { read, write, prefersReducedMotion } from './storage';
 import { icon, type IconName } from './icons';
@@ -841,6 +841,11 @@ function init() {
   document.addEventListener('visibilitychange', () => document.visibilityState === 'visible' && scheduleAutoWeather());
   initGraphics();
   initTooltips();
+  // level is computed live (static build), with exact details on hover
+  document.querySelectorAll<HTMLElement>('[data-my-level]').forEach((el) => (el.textContent = String(codingLevel(profile.codingSince))));
+  const levelDetail = codingDetails(profile.codingSince);
+  document.querySelectorAll<HTMLElement>('[data-level-tip]').forEach((el) => (el.dataset.tip = levelDetail));
+  document.querySelectorAll<HTMLElement>('[data-level-detail]').forEach((el) => (el.textContent = levelDetail));
   initMori();
   renderRecruiter();
   initSound();

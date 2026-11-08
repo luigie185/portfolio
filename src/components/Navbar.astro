@@ -17,19 +17,20 @@ const links = [
 
 <nav class="hud-bubble" data-hud aria-label="Game menu">
   <!-- Your crest: your level, with a gilt ring. Hover/focus shows your name. -->
-  <a href="#about" class="hud-bubble__crest">
+  <a href="#about" class="hud-bubble__crest" data-level-crest>
     <span class="hud-nameplate" aria-hidden="true">
       <span class="hud-nameplate__name">{profile.name}</span>
-      <span class="hud-nameplate__meta">LV {profile.level} · {profile.role}</span>
+      <span class="hud-nameplate__meta">LV <span data-my-level>{profile.level}</span> · Coding since {profile.codingYear}</span>
+      <span class="hud-nameplate__detail" data-level-detail></span>
     </span>
     <svg viewBox="0 0 48 48" aria-hidden="true">
       <circle cx="24" cy="24" r="20" class="hud-ring__track" />
       <circle cx="24" cy="24" r="20" class="hud-ring__fill hud-ring__fill--full" />
       <circle cx="24" cy="24" r="15.5" class="hud-ring__disc" />
       <text x="24" y="21" text-anchor="middle" class="hud-ring__lv">LV</text>
-      <text x="24" y="32" text-anchor="middle" class="hud-ring__num">{profile.level}</text>
+      <text x="24" y="32" text-anchor="middle" class="hud-ring__num" data-my-level>{profile.level}</text>
     </svg>
-    <span class="sr-only">{profile.name}, level {profile.level}. Back to top.</span>
+    <span class="sr-only">{profile.name}, level <span data-my-level>{profile.level}</span>, coding since {profile.codingYear}. Back to top.</span>
   </a>
 
   <span class="hud-bubble__sep" aria-hidden="true"></span>

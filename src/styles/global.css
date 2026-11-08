@@ -3664,3 +3664,16 @@ kbd {
 .dark .mori-reply { color: #f3b354; background: rgba(214, 168, 79, 0.1); border-color: rgba(214, 168, 79, 0.45); }
 .mori-panel__tail { background: #fffdf6; border-right: 2px solid #c59b47; border-bottom: 2px solid #c59b47; width: 16px; height: 16px; margin-left: -8px; bottom: -7px; }
 .dark .mori-panel__tail { background: #131e31; border-color: #8a6a2c; }
+
+/* exact coding-journey details under the name on the HUD crest */
+.hud-nameplate__detail {
+  margin-top: 2px;
+  max-width: 290px;
+  white-space: normal;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.62rem;
+  line-height: 1.4;
+  color: #6b5d45;
+}
+.dark .hud-nameplate__detail { color: #8fa3bf; }
+.hero-crest__level { cursor: help; }

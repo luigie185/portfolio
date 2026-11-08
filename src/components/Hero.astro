@@ -95,7 +95,7 @@ const photo = photoFile ? `/${photoFile}` : null;
                 fetchpriority="high"
               />
             )}
-            <span class="hero-crest__level">LV {profile.level}</span>
+            <span class="hero-crest__level" tabindex="0" data-level-tip data-tip={`Coding since ${profile.codingYear}`}>LV <span data-my-level>{profile.level}</span></span>
           </div>
 
           <div class="min-w-0">

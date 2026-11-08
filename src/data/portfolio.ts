@@ -40,12 +40,43 @@ export interface ProjectItem {
   repoUrl?: string;
 }
 
+/** Level = 1 + whole years since the date (e.g. LV 2 from the first anniversary). */
+export function codingLevel(since: string, now: Date = new Date()): number {
+  const [y, m, d] = since.split("-").map(Number);
+  let years = now.getFullYear() - y;
+  if (now.getMonth() + 1 < m || (now.getMonth() + 1 === m && now.getDate() < d)) years--;
+  return Math.max(1, years + 1);
+}
+
+/** Hover details for the level: exact start date, time coding, next level-up. */
+export function codingDetails(since: string, now: Date = new Date()): string {
+  const [y, m, d] = since.split("-").map(Number);
+  const start = new Date(y, m - 1, d);
+  const level = codingLevel(since, now);
+  const next = new Date(y + level, m - 1, d);
+  const day = 86400000;
+  const fmt = (dt: Date) => dt.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
+  const days = Math.max(0, Math.floor((now.getTime() - start.getTime()) / day));
+  const months = Math.floor(days / 30.44);
+  const span = months >= 12 ? `${Math.floor(months / 12)} yr ${months % 12} mo` : months >= 1 ? `${months} month${months > 1 ? "s" : ""}` : `${days} day${days === 1 ? "" : "s"}`;
+  const toNext = Math.ceil((next.getTime() - now.getTime()) / day);
+  return `Coding since ${fmt(start)} · ${span} in · LV ${level + 1} on ${fmt(next)} (${toNext} days)`;
+}
+
 export const profile = {
   name: "Luigie Cyril Francis A. Posod",
   shortName: "Luigie",
   role: "Software Engineer",
   rpgClass: "Arcane Full-Stack Artificer",
-  level: 25,
+  /** Coding journey start. The level is 1 in the first year and goes up by one each
+   *  year after (computed live, so it rises on its own). Only the year is shown. */
+  codingSince: "2026-08-01",
+  get level() {
+    return codingLevel(this.codingSince);
+  },
+  get codingYear() {
+    return Number(this.codingSince.slice(0, 4));
+  },
   guild: "Kingdom of Ding Dong Dell · Remote",
   tagline:
     "Weaving fast, resilient digital realms with clean architecture and modern web alchemy.",
