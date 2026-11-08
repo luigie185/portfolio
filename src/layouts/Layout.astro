@@ -4,6 +4,7 @@ import TitleScreen from '../components/TitleScreen.astro';
 import QuestJournal from '../components/QuestJournal.astro';
 import Scenery from '../components/Scenery.astro';
 import Icon from '../components/Icon.astro';
+import MoriDialog from '../components/MoriDialog.astro';
 
 interface Props {
   title: string;
@@ -128,6 +129,7 @@ const canonical = Astro.site ? new URL(Astro.url.pathname, Astro.site).href : un
 
     <slot />
 
+    {!plain && <MoriDialog />}
     {!plain && <QuestJournal />}
     <div data-toast-region class="toast-region" role="status" aria-live="polite"></div>
     <div id="forest-tip" class="forest-tip" role="tooltip" hidden><Icon name="leaf" class="forest-tip__icon" /><span class="forest-tip__text"></span><span class="forest-tip__arrow" aria-hidden="true"></span></div>

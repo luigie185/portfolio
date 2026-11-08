@@ -1,8 +1,7 @@
 ---
 import Icon from './Icon.astro';
-import { dialogue, profile } from '../data/portfolio';
+import { profile } from '../data/portfolio';
 import Acorn from './Acorn.astro';
-import ForestSpirit from './ForestSpirit.astro';
 import fs from 'node:fs';
 import path from 'node:path';
 
@@ -202,68 +201,4 @@ const photo = photoFile ? `/${photoFile}` : null;
     </div>
   </div>
 
-  <!-- Forest spirit guide: RPG dialogue window with typewriter text -->
-  <div data-dialogue-box class="dialogue-sheet relative">
-    <Acorn id="dialogue" class="-bottom-3 right-6 z-20" />
-
-    <!-- name plate tab -->
-    <div class="dialogue-nameplate">
-      <Icon name="leaf" /> {dialogue.speaker}
-    </div>
-
-    <div class="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6">
-      <!-- Mori's portrait (pat for a reaction) -->
-      <button
-        type="button"
-        data-pat-spirit
-        data-tip="Give Mori a gentle pat"
-        aria-label="Pat Mori, the forest spirit"
-        class="dialogue-portrait spirit-avatar"
-      >
-        <ForestSpirit standalone class="w-[4.5rem] h-[4.5rem]" />
-      </button>
-
-      <div class="flex-1 w-full min-w-0">
-        <!-- speech bubble -->
-        <div class="dialogue-bubble">
-          <!-- Screen readers get the full line once; the animated copy is hidden from them -->
-          <p class="sr-only" aria-live="polite" data-dialogue-sr>{dialogue.greeting}</p>
-          <p aria-hidden="true" class="dialogue-text">
-            <span data-dialogue-visible>{dialogue.greeting}</span><span data-dialogue-caret class="dialogue-caret">▼</span>
-          </p>
-        </div>
-
-        <div class="mt-4 grid gap-3 sm:grid-cols-[1fr_auto] sm:items-start">
-          <div>
-            <p class="dialogue-group-label">Ask Mori</p>
-            <div class="flex flex-wrap gap-2" role="group" aria-label="Ask Mori">
-              {
-                dialogue.options.map((opt, i) => (
-                  <button type="button" data-dialogue-option={i} class="npc-choice dialogue-option">
-                    <span class="npc-choice__cursor" aria-hidden="true">▸</span>
-                    <span>{opt.label}</span>
-                  </button>
-                ))
-              }
-            </div>
-          </div>
-          <div>
-            <p class="dialogue-group-label">Cast a spell</p>
-            <div class="flex flex-wrap gap-2" role="group" aria-label="Spells">
-              <button type="button" data-theme-toggle aria-pressed="false" data-tip="Switch day and night · N" class="npc-choice dialogue-spell">
-                <Icon name="wand" /><span>Time-Shift</span>
-              </button>
-              <button type="button" data-weather-cycle data-tip="Change the weather · R" class="npc-choice dialogue-spell">
-                <Icon name="clear" /><span>Weather</span>
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <p class="dialogue-hint">
-          Click the text to skip · <kbd>J</kbd> journal · <kbd>1</kbd><kbd>2</kbd><kbd>3</kbd> travel
-        </p>
-      </div>
-    </div>
-  </div>
 </section>

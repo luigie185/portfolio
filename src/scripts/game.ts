@@ -745,6 +745,91 @@ function setRecruiter(on: boolean) {
 }
 
 /* ------------------------------------------------------------------ */
+/* Talking with Mori: click Mori in the countryside to open the panel  */
+/* ------------------------------------------------------------------ */
+
+const moriEls = () => ({
+  hotspot: document.querySelector<HTMLElement>('[data-mori-open]'),
+  panel: document.querySelector<HTMLElement>('.mori-panel'),
+  sceneMori: document.querySelector<SVGGElement>('.scene-actors [data-spirit]'),
+});
+
+/**
+ * Put the button exactly over Mori in the painting — unless the page content
+ * covers that spot (narrow screens), then dock a small Mori portrait in the
+ * bottom-left corner instead. Re-measured on resize.
+ */
+function placeMori() {
+  const { hotspot, panel, sceneMori } = moriEls();
+  if (!hotspot || !panel || !sceneMori) return;
+  const r = sceneMori.getBoundingClientRect();
+  const content = document.querySelector('#main')?.getBoundingClientRect();
+  // the inner column (max-w-4xl) is narrower than #main; measure its first section
+  const column = document.querySelector('#main > section')?.getBoundingClientRect() ?? content;
+  // dock when the cards cover Mori, or the cropped painting puts Mori off-screen
+  const offscreen = r.left < 4 || r.top < 4 || r.right > window.innerWidth - 4 || r.bottom > window.innerHeight - 4;
+  const covered = offscreen || !column || r.right + 12 > column.left;
+  hotspot.classList.toggle('is-docked', covered);
+  if (!covered) {
+    hotspot.style.left = `${Math.round(r.left - 6)}px`;
+    hotspot.style.top = `${Math.round(r.top - 10)}px`;
+    hotspot.style.width = `${Math.round(r.width + 12)}px`;
+    hotspot.style.height = `${Math.round(r.height + 16)}px`;
+  } else {
+    hotspot.style.left = hotspot.style.top = hotspot.style.width = hotspot.style.height = '';
+  }
+  // panel sits above Mori (or above the dock), clamped to the screen
+  const anchor = hotspot.getBoundingClientRect();
+  const w = Math.min(560, window.innerWidth - 24);
+  panel.style.width = `${w}px`;
+  panel.style.left = `${Math.round(Math.max(12, Math.min(anchor.left - 10, window.innerWidth - w - 12)))}px`;
+  panel.style.bottom = `${Math.round(window.innerHeight - anchor.top + 14)}px`;
+  panel.style.setProperty('--tail-x', `${Math.round(anchor.left + anchor.width / 2 - parseFloat(panel.style.left))}px`);
+}
+
+const moriOpen = () => !moriEls().panel?.hidden;
+
+function openMori(fromPat = true) {
+  const { hotspot, panel } = moriEls();
+  if (!hotspot || !panel) return;
+  placeMori();
+  panel.hidden = false;
+  requestAnimationFrame(() => panel.classList.add('is-open'));
+  hotspot.setAttribute('aria-expanded', 'true');
+  hotspot.classList.remove('has-news');
+  if (fromPat) {
+    moriReact();
+    completeQuest('pat');
+  }
+  panel.querySelector<HTMLElement>('[data-dialogue-option]')?.focus({ preventScroll: true });
+}
+
+function closeMori(returnFocus = true) {
+  const { hotspot, panel } = moriEls();
+  if (!hotspot || !panel || panel.hidden) return;
+  panel.classList.remove('is-open');
+  hotspot.setAttribute('aria-expanded', 'false');
+  window.setTimeout(() => (panel.hidden = true), prefersReducedMotion() ? 0 : 180);
+  if (returnFocus) hotspot.focus({ preventScroll: true });
+}
+
+function initMori() {
+  placeMori();
+  window.addEventListener('resize', () => requestAnimationFrame(placeMori), { passive: true });
+  // a new line while the panel is closed shows a "!" on Mori
+  document.addEventListener('mori:said', () => {
+    if (!moriOpen()) moriEls().hotspot?.classList.add('has-news');
+  });
+  // click anywhere else closes it
+  document.addEventListener('pointerdown', (e) => {
+    if (!moriOpen()) return;
+    const t = e.target as HTMLElement;
+    if (t.closest('.mori-panel, [data-mori-open]')) return;
+    closeMori(false);
+  });
+}
+
+/* ------------------------------------------------------------------ */
 /* Wiring                                                              */
 /* ------------------------------------------------------------------ */
 
@@ -756,6 +841,7 @@ function init() {
   document.addEventListener('visibilitychange', () => document.visibilityState === 'visible' && scheduleAutoWeather());
   initGraphics();
   initTooltips();
+  initMori();
   renderRecruiter();
   initSound();
   initHud();
@@ -781,6 +867,8 @@ function init() {
       );
     }
     if (t.closest('[data-pat-spirit]')) return patMori();
+    if (t.closest('[data-mori-open]')) return moriOpen() ? closeMori() : openMori();
+    if (t.closest('[data-mori-close]')) return closeMori();
     if (t.closest('[data-weather-cycle]')) return cycleWeather();
     if (t.closest('[data-auto-weather]')) return toggleAutoWeather();
     if (t.closest('[data-sound-toggle]')) return toggleSound();
@@ -838,6 +926,10 @@ function init() {
 
   // Keyboard shortcuts (ignored while typing or with modifier keys).
   document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && moriOpen()) {
+      closeMori();
+      return;
+    }
     if (e.ctrlKey || e.metaKey || e.altKey) return;
     const tag = (e.target as HTMLElement).tagName;
     if (tag === 'INPUT' || tag === 'TEXTAREA' || (e.target as HTMLElement).isContentEditable) return;

@@ -3515,3 +3515,112 @@ kbd {
   cursor: pointer;
 }
 .dark .recruiter-facts__exit { color: #59c49d; }
+
+/* ===================================================================== */
+/* Talking with Mori: button over Mori in the painting (or a docked     */
+/* portrait on narrow screens) + a speech-bubble panel above it         */
+/* ===================================================================== */
+.mori-hotspot {
+  position: fixed;
+  z-index: 45;
+  border-radius: 9999px;
+  cursor: pointer;
+  background: transparent;
+}
+.mori-hotspot:hover { background: radial-gradient(circle, rgba(255, 246, 214, 0.28), transparent 70%); }
+.mori-hotspot:focus-visible { outline-offset: 0; }
+.mori-hotspot__dock { display: none; }
+/* docked: a round Mori portrait in the bottom-left, above the HUD bubble */
+.mori-hotspot.is-docked {
+  left: 12px;
+  bottom: calc(max(0.9rem, env(safe-area-inset-bottom)) + 4.4rem);
+  width: 58px;
+  height: 58px;
+  background: radial-gradient(circle at 50% 35%, #e6f5f8, #cfe6d2 70%);
+  border: 2.5px solid #c59b47;
+  box-shadow: 0 8px 18px -8px rgba(40, 30, 10, 0.55), inset 0 0 0 2px rgba(255, 250, 235, 0.8);
+}
+.dark .mori-hotspot.is-docked { background: radial-gradient(circle at 50% 35%, #1d3554, #0f1f36 70%); }
+.mori-hotspot.is-docked .mori-hotspot__dock { display: block; width: 100%; height: 100%; padding: 4px; }
+.mori-hotspot__news {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  display: none;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 9999px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: #1a140b;
+  background: linear-gradient(180deg, #fbe3a6, #f2c46b);
+  border: 2px solid #fffaf0;
+  box-shadow: 0 0 0 0 rgba(242, 196, 107, 0.7);
+  animation: news-pulse 1.8s ease-out infinite;
+}
+.mori-hotspot.has-news .mori-hotspot__news { display: grid; }
+@keyframes news-pulse {
+  0% { box-shadow: 0 0 0 0 rgba(242, 196, 107, 0.7); transform: scale(1); }
+  40% { transform: scale(1.12); }
+  100% { box-shadow: 0 0 0 12px rgba(242, 196, 107, 0); transform: scale(1); }
+}
+.show-title .mori-hotspot,
+.recruiter .mori-hotspot,
+.recruiter .mori-panel { display: none !important; }
+
+.mori-panel {
+  position: fixed;
+  z-index: 70;
+  max-height: calc(100vh - 140px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  opacity: 0;
+  transform: translate3d(0, 10px, 0) scale(0.96);
+  transform-origin: var(--tail-x, 40px) 100%;
+  transition: opacity 0.18s ease, transform 0.22s cubic-bezier(0.3, 1.4, 0.5, 1);
+}
+.mori-panel.is-open { opacity: 1; transform: none; }
+.mori-panel[hidden] { display: none; }
+.mori-panel .dialogue-sheet { margin-top: 0; box-shadow: 0 24px 50px -18px rgba(20, 15, 5, 0.6); }
+.mori-panel__tail {
+  position: absolute;
+  bottom: -9px;
+  left: var(--tail-x, 40px);
+  width: 18px;
+  height: 18px;
+  margin-left: -9px;
+  background: var(--washi);
+  border-right: 3px solid #b88d3b;
+  border-bottom: 3px solid #b88d3b;
+  transform: rotate(45deg);
+}
+.mori-panel__close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 9999px;
+  color: #6b5d45;
+  border: 1.5px solid #d9c49a;
+  background: #fffaf0;
+  cursor: pointer;
+}
+.dark .mori-panel__close { color: #f3b354; background: #172235; border-color: #2e4063; }
+/* compact layout inside the floating panel */
+.mori-panel .dialogue-portrait { width: 72px; height: 72px; }
+.mori-panel .dialogue-text { min-height: 3.2rem; font-size: 0.95rem; }
+@media (max-width: 640px) {
+  .mori-panel .dialogue-portrait { display: none; }
+}
+/* headroom so the name-plate tab isn't clipped by the panel's scroll box */
+.mori-panel { padding-top: 18px; }
+/* narrow phones: keep the HUD bubble on one line (sound stays in Settings, on the title screen and on M) */
+@media (max-width: 420px) {
+  .hud-bubble__token--sound { display: none; }
+}

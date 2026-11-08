@@ -31,6 +31,7 @@ export function say(text: string) {
   window.clearInterval(timer);
   fullText = text;
   if (sr) sr.textContent = text;
+  document.dispatchEvent(new CustomEvent('mori:said'));
   caret?.classList.remove('is-done');
 
   if (prefersReducedMotion()) {

@@ -1,0 +1,96 @@
+---
+/**
+ * Talking with Mori. Mori lives in the painted countryside (bottom-left), so a
+ * button is placed exactly over Mori's spot in the painting; clicking it opens
+ * this speech-bubble panel above Mori. Where the page content would cover Mori
+ * (narrower screens), a small Mori portrait docks in the bottom-left corner
+ * instead and opens the same panel. Positions are measured by the game script.
+ */
+import Icon from './Icon.astro';
+import Acorn from './Acorn.astro';
+import ForestSpirit from './ForestSpirit.astro';
+import { dialogue } from '../data/portfolio';
+---
+
+<!-- the button over Mori (or the docked portrait on narrow screens) -->
+<button
+  type="button"
+  class="mori-hotspot"
+  data-mori-open
+  data-tip="Talk to Mori"
+  aria-label="Talk to Mori, the forest spirit"
+  aria-expanded="false"
+  aria-controls="mori-panel"
+>
+  <span class="mori-hotspot__dock" aria-hidden="true"><ForestSpirit standalone class="w-full h-full" /></span>
+  <span class="mori-hotspot__news" aria-hidden="true">!</span>
+</button>
+
+<div id="mori-panel" class="mori-panel" data-dialogue-box role="dialog" aria-label="Talk with Mori" hidden>
+  <div class="dialogue-sheet relative">
+    <Acorn id="dialogue" class="-bottom-3 right-6 z-20" />
+    <button type="button" class="mori-panel__close" data-mori-close aria-label="Close">
+      <Icon name="x" />
+    </button>
+    <!-- name plate tab -->
+    <div class="dialogue-nameplate">
+      <Icon name="leaf" /> {dialogue.speaker}
+    </div>
+
+    <div class="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6">
+      <!-- Mori's portrait (pat for a reaction) -->
+      <button
+        type="button"
+        data-pat-spirit
+        data-tip="Give Mori a gentle pat"
+        aria-label="Pat Mori, the forest spirit"
+        class="dialogue-portrait spirit-avatar"
+      >
+        <ForestSpirit standalone class="w-[4.5rem] h-[4.5rem]" />
+      </button>
+
+      <div class="flex-1 w-full min-w-0">
+        <!-- speech bubble -->
+        <div class="dialogue-bubble">
+          <!-- Screen readers get the full line once; the animated copy is hidden from them -->
+          <p class="sr-only" aria-live="polite" data-dialogue-sr>{dialogue.greeting}</p>
+          <p aria-hidden="true" class="dialogue-text">
+            <span data-dialogue-visible>{dialogue.greeting}</span><span data-dialogue-caret class="dialogue-caret">▼</span>
+          </p>
+        </div>
+
+        <div class="mt-4 grid gap-3 sm:grid-cols-[1fr_auto] sm:items-start">
+          <div>
+            <p class="dialogue-group-label">Ask Mori</p>
+            <div class="flex flex-wrap gap-2" role="group" aria-label="Ask Mori">
+              {
+                dialogue.options.map((opt, i) => (
+                  <button type="button" data-dialogue-option={i} class="npc-choice dialogue-option">
+                    <span class="npc-choice__cursor" aria-hidden="true">▸</span>
+                    <span>{opt.label}</span>
+                  </button>
+                ))
+              }
+            </div>
+          </div>
+          <div>
+            <p class="dialogue-group-label">Cast a spell</p>
+            <div class="flex flex-wrap gap-2" role="group" aria-label="Spells">
+              <button type="button" data-theme-toggle aria-pressed="false" data-tip="Switch day and night · N" class="npc-choice dialogue-spell">
+                <Icon name="wand" /><span>Time-Shift</span>
+              </button>
+              <button type="button" data-weather-cycle data-tip="Change the weather · R" class="npc-choice dialogue-spell">
+                <Icon name="clear" /><span>Weather</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <p class="dialogue-hint">
+          Click the text to skip · <kbd>J</kbd> journal · <kbd>1</kbd><kbd>2</kbd><kbd>3</kbd> travel
+        </p>
+      </div>
+    </div>
+  </div>
+  <span class="mori-panel__tail" aria-hidden="true"></span>
+</div>
