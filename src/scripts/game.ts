@@ -696,7 +696,7 @@ function initSound() {
   // Returning visitors (no title screen): start on the first interaction.
   const firstGesture = (e: Event) => {
     if ((e.target as HTMLElement).closest?.('[data-sound-toggle]')) return; // that click decides itself
-    if (!document.documentElement.classList.contains('show-title')) audio.start();
+    if (!document.documentElement.classList.contains('show-title') && !isRecruiter()) audio.start();
   };
   window.addEventListener('pointerdown', firstGesture, { once: true, capture: true });
   window.addEventListener('keydown', firstGesture, { once: true, capture: true });
@@ -707,7 +707,41 @@ function initSound() {
     const { music, ambience } = audio.volumes;
     audio.setVolumes(el.dataset.volume === 'music' ? Number(el.value) : music, el.dataset.volume === 'ambience' ? Number(el.value) : ambience);
   });
-  document.addEventListener('visibilitychange', () => audio.setPageVisible(document.visibilityState === 'visible'));
+  document.addEventListener('visibilitychange', () => audio.setPageVisible(document.visibilityState === 'visible' && !isRecruiter()));
+}
+
+/* ------------------------------------------------------------------ */
+/* Recruiter view: quick facts, no game layer                          */
+/* ------------------------------------------------------------------ */
+
+const isRecruiter = () => document.documentElement.classList.contains('recruiter');
+
+function renderRecruiter() {
+  document.querySelectorAll('[data-recruiter-toggle]').forEach((b) => b.setAttribute('aria-pressed', String(isRecruiter())));
+  // the scene and its sounds sleep while recruiters read
+  audio.setPageVisible(!isRecruiter() && document.visibilityState === 'visible');
+}
+
+function setRecruiter(on: boolean) {
+  const root = document.documentElement;
+  root.classList.toggle('recruiter', on);
+  try {
+    if (on) localStorage.setItem('view', 'recruiter');
+    else localStorage.removeItem('view');
+  } catch {
+    /* ignore */
+  }
+  // keep the address shareable: ?view=recruiter while it's on
+  const url = new URL(location.href);
+  if (on) url.searchParams.set('view', 'recruiter');
+  else url.searchParams.delete('view');
+  history.replaceState(null, '', url);
+  renderRecruiter();
+  if (!on) {
+    audio.start();
+    toast('leaf', 'Welcome back to the forest', 'The full adventure is on again.');
+  }
+  window.scrollTo({ top: 0, behavior: 'auto' });
 }
 
 /* ------------------------------------------------------------------ */
@@ -722,6 +756,7 @@ function init() {
   document.addEventListener('visibilitychange', () => document.visibilityState === 'visible' && scheduleAutoWeather());
   initGraphics();
   initTooltips();
+  renderRecruiter();
   initSound();
   initHud();
   render();
@@ -749,6 +784,12 @@ function init() {
     if (t.closest('[data-weather-cycle]')) return cycleWeather();
     if (t.closest('[data-auto-weather]')) return toggleAutoWeather();
     if (t.closest('[data-sound-toggle]')) return toggleSound();
+    if (t.closest('[data-recruiter-toggle]')) return setRecruiter(!isRecruiter());
+    if (t.closest('[data-recruiter-skip]')) {
+      document.documentElement.classList.remove('show-title');
+      write(TITLE_KEY, '1', 'session');
+      return setRecruiter(true);
+    }
     const gfxBtn = t.closest<HTMLElement>('[data-gfx]');
     if (gfxBtn) return setGraphics(gfxBtn.dataset.gfx as Gfx);
     const journalBtn = t.closest<HTMLElement>('[data-open-journal]');
@@ -831,6 +872,9 @@ function init() {
         break;
       case 'm':
         toggleSound();
+        break;
+      case 'c':
+        setRecruiter(!isRecruiter());
         break;
       case '1':
         jump('#about');

@@ -1,0 +1,89 @@
+---
+import Layout from '../layouts/Layout.astro';
+import ForestSpirit from '../components/ForestSpirit.astro';
+import Icon from '../components/Icon.astro';
+import { profile } from '../data/portfolio';
+---
+
+<Layout title={`Lost in the forest — ${profile.name}`} description="This path doesn't lead anywhere. Head back to the meadow." plain>
+  <main id="main" class="lost">
+    <div class="lost__card">
+      <ForestSpirit standalone class="lost__mori" />
+      <p class="lost__code">404</p>
+      <h1 class="lost__title">You wandered off the path…</h1>
+      <p class="lost__text">
+        Mori looked everywhere — behind the camphor tree, under the bus-stop bench, even in the rice paddies — but this page
+        isn't in the forest. Let's get you back.
+      </p>
+      <div class="lost__actions">
+        <a href="/" class="signpost signpost--primary signpost--lg">
+          <Icon name="arrowUp" class="lost__arrow" /> Back to the meadow
+        </a>
+        <a href="/#projects" class="signpost signpost--lg"><Icon name="book" /> See my work</a>
+      </div>
+    </div>
+  </main>
+</Layout>
+
+<style>
+  .lost {
+    display: grid;
+    place-items: center;
+    min-height: 100vh;
+    padding: 1.5rem 1rem;
+  }
+  .lost__card {
+    max-width: 30rem;
+    padding: 2rem 1.75rem 1.75rem;
+    border-radius: 24px;
+    text-align: center;
+    background:
+      var(--washi-fibres) padding-box,
+      linear-gradient(var(--washi), var(--washi)) padding-box,
+      linear-gradient(145deg, #e8c77a, #b88d3b 40%, #f2d895 60%, #a8792c) border-box;
+    border: 3px solid transparent;
+    box-shadow: 0 28px 50px -28px rgba(40, 30, 10, 0.55);
+  }
+  :global(.dark) .lost__card {
+    background:
+      linear-gradient(var(--washi), var(--washi)) padding-box,
+      linear-gradient(145deg, #d6a84f, #6e5524 40%, #e8c77a 60%, #5a4420) border-box;
+  }
+  :global(.lost__mori) {
+    width: 6.5rem;
+    height: 6.5rem;
+    margin: 0 auto;
+  }
+  .lost__code {
+    margin-top: 0.4rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.3em;
+    color: #c2621f;
+  }
+  :global(.dark) .lost__code { color: #f3b354; }
+  .lost__title {
+    margin-top: 0.3rem;
+    font-size: clamp(1.6rem, 1.2rem + 1.8vw, 2.2rem);
+    font-weight: 700;
+    line-height: 1.15;
+    color: #2a2620;
+  }
+  :global(.dark) .lost__title { color: #f5efe2; }
+  .lost__text {
+    margin-top: 0.8rem;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: #4a463c;
+  }
+  :global(.dark) .lost__text { color: #c2cfe3; }
+  .lost__actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.75rem;
+    margin-top: 1.4rem;
+  }
+  :global(.lost__arrow) { transform: rotate(-90deg); }
+</style>

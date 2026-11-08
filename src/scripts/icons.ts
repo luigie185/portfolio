@@ -6,6 +6,7 @@
 import {
   ArrowUp,
   BookOpen,
+  Briefcase,
   Bird,
   Check,
   CloudDrizzle,
@@ -55,6 +56,7 @@ export const ICONS = {
   arrowUp: ArrowUp,
   bird: Bird,
   book: BookOpen,
+  briefcase: Briefcase,
   check: Check,
   clear: CloudSun,
   drizzle: CloudDrizzle,
@@ -101,7 +103,10 @@ export type IconName = keyof typeof ICONS;
 
 /** SVG markup for an icon, sized to 1em and coloured by currentColor. */
 export function icon(name: IconName, className = ''): string {
-  return ICONS[name]
-    .replace(/\s(class|width|height)="[^"]*"/g, '')
-    .replace('<svg', `<svg class="icon ${className}" aria-hidden="true" focusable="false"`);
+  // only strip size/class from the outer <svg> — inner shapes (e.g. <rect>) need theirs
+  return ICONS[name].replace(/<svg\b[^>]*>/, (tag) =>
+    tag
+      .replace(/\s(class|width|height)="[^"]*"/g, '')
+      .replace('<svg', `<svg class="icon ${className}" aria-hidden="true" focusable="false"`),
+  );
 }

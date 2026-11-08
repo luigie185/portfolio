@@ -8,16 +8,23 @@ import Icon from '../components/Icon.astro';
 interface Props {
   title: string;
   description?: string;
+  /** Plain pages (404): scenery only — no title screen, game or journal. */
+  plain?: boolean;
 }
 
 const {
   title,
   description = 'Personal portfolio showcasing software engineering projects and work experience.',
+  plain = false,
 } = Astro.props;
+
+// Share previews: absolute URLs when the site URL is known (see astro.config.mjs)
+const ogImage = new URL('/og.png', Astro.site ?? Astro.url).href;
+const canonical = Astro.site ? new URL(Astro.url.pathname, Astro.site).href : undefined;
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="en" data-plain={plain ? '' : undefined}>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -25,6 +32,23 @@ const {
     <meta name="generator" content={Astro.generator} />
     <meta name="description" content={description} />
     <title>{title}</title>
+    {canonical && <link rel="canonical" href={canonical} />}
+    <meta name="theme-color" content="#2e7050" />
+
+    <!-- Share previews (LinkedIn, Messenger, Discord, X, Slack…) -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={title} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="A hand-painted moonlit countryside with the title of the portfolio" />
+    {canonical && <meta property="og:url" content={canonical} />}
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
 
     <!-- Google Fonts: Fraunces (Storybook Serif), Nunito (Warm Sans), JetBrains Mono -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -43,7 +67,16 @@ const {
         try { seen = sessionStorage.getItem('forest-title-seen'); } catch (e) {}
         var dark = theme ? theme === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
         root.classList.toggle('dark', dark);
-        if (!seen) root.classList.add('show-title');
+        // Recruiter view: ?view=recruiter (shareable) or the saved choice.
+        var rec = null;
+        try {
+          var q = new URLSearchParams(location.search).get('view');
+          if (q === 'recruiter') { localStorage.setItem('view', 'recruiter'); }
+          else if (q === 'full') { localStorage.removeItem('view'); }
+          rec = localStorage.getItem('view');
+        } catch (e) {}
+        if (rec === 'recruiter') root.classList.add('recruiter');
+        if (!seen && rec !== 'recruiter' && !root.hasAttribute('data-plain')) root.classList.add('show-title');
 
         // Weather survives reloads within the session.
         var wx = null;
@@ -88,19 +121,23 @@ const {
     class="text-[#222b25] dark:text-[#f4efe2] antialiased selection:bg-[#2b6e4c]/20 selection:text-[#1f5238] dark:selection:bg-[#f3b354]/25 dark:selection:text-[#f3b354] transition-colors duration-300 min-h-screen flex flex-col relative overflow-x-hidden"
   >
     <a href="#main" class="skip-link">Skip to content</a>
-    <TitleScreen />
+    {!plain && <TitleScreen />}
 
     <!-- Hand-painted satoyama countryside (day meadow / moonlit night) -->
     <Scenery />
 
     <slot />
 
-    <QuestJournal />
+    {!plain && <QuestJournal />}
     <div data-toast-region class="toast-region" role="status" aria-live="polite"></div>
     <div id="forest-tip" class="forest-tip" role="tooltip" hidden><Icon name="leaf" class="forest-tip__icon" /><span class="forest-tip__text"></span><span class="forest-tip__arrow" aria-hidden="true"></span></div>
 
-    <script>
-      import '../scripts/game';
-    </script>
+    {
+      !plain && (
+        <script>
+          import '../scripts/game';
+        </script>
+      )
+    }
   </body>
 </html>
