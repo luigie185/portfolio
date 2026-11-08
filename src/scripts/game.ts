@@ -780,7 +780,7 @@ function placeMori() {
   }
   // panel sits above Mori (or above the dock), clamped to the screen
   const anchor = hotspot.getBoundingClientRect();
-  const w = Math.min(560, window.innerWidth - 24);
+  const w = Math.min(380, window.innerWidth - 24);
   panel.style.width = `${w}px`;
   panel.style.left = `${Math.round(Math.max(12, Math.min(anchor.left - 10, window.innerWidth - w - 12)))}px`;
   panel.style.bottom = `${Math.round(window.innerHeight - anchor.top + 14)}px`;
@@ -801,7 +801,7 @@ function openMori(fromPat = true) {
     moriReact();
     completeQuest('pat');
   }
-  panel.querySelector<HTMLElement>('[data-dialogue-option]')?.focus({ preventScroll: true });
+  panel.querySelector<HTMLElement>('.mori-reply')?.focus({ preventScroll: true });
 }
 
 function closeMori(returnFocus = true) {

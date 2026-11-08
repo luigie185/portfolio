@@ -3618,9 +3618,49 @@ kbd {
 @media (max-width: 640px) {
   .mori-panel .dialogue-portrait { display: none; }
 }
-/* headroom so the name-plate tab isn't clipped by the panel's scroll box */
-.mori-panel { padding-top: 18px; }
 /* narrow phones: keep the HUD bubble on one line (sound stays in Settings, on the title screen and on M) */
 @media (max-width: 420px) {
   .hud-bubble__token--sound { display: none; }
 }
+
+/* Mori's speech bubble: just the words, plus a few reply chips */
+.mori-panel { overflow: visible; max-height: none; }
+.mori-speech {
+  position: relative;
+  padding: 0.9rem 1.05rem 0.85rem;
+  border-radius: 18px;
+  background: var(--washi-fibres), #fffdf6;
+  border: 2px solid #c59b47;
+  box-shadow: 0 16px 34px -14px rgba(20, 15, 5, 0.55);
+}
+.dark .mori-speech { background: #131e31; border-color: #8a6a2c; }
+.mori-speech__text {
+  font-size: 0.95rem;
+  line-height: 1.55;
+  font-weight: 500;
+  color: #2a2620;
+  cursor: pointer;
+}
+.dark .mori-speech__text { color: #f5efe2; }
+.mori-speech__replies {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.7rem;
+}
+.mori-reply {
+  padding: 0.3rem 0.7rem;
+  border-radius: 9999px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #23476e;
+  background: rgba(197, 155, 71, 0.14);
+  border: 1px solid rgba(197, 155, 71, 0.55);
+  cursor: pointer;
+  transition: background-color 0.15s ease, transform 0.15s ease;
+}
+.mori-reply:hover { background: rgba(197, 155, 71, 0.3); transform: translateY(-1px); }
+.dark .mori-reply { color: #f3b354; background: rgba(214, 168, 79, 0.1); border-color: rgba(214, 168, 79, 0.45); }
+.mori-panel__tail { background: #fffdf6; border-right: 2px solid #c59b47; border-bottom: 2px solid #c59b47; width: 16px; height: 16px; margin-left: -8px; bottom: -7px; }
+.dark .mori-panel__tail { background: #131e31; border-color: #8a6a2c; }
