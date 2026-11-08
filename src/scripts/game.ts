@@ -1,4 +1,4 @@
-import { ACORN_IDS, SEASONS, codingDetails, codingLevel, profile, WEATHERS, XP_PER_LEVEL, dialogue, quests, type SeasonId, type WeatherId } from '../data/portfolio';
+import { ACORN_IDS, SEASONS, codingDetails, codingLevel, profile, WEATHERS, dialogue, quests, type SeasonId, type WeatherId } from '../data/portfolio';
 import { initDialogue, say } from './dialogue';
 import { read, write, prefersReducedMotion } from './storage';
 import { icon, type IconName } from './icons';
@@ -12,7 +12,6 @@ const STORE_KEY = 'forest-quest-v1';
 const TITLE_KEY = 'forest-title-seen';
 
 interface GameState {
-  xp: number;
   quests: string[];
   acorns: string[];
   weathers: string[];
@@ -25,7 +24,6 @@ function load(): GameState {
     if (raw) {
       const s = JSON.parse(raw) as Partial<GameState>;
       return {
-        xp: Number(s.xp) || 0,
         quests: Array.isArray(s.quests) ? s.quests : [],
         acorns: Array.isArray(s.acorns) ? s.acorns : [],
         weathers: Array.isArray(s.weathers) ? s.weathers : [],
@@ -35,12 +33,11 @@ function load(): GameState {
   } catch {
     /* corrupted save — start fresh */
   }
-  return { xp: 0, quests: [], acorns: [], weathers: [], seasons: [] };
+  return { quests: [], acorns: [], weathers: [], seasons: [] };
 }
 
 const state = load();
 const save = () => write(STORE_KEY, JSON.stringify(state));
-const levelOf = (xp: number) => Math.floor(xp / XP_PER_LEVEL) + 1;
 
 /* ------------------------------------------------------------------ */
 /* Toasts                                                              */
@@ -268,22 +265,6 @@ function toggleAutoWeather() {
 /* ------------------------------------------------------------------ */
 
 function render() {
-  const level = levelOf(state.xp);
-  const inLevel = state.xp % XP_PER_LEVEL;
-
-  document.querySelectorAll<HTMLElement>('[data-hud-level]').forEach((el) => (el.textContent = String(level)));
-  document.querySelectorAll<HTMLElement>('[data-hud-xp]').forEach((el) => (el.textContent = `${inLevel}/${XP_PER_LEVEL}`));
-  document.querySelectorAll<SVGCircleElement>('[data-hud-xp-ring]').forEach((ring) => {
-    const len = 2 * Math.PI * 20;
-    ring.style.strokeDashoffset = String(len * (1 - inLevel / XP_PER_LEVEL));
-  });
-  document.querySelectorAll<HTMLElement>('[data-hud-crest-meta]').forEach((el) => {
-    el.textContent = `Traveler LV ${level} · ${inLevel}/${XP_PER_LEVEL} XP`;
-  });
-  document.querySelectorAll<HTMLElement>('[data-hud-xp-bar]').forEach((el) => {
-    el.style.transform = `scaleX(${inLevel / XP_PER_LEVEL})`;
-    el.closest('[role="progressbar"]')?.setAttribute('aria-valuenow', String(inLevel));
-  });
   document.querySelectorAll<HTMLElement>('[data-hud-acorns]').forEach(
     (el) => (el.textContent = `${state.acorns.length}/${ACORN_IDS.length}`),
   );
@@ -308,23 +289,12 @@ export function completeQuest(id: string) {
   const quest = quests.find((q) => q.id === id);
   if (!quest || state.quests.includes(id)) return;
 
-  const before = levelOf(state.xp);
   state.quests.push(id);
-  state.xp += quest.xp;
   save();
   render();
 
-  toast(quest.icon, `Quest complete: ${quest.title}`, `+${quest.xp} XP`);
+  toast(quest.icon, `Quest complete: ${quest.title}`, `${state.quests.length} of ${quests.length} quests done`);
   moriReact();
-  const after = levelOf(state.xp);
-  if (after > before) {
-    window.setTimeout(() => toast('star', `Level up! Traveler LV.${after}`, 'The forest spirits cheer for you.'), 700);
-    document.querySelectorAll('[data-hud-badge]').forEach((el) => {
-      el.classList.remove('is-levelup');
-      void (el as HTMLElement).offsetWidth;
-      el.classList.add('is-levelup');
-    });
-  }
   if (state.quests.length === quests.length) {
     window.setTimeout(() => toast('trophy', 'All quests complete!', 'You are now a true Friend of the Forest.'), 1400);
   }
@@ -333,7 +303,6 @@ export function completeQuest(id: string) {
 function collectAcorn(id: string, from: HTMLElement) {
   if (state.acorns.includes(id)) return;
   state.acorns.push(id);
-  state.xp += 10;
   save();
 
   // little pop effect before the acorn disappears
@@ -346,7 +315,7 @@ function collectAcorn(id: string, from: HTMLElement) {
 
   const left = ACORN_IDS.length - state.acorns.length;
   moriReact();
-  toast('acorn', 'Acorn found! +10 XP', left > 0 ? `${left} more hidden in the forest.` : 'That was the last one!');
+  toast('acorn', `Acorn found! (${state.acorns.length}/${ACORN_IDS.length})`, left > 0 ? `${left} more hidden in the forest.` : 'That was the last one!');
   if (left === 0) {
     completeQuest('acorns');
     say(dialogue.acornsComplete);
@@ -465,13 +434,12 @@ function pageEnter() {
 function renderTitleMenu() {
   const cta = document.querySelector<HTMLElement>('[data-title-cta]');
   const fresh = document.querySelector<HTMLElement>('[data-title-fresh]');
-  const hasSave = state.xp > 0;
-  if (cta) cta.textContent = hasSave ? `Continue Journey · LV ${levelOf(state.xp)}` : 'Begin Journey';
+  const hasSave = state.quests.length > 1 || state.acorns.length > 0;
+  if (cta) cta.textContent = hasSave ? 'Continue Journey' : 'Begin Journey';
   if (fresh) fresh.hidden = !hasSave;
 }
 
 function resetProgress() {
-  state.xp = 0;
   state.quests = [];
   state.acorns = [];
   state.weathers = [];

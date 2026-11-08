@@ -104,19 +104,15 @@ export const profile = {
 };
 
 /* ------------------------------------------------------------------ */
-/* Game layer: the visitor ("traveler") earns XP by exploring the page */
+/* Game layer: quests and acorns the visitor can complete while exploring */
 /* ------------------------------------------------------------------ */
 
 export interface Quest {
   id: string;
   title: string;
   hint: string;
-  xp: number;
   icon: IconName;
 }
-
-/** XP needed per traveler level. */
-export const XP_PER_LEVEL = 100;
 
 /** Acorns hidden around the page (ids must match <Acorn id="..."/> usages). */
 export const ACORN_IDS = ["hero", "dialogue", "quests", "relics", "footer"] as const;
@@ -157,17 +153,17 @@ export const SEASONS = [
 export type SeasonId = (typeof SEASONS)[number]["id"];
 
 export const quests: Quest[] = [
-  { id: "begin", icon: "compass", title: "Begin the Journey", hint: "Press start on the title screen.", xp: 20 },
-  { id: "greet", icon: "leaf", title: "Greet the Forest Spirit", hint: "Choose any dialogue option with Mori.", xp: 40 },
-  { id: "quest-log", icon: "scroll", title: "Read the Quest Log", hint: "Travel to the Work Experience chapter.", xp: 60 },
-  { id: "relics", icon: "book", title: "Enter the Relic Vault", hint: "Travel to the Projects chapter.", xp: 60 },
-  { id: "nightfall", icon: "moon", title: "Cast Time-Shift", hint: "Switch between day and night.", xp: 40 },
-  { id: "pat", icon: "sprout", title: "Befriend Mori", hint: "Give the forest spirit a gentle pat.", xp: 30 },
-  { id: "weather", icon: "clear", title: "Change the Weather", hint: "Tap the weather charm or press R.", xp: 40 },
-  { id: "all-weather", icon: "rainbow", title: "Through the Year", hint: "Live through all six seasons of the forest.", xp: 80 },
-  { id: "journal", icon: "map", title: "Open the Journal", hint: "Press J or tap the journal button.", xp: 20 },
-  { id: "acorns", icon: "acorn", title: "Acorn Gatherer", hint: `Find all ${ACORN_IDS.length} acorns hidden across the forest.`, xp: 150 },
-  { id: "pigeon", icon: "bird", title: "Send a Pigeon Post", hint: "Reach out through the email link.", xp: 80 },
+  { id: "begin", icon: "compass", title: "Begin the Journey", hint: "Press start on the title screen." },
+  { id: "greet", icon: "leaf", title: "Greet the Forest Spirit", hint: "Choose any dialogue option with Mori." },
+  { id: "quest-log", icon: "scroll", title: "Read the Quest Log", hint: "Travel to the Work Experience chapter." },
+  { id: "relics", icon: "book", title: "Enter the Relic Vault", hint: "Travel to the Projects chapter." },
+  { id: "nightfall", icon: "moon", title: "Cast Time-Shift", hint: "Switch between day and night." },
+  { id: "pat", icon: "sprout", title: "Befriend Mori", hint: "Give the forest spirit a gentle pat." },
+  { id: "weather", icon: "clear", title: "Change the Weather", hint: "Tap the weather charm or press R." },
+  { id: "all-weather", icon: "rainbow", title: "Through the Year", hint: "Live through all six seasons of the forest." },
+  { id: "journal", icon: "map", title: "Open the Journal", hint: "Press J or tap the journal button." },
+  { id: "acorns", icon: "acorn", title: "Acorn Gatherer", hint: `Find all ${ACORN_IDS.length} acorns hidden across the forest.` },
+  { id: "pigeon", icon: "bird", title: "Send a Pigeon Post", hint: "Reach out through the email link." },
 ];
 
 

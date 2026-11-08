@@ -26,11 +26,7 @@ import { ACORN_IDS, quests } from '../data/portfolio';
       </button>
     </div>
 
-    <div class="grid grid-cols-3 gap-2 text-center font-mono">
-      <div class="rounded-xl bg-[#fffaf0] dark:bg-[#1a2740] border border-[#dfd3b8] dark:border-[#2e4063] p-2">
-        <p class="text-[10px] uppercase font-bold text-[#d4712a] dark:text-[#f3b354]">Your level</p>
-        <p class="text-lg font-bold" data-hud-level>1</p>
-      </div>
+    <div class="grid grid-cols-2 gap-2 text-center font-mono">
       <div class="rounded-xl bg-[#fffaf0] dark:bg-[#1a2740] border border-[#dfd3b8] dark:border-[#2e4063] p-2">
         <p class="text-[10px] uppercase font-bold text-[#d4712a] dark:text-[#f3b354]">Quests</p>
         <p class="text-lg font-bold" data-hud-quests>0/{quests.length}</p>
@@ -57,7 +53,6 @@ import { ACORN_IDS, quests } from '../data/portfolio';
               </p>
               <p class="text-xs text-[#576058] dark:text-[#9fb0c9]">{q.hint}</p>
             </div>
-            <span class="font-mono text-xs font-bold text-[#2e7050] dark:text-[#59c49d] shrink-0">+{q.xp} XP</span>
           </li>
         ))
       }

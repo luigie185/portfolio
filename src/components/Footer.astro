@@ -1,6 +1,6 @@
 ---
 import Icon from './Icon.astro';
-import { ACORN_IDS, XP_PER_LEVEL, profile, quests } from '../data/portfolio';
+import { ACORN_IDS, profile, quests } from '../data/portfolio';
 import Acorn from './Acorn.astro';
 import ForestSpirit from './ForestSpirit.astro';
 
@@ -48,11 +48,7 @@ grass += ' L1440 60 Z';
           Your journey is saved in this browser. Rest a while, or come back anytime to finish your quests.
         </p>
 
-        <dl class="mt-4 grid grid-cols-3 gap-2 max-w-sm">
-          <div class="save-stat">
-            <dt>Your level</dt>
-            <dd><span data-hud-level>1</span></dd>
-          </div>
+        <dl class="mt-4 grid grid-cols-2 gap-2 max-w-[16rem]">
           <div class="save-stat">
             <dt>Quests</dt>
             <dd data-hud-quests>0/{quests.length}</dd>
@@ -62,7 +58,6 @@ grass += ' L1440 60 Z';
             <dd data-hud-acorns>0/{ACORN_IDS.length}</dd>
           </div>
         </dl>
-        <p class="sr-only">{XP_PER_LEVEL} experience points per level.</p>
 
         <button type="button" data-open-journal class="signpost mt-4">
           <Icon name="map" /> Open the journal
